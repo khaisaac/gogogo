@@ -1,4 +1,5 @@
 const ADMIN_MEDIA_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || "admin-media";
+const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
 
 function sanitizeFileName(name: string) {
   return name
@@ -26,6 +27,12 @@ export async function uploadAdminImage(
 ) {
   if (!file || file.size === 0) {
     return null;
+  }
+
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    throw new Error(
+      `${file.name || "Image"} is larger than 8MB. Please upload a smaller file.`,
+    );
   }
 
   await ensureBucketExists(supabase);

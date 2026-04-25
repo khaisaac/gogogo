@@ -20,10 +20,13 @@ import styles from "../../../admin.module.css";
 
 export default async function AdminEditPackagePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { id } = await params;
+  const { error: actionError } = await searchParams;
   const supabase = await requireAdminClient();
   const { data: pkg } = await supabase
     .from("packages")
@@ -49,6 +52,9 @@ export default async function AdminEditPackagePage({
       </div>
 
       <form action={updateAction}>
+        {actionError ? (
+          <p className={styles.helper}>Failed to update package: {actionError}</p>
+        ) : null}
         <div className={styles.formGrid}>
           <div className={styles.field}>
             <label htmlFor="title">Title</label>

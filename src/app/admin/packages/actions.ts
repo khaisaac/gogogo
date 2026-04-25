@@ -50,6 +50,14 @@ function getMissingColumnName(message: string) {
   return match ? match[1] : null;
 }
 
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Failed to save package";
+}
+
 async function insertWithSchemaFallback(
   supabase: Awaited<ReturnType<typeof requireAdminClient>>,
   payload: Record<string, unknown>,
@@ -186,116 +194,128 @@ function getPayload(formData: FormData): PackagePayload {
 }
 
 export async function createPackage(formData: FormData) {
-  const payload = getPayload(formData);
-  console.log("📦 Payload to save:", JSON.stringify(payload, null, 2));
+  try {
+    const payload = getPayload(formData);
+    console.log("📦 Payload to save:", JSON.stringify(payload, null, 2));
 
-  if (!payload.title || !payload.duration) {
-    throw new Error("Title and duration are required");
-  }
+    if (!payload.title || !payload.duration) {
+      throw new Error("Title and duration are required");
+    }
 
-  const supabase = await requireAdminClient();
-  const imageFile = formData.get("image_file");
-  const galleryFiles = formData
-    .getAll("gallery_files")
-    .filter((entry): entry is File => entry instanceof File);
+    const supabase = await requireAdminClient();
+    const imageFile = formData.get("image_file");
+    const galleryFiles = formData
+      .getAll("gallery_files")
+      .filter((entry): entry is File => entry instanceof File);
 
-  if (imageFile instanceof File && imageFile.size > 0) {
-    console.log("📸 Uploading main image...");
-    payload.image = await uploadAdminImage(supabase, imageFile, "packages");
-    console.log("✅ Main image uploaded:", payload.image);
-  }
+    if (imageFile instanceof File && imageFile.size > 0) {
+      console.log("📸 Uploading main image...");
+      payload.image = await uploadAdminImage(supabase, imageFile, "packages");
+      console.log("✅ Main image uploaded:", payload.image);
+    }
 
-  if (galleryFiles.length > 0) {
-    console.log("🖼️ Uploading gallery files...", galleryFiles.length);
-    const existingGallery = String(formData.get("current_gallery") || "")
-      .split("\n")
-      .map((value) => value.trim())
-      .filter(Boolean)
-      .slice(0, MAX_GALLERY_IMAGES);
-    const remainingSlots = Math.max(
-      0,
-      MAX_GALLERY_IMAGES - existingGallery.length,
-    );
-    const galleryUrls = await uploadAdminImages(
-      supabase,
-      galleryFiles.slice(0, remainingSlots),
-      "packages",
-    );
-    console.log("✅ Gallery uploaded:", galleryUrls);
-    payload.description = serializePackageContent({
-      detail: String(formData.get("detail") || "").trim(),
-      highlights: String(formData.get("highlights") || "").trim(),
-      itinerary: payload.itinerary,
-      gallery: [...existingGallery, ...galleryUrls].slice(
+    if (galleryFiles.length > 0) {
+      console.log("🖼️ Uploading gallery files...", galleryFiles.length);
+      const existingGallery = String(formData.get("current_gallery") || "")
+        .split("\n")
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .slice(0, MAX_GALLERY_IMAGES);
+      const remainingSlots = Math.max(
         0,
-        MAX_GALLERY_IMAGES,
-      ),
-      include: String(formData.get("include") || "").trim(),
-      exclude: String(formData.get("exclude") || "").trim(),
-      whatToBring: String(formData.get("what_to_bring") || "").trim(),
-      notes: String(formData.get("notes") || "").trim(),
-    });
+        MAX_GALLERY_IMAGES - existingGallery.length,
+      );
+      const galleryUrls = await uploadAdminImages(
+        supabase,
+        galleryFiles.slice(0, remainingSlots),
+        "packages",
+      );
+      console.log("✅ Gallery uploaded:", galleryUrls);
+      payload.description = serializePackageContent({
+        detail: String(formData.get("detail") || "").trim(),
+        highlights: String(formData.get("highlights") || "").trim(),
+        itinerary: payload.itinerary,
+        gallery: [...existingGallery, ...galleryUrls].slice(
+          0,
+          MAX_GALLERY_IMAGES,
+        ),
+        include: String(formData.get("include") || "").trim(),
+        exclude: String(formData.get("exclude") || "").trim(),
+        whatToBring: String(formData.get("what_to_bring") || "").trim(),
+        notes: String(formData.get("notes") || "").trim(),
+      });
+    }
+
+    console.log("📦 Final payload:", JSON.stringify(payload, null, 2));
+    console.log("💾 Inserting into Supabase...");
+    const { itinerary: _itinerary, ...databasePayload } = payload;
+    const { data } = await insertWithSchemaFallback(supabase, databasePayload);
+
+    console.log("✅ Package saved successfully:", data);
+    revalidatePath("/admin/packages");
+    redirect("/admin/packages");
+  } catch (error) {
+    const message = getErrorMessage(error);
+    console.error("❌ createPackage failed:", error);
+    redirect(`/admin/packages/new?error=${encodeURIComponent(message)}`);
   }
-
-  console.log("📦 Final payload:", JSON.stringify(payload, null, 2));
-  console.log("💾 Inserting into Supabase...");
-  const { itinerary: _itinerary, ...databasePayload } = payload;
-  const { data } = await insertWithSchemaFallback(supabase, databasePayload);
-
-  console.log("✅ Package saved successfully:", data);
-  revalidatePath("/admin/packages");
-  redirect("/admin/packages");
 }
 
 export async function updatePackage(id: string, formData: FormData) {
-  const payload = getPayload(formData);
+  try {
+    const payload = getPayload(formData);
 
-  if (!payload.title || !payload.duration) {
-    throw new Error("Title and duration are required");
+    if (!payload.title || !payload.duration) {
+      throw new Error("Title and duration are required");
+    }
+
+    const supabase = await requireAdminClient();
+    const imageFile = formData.get("image_file");
+    const galleryFiles = formData
+      .getAll("gallery_files")
+      .filter((entry): entry is File => entry instanceof File);
+
+    if (imageFile instanceof File && imageFile.size > 0) {
+      payload.image = await uploadAdminImage(supabase, imageFile, "packages");
+    }
+
+    const uploadedGallery = await uploadAdminImages(
+      supabase,
+      galleryFiles,
+      "packages",
+    );
+    if (uploadedGallery.length > 0) {
+      const existingGallery = String(formData.get("current_gallery") || "")
+        .split("\n")
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .slice(0, MAX_GALLERY_IMAGES);
+
+      payload.description = serializePackageContent({
+        detail: String(formData.get("detail") || "").trim(),
+        highlights: String(formData.get("highlights") || "").trim(),
+        itinerary: payload.itinerary,
+        gallery: [...existingGallery, ...uploadedGallery].slice(
+          0,
+          MAX_GALLERY_IMAGES,
+        ),
+        include: String(formData.get("include") || "").trim(),
+        exclude: String(formData.get("exclude") || "").trim(),
+        whatToBring: String(formData.get("what_to_bring") || "").trim(),
+        notes: String(formData.get("notes") || "").trim(),
+      });
+    }
+
+    const { itinerary: _itinerary, ...databasePayload } = payload;
+    await updateWithSchemaFallback(supabase, id, databasePayload);
+
+    revalidatePath("/admin/packages");
+    redirect("/admin/packages");
+  } catch (error) {
+    const message = getErrorMessage(error);
+    console.error("❌ updatePackage failed:", error);
+    redirect(`/admin/packages/${id}/edit?error=${encodeURIComponent(message)}`);
   }
-
-  const supabase = await requireAdminClient();
-  const imageFile = formData.get("image_file");
-  const galleryFiles = formData
-    .getAll("gallery_files")
-    .filter((entry): entry is File => entry instanceof File);
-
-  if (imageFile instanceof File && imageFile.size > 0) {
-    payload.image = await uploadAdminImage(supabase, imageFile, "packages");
-  }
-
-  const uploadedGallery = await uploadAdminImages(
-    supabase,
-    galleryFiles,
-    "packages",
-  );
-  if (uploadedGallery.length > 0) {
-    const existingGallery = String(formData.get("current_gallery") || "")
-      .split("\n")
-      .map((value) => value.trim())
-      .filter(Boolean)
-      .slice(0, MAX_GALLERY_IMAGES);
-
-    payload.description = serializePackageContent({
-      detail: String(formData.get("detail") || "").trim(),
-      highlights: String(formData.get("highlights") || "").trim(),
-      itinerary: payload.itinerary,
-      gallery: [...existingGallery, ...uploadedGallery].slice(
-        0,
-        MAX_GALLERY_IMAGES,
-      ),
-      include: String(formData.get("include") || "").trim(),
-      exclude: String(formData.get("exclude") || "").trim(),
-      whatToBring: String(formData.get("what_to_bring") || "").trim(),
-      notes: String(formData.get("notes") || "").trim(),
-    });
-  }
-
-  const { itinerary: _itinerary, ...databasePayload } = payload;
-  await updateWithSchemaFallback(supabase, id, databasePayload);
-
-  revalidatePath("/admin/packages");
-  redirect("/admin/packages");
 }
 
 export async function deletePackage(id: string) {

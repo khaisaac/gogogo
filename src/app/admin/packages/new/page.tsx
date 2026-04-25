@@ -55,7 +55,13 @@ const DEFAULT_ITINERARY = [
   },
 ];
 
-export default function AdminNewPackagePage() {
+export default async function AdminNewPackagePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+
   return (
     <section className={styles.card}>
       <div className={styles.row}>
@@ -66,6 +72,7 @@ export default function AdminNewPackagePage() {
       </div>
 
       <form action={createPackage}>
+        {error ? <p className={styles.helper}>Failed to save package: {error}</p> : null}
         <div className={styles.formGrid}>
           <div className={styles.field}>
             <label htmlFor="title">Title</label>
