@@ -1,0 +1,240 @@
+.about {
+  background: var(--color-white);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Centered Header — Kandoo style */
+.header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 56px;
+  padding: 0 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.contentContainer {
+  position: relative;
+  z-index: 2;
+}
+
+.label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  line-height: 1.4;
+}
+
+/* Two-column layout */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 72px;
+  align-items: center;
+}
+
+/* Left Column — Text + Stats + CTA */
+.textCol {
+  padding-left: 20px;
+}
+
+.text {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  line-height: 1.85;
+  margin-bottom: 20px;
+  font-size: 0.92rem;
+}
+
+.stats {
+  display: flex;
+  gap: 40px;
+  margin: 36px 0 32px;
+}
+
+.stat {
+  text-align: left;
+}
+
+.stat strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--color-primary);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.stat span {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-heading);
+  line-height: 1;
+}
+
+/* Right Column — Photo + Badge + Map */
+.imageCol {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mapBg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  max-width: 1600px;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mapImage {
+  width: 100%;
+  height: auto;
+}
+
+.imageWrapper {
+  position: relative;
+  z-index: 1;
+  width: 420px;
+  height: 380px;
+  overflow: visible;
+}
+
+.imageSlider {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  cursor: grab;
+}
+
+.imageSlider.dragging {
+  cursor: grabbing;
+  scroll-snap-type: none; /* remove snap feel while dragging for smoothness */
+}
+
+.imageSlider::-webkit-scrollbar {
+  display: none;
+}
+
+.slideImage {
+  min-width: 100%;
+  height: 100%;
+  object-fit: cover;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  pointer-events: none; /* Prevents default HTML image drag which messes up custom swipe logic */
+}
+
+/* Rotating badge positioned at top-right, overlapping the image */
+.rotatingBadgeWrapper {
+  position: absolute;
+  top: -40px;
+  right: -60px;
+  z-index: 2;
+}
+
+/* Carousel dots under image */
+.dots {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  z-index: 1;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background var(--transition-fast);
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+
+.dotActive {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-heading);
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .imageWrapper {
+    width: 340px;
+    height: 320px;
+  }
+
+  .rotatingBadgeWrapper {
+    top: -30px;
+    right: -40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .textCol {
+    padding-left: 0;
+    order: 2;
+  }
+
+  .imageCol {
+    order: 1;
+  }
+
+  .imageWrapper {
+    width: 300px;
+    height: 280px;
+  }
+
+  .subtitle {
+    font-size: 1.3rem;
+  }
+
+  .stats {
+    gap: 24px;
+  }
+
+  .stat strong {
+    font-size: 1.8rem;
+  }
+
+  .rotatingBadgeWrapper {
+    top: -20px;
+    right: -30px;
+  }
+}

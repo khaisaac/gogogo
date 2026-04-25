@@ -1,0 +1,857 @@
+.page {
+  min-height: 100vh;
+  background: #f6f8fb;
+  padding-bottom: 112px;
+}
+
+.container {
+  width: min(1220px, 100%);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.topBlock {
+  padding: 110px 0 34px;
+}
+
+.locationLabel {
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #2f5c48;
+  margin-bottom: 8px;
+}
+
+.title {
+  color: #12345a;
+  font-size: clamp(1.45rem, 2.5vw, 2.45rem);
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.reviewRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  color: #4f6477;
+  font-size: 0.92rem;
+  margin-bottom: 18px;
+}
+
+.stars {
+  color: #12345a;
+  letter-spacing: 1px;
+}
+
+.rating,
+.reviews {
+  font-weight: 700;
+}
+
+.provider {
+  color: #5e7386;
+}
+
+.mediaAndBooking {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 170px;
+  gap: 8px;
+}
+
+.galleryMobileCarousel {
+  display: none;
+}
+
+.galleryMobileTrack {
+  display: flex;
+  transition: transform 0.28s ease;
+  user-select: none;
+}
+
+.galleryMobileSlide {
+  flex: 0 0 100%;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.galleryMobileNavBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  background: rgba(12, 28, 50, 0.58);
+  color: #fff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  line-height: 1;
+  z-index: 2;
+}
+
+.galleryMobileNavBtn:disabled {
+  opacity: 0.35;
+}
+
+.galleryMobileNavLeft {
+  left: 10px;
+}
+
+.galleryMobileNavRight {
+  right: 10px;
+}
+
+.galleryItem {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.galleryItemMain {
+  grid-row: span 2;
+  grid-column: span 2;
+}
+
+.galleryImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.galleryItem:hover .galleryImage {
+  transform: scale(1.04);
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 30, 0.72);
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+}
+
+.modalPanel {
+  width: min(980px, 100%);
+  max-height: 90vh;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.modalClose {
+  justify-self: end;
+  border: 1px solid #b7c8da;
+  border-radius: 999px;
+  background: #f4f8fc;
+  color: #1b466c;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.modalImage {
+  width: 100%;
+  max-height: calc(90vh - 70px);
+  object-fit: contain;
+  border-radius: 10px;
+  background: #eef3f9;
+}
+
+.bookingCard {
+  background: #fff;
+  border: 1px solid #dce2ea;
+  border-radius: 14px;
+  padding: 18px;
+  position: sticky;
+  top: 94px;
+}
+
+.fromLabel {
+  color: #56708a;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+.bookingPrice {
+  color: #12345a;
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.bookingPrice span {
+  font-size: 0.95rem;
+  color: #56708a;
+  font-weight: 600;
+}
+
+.bookingSummary {
+  margin: 0 0 12px;
+  color: #31557a;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.selector {
+  border: 1px solid #d9e1ea;
+  border-radius: 999px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  color: #234263;
+  font-weight: 600;
+  margin-bottom: 10px;
+  background: #f9fbfd;
+}
+
+.bookingSelect {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #234263;
+  font-weight: 600;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.adultStepper {
+  border: 1px solid #d9e1ea;
+  border-radius: 18px;
+  background: #f9fbfd;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.adultStepperLabel {
+  color: #234263;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.adultStepperControls {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adultStepperButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid #c7d3df;
+  background: #ffffff;
+  color: #12345a;
+  font-weight: 800;
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.adultStepperButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.adultStepperValue {
+  min-width: 24px;
+  text-align: center;
+  color: #12345a;
+  font-weight: 800;
+}
+
+.dateTrigger {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: #234263;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  padding: 0;
+}
+
+.datePickerInput {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.availabilityBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  border-radius: 999px;
+  background: #0f6ddf;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  margin-bottom: 16px;
+}
+
+.policyList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.policyList li {
+  display: grid;
+  gap: 4px;
+}
+
+.policyList strong {
+  color: #1a476f;
+  font-size: 0.94rem;
+}
+
+.policyList span {
+  color: #60788f;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.summary {
+  margin-top: 16px;
+  color: #36556f;
+  font-size: 1rem;
+  line-height: 1.8;
+  max-width: 760px;
+}
+
+.contentBlock {
+  padding: 8px 0 68px;
+}
+
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metaCard {
+  background: #fff;
+  border: 1px solid #dce2ea;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.metaLabel {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.7rem;
+  color: #5e768d;
+  margin-bottom: 6px;
+}
+
+.metaValue {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #173e64;
+}
+
+.detailCard {
+  background: #fff;
+  border: 1px solid #dce2ea;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 14px;
+}
+
+.sectionTitle,
+.sectionSubtitle {
+  color: #163b61;
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  font-size: 1.45rem;
+}
+
+.sectionSubtitle {
+  font-size: 1.3rem;
+}
+
+.accordionList {
+  border: 1px solid #dce2ea;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.accordionItem {
+  border-bottom: 1px dashed #cfd9e4;
+  background: #fff;
+}
+
+.accordionItem:last-child {
+  border-bottom: none;
+}
+
+.accordionSummary {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 14px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.summaryLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.summaryIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.summaryIcon img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.iconItinerary {
+  background: #d9f4ff;
+  border-color: #9bd8f0;
+  color: #006d8f;
+}
+
+.iconHighlight {
+  background: #fff5d9;
+  border-color: #f0d98f;
+  color: #8d6200;
+}
+
+.iconInclude {
+  background: #ddf7e7;
+  border-color: #98d9b2;
+  color: #0e6d39;
+}
+
+.iconExclude {
+  background: #fde0e0;
+  border-color: #efb1b1;
+  color: #8a1f1f;
+}
+
+.iconBring {
+  background: #efe6ff;
+  border-color: #cbb5f5;
+  color: #4f2f87;
+}
+
+.iconNotes {
+  background: #e6eef7;
+  border-color: #b3c9df;
+  color: #28547a;
+}
+
+.toggleBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #b8c8d8;
+  border-radius: 999px;
+  padding: 5px 10px;
+  color: #173e64;
+  background: #f5f9fc;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.accordionSummary .sectionSubtitle {
+  font-size: 1.03rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.summaryArrow {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.accordionBody {
+  padding: 0 14px 16px;
+}
+
+.moreDays {
+  margin-top: 12px;
+  border: 1px solid #dce2ea;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.moreDaysSummary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #184467;
+  padding: 10px 12px;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid #e3edf8;
+  text-align: left;
+  background: #f6fbff;
+}
+
+.emptyText,
+.notesText {
+  color: #5f7890;
+  line-height: 1.7;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.featureList li {
+  display: grid;
+  gap: 4px;
+  padding-left: 24px;
+  position: relative;
+}
+
+.featureList li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #0f6ddf;
+  font-weight: 700;
+}
+
+.featureList strong {
+  color: #1d446a;
+}
+
+.featureList span {
+  color: #5f7890;
+  line-height: 1.7;
+}
+
+.itineraryList {
+  display: grid;
+  gap: 12px;
+}
+
+.dayCard {
+  border: 1px solid #dce2ea;
+  border-radius: 12px;
+  background: #f9fbfd;
+  padding: 18px;
+}
+
+.dayTitle {
+  color: #173e64;
+  font-size: 1.02rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.dayList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.dayList li {
+  position: relative;
+  padding-left: 20px;
+  color: #5f7890;
+  line-height: 1.65;
+}
+
+.dayList li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #0f6ddf;
+  font-weight: 700;
+}
+
+.dayOverview {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #e3edf8;
+}
+
+.dayOverviewTitle {
+  color: #173e64;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.highlightList {
+  margin: 0;
+  padding-left: 20px;
+  color: #4d6881;
+  line-height: 1.8;
+}
+
+.relatedTourSection {
+  margin-top: 22px;
+}
+
+.relatedTourTitle {
+  margin: 0 0 16px;
+  color: #163b61;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.relatedTourGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.relatedTourLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.relatedTourEmpty {
+  margin: 0;
+  color: #5f7890;
+  font-size: 0.95rem;
+}
+
+.guestContactCard {
+  margin-top: 22px;
+  border: 1px solid #dce2ea;
+  border-radius: 12px;
+  background: #f8fbff;
+  padding: 18px;
+}
+
+.guestContactTitle {
+  margin: 0 0 6px;
+  color: #173e64;
+  font-size: 1.08rem;
+}
+
+.guestContactHelp {
+  margin: 0;
+  color: #5f7890;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.guestContactGrid {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.guestContactField {
+  display: grid;
+  gap: 6px;
+}
+
+.guestContactField span {
+  color: #234263;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.guestContactField input {
+  border: 1px solid #d1dbe7;
+  border-radius: 10px;
+  height: 42px;
+  padding: 0 12px;
+  color: #173e64;
+  background: #fff;
+}
+
+.guestContactField input:focus {
+  outline: none;
+  border-color: #0f6ddf;
+  box-shadow: 0 0 0 3px rgba(15, 109, 223, 0.14);
+}
+
+.bottomBookingBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 70;
+  border-top: 1px solid #dce2ea;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -6px 20px rgba(19, 52, 90, 0.09);
+}
+
+.bottomBookingInner {
+  width: min(1220px, 100%);
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bottomBookingPriceWrap {
+  display: grid;
+  gap: 2px;
+}
+
+.bottomBookingLabel {
+  margin: 0;
+  color: #587089;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.bottomBookingPrice {
+  margin: 0;
+  color: #12345a;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.bottomBookingPrice span {
+  margin-left: 6px;
+  color: #587089;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.bottomBookingBtn {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #0f6ddf;
+  color: #fff;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.actions :global(a) {
+  text-decoration: none;
+}
+
+@media (max-width: 980px) {
+  .mediaAndBooking {
+    grid-template-columns: 1fr;
+  }
+
+  .bookingCard {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .topBlock {
+    padding-top: 96px;
+  }
+
+  .galleryGrid {
+    display: none;
+  }
+
+  .galleryMobileCarousel {
+    display: block;
+    overflow: hidden;
+    border-radius: 12px;
+    position: relative;
+  }
+
+  .galleryMobileNavBtn {
+    display: inline-flex;
+  }
+
+  .metaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .detailCard {
+    padding: 20px;
+  }
+
+  .guestContactGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .relatedTourGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottomBookingInner {
+    padding: 10px 16px;
+  }
+
+  .bottomBookingBtn {
+    min-width: 172px;
+  }
+}

@@ -1,0 +1,43 @@
+.container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: rotate 25s linear infinite;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+}
+
+.circleText {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 5px;
+  fill: var(--color-heading);
+  font-family: var(--font-display);
+}
+
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 140px !important;
+    height: 140px !important;
+  }
+
+  .circleText {
+    font-size: 9px;
+    letter-spacing: 4px;
+  }
+}

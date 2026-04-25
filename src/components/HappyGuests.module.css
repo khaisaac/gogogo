@@ -1,0 +1,37 @@
+.section {
+  position: relative;
+  min-height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('/n.jpg') center/cover no-repeat;
+  background-attachment: fixed; /* Parallax effect */
+  overflow: hidden;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35); /* Darken so text pops */
+  z-index: 1;
+}
+
+.container {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 900;
+  color: var(--color-white);
+  line-height: 1.15;
+  text-transform: uppercase;
+  max-width: 1000px;
+  margin: 0 auto;
+  text-shadow: 2px 4px 15px rgba(0, 0, 0, 0.6);
+  letter-spacing: 1px;
+}

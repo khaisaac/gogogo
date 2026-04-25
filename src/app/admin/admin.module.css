@@ -1,0 +1,415 @@
+.adminPage {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  background: #f0f0f1;
+  color: #1d2327;
+}
+
+.header {
+  grid-row: 1 / 3;
+  background: #1d2327;
+  color: #f6f7f7;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.headerInner {
+  padding: 18px 12px;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  min-height: 100vh;
+}
+
+.kicker {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  color: #9ea6ad;
+  font-weight: 700;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.nav {
+  display: grid;
+  gap: 4px;
+}
+
+.nav form {
+  margin: 0;
+}
+
+.navLink {
+  text-decoration: none;
+  color: #dcdcde;
+  padding: 10px 10px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.navLink:hover {
+  background: #2c3338;
+  color: #72aee6;
+}
+
+.activeNavLink {
+  background: #2271b1;
+  color: #ffffff;
+}
+
+.activeNavLink:hover {
+  background: #2271b1;
+  color: #ffffff;
+}
+
+.logoutBtn {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: #ffb8b8;
+  padding: 10px 10px;
+  border-radius: 3px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.logoutBtn:hover {
+  background: #472526;
+  color: #ffd2d2;
+}
+
+.main {
+  padding: 24px;
+  min-height: 100vh;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #c3c4c7;
+  border-radius: 0;
+  padding: 18px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.primaryLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: #2271b1;
+  color: #ffffff;
+  border: 1px solid #2271b1;
+  border-radius: 3px;
+  padding: 8px 12px;
+  font-size: 0.81rem;
+  line-height: 1;
+  font-weight: 600;
+}
+
+.primaryLink:hover {
+  background: #135e96;
+  border-color: #135e96;
+}
+
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  border: 1px solid #c3c4c7;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 10px;
+  font-size: 0.84rem;
+  color: #1d2327;
+  border-bottom: 1px solid #dcdcde;
+}
+
+.table thead th {
+  background: #f6f7f7;
+  font-weight: 600;
+  color: #2c3338;
+}
+
+.table tbody tr:nth-child(even) {
+  background: #fcfcfc;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  border-radius: 2px;
+  border: 1px solid #dcdcde;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.active {
+  background: #edfaef;
+  color: #0f5132;
+  border-color: #b7dfc3;
+}
+
+.inactive {
+  background: #f6f7f7;
+  color: #50575e;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.outlineLink {
+  text-decoration: none;
+  border: 1px solid #2271b1;
+  color: #2271b1;
+  border-radius: 3px;
+  background: #ffffff;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.outlineLink:hover {
+  color: #135e96;
+  border-color: #135e96;
+}
+
+.dangerBtn {
+  border: 1px solid #b32d2e;
+  background: #ffffff;
+  color: #b32d2e;
+  border-radius: 3px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.dangerBtn:hover {
+  background: #b32d2e;
+  color: #ffffff;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 0.82rem;
+  color: #1d2327;
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  background: #ffffff;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  color: #1d2327;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: 2px solid transparent;
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+}
+
+.field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.inlineCheck {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: #1d2327;
+}
+
+.formActions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chipGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border: 1px solid #c3c4c7;
+  border-radius: 3px;
+  background: #f6f7f7;
+  padding: 8px;
+}
+
+.submitBtn {
+  border: 1px solid #2271b1;
+  background: #2271b1;
+  color: #ffffff;
+  border-radius: 3px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.submitBtn:hover {
+  background: #135e96;
+  border-color: #135e96;
+}
+
+.helper {
+  color: #50575e;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.pricingMatrix {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.pricingSection {
+  border: 1px solid #c3c4c7;
+  background: #f6f7f7;
+  border-radius: 3px;
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.pricingTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pricingTotalGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  border-top: 1px dashed #c3c4c7;
+  padding-top: 10px;
+}
+
+.gridCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.quickCard {
+  background: #ffffff;
+  border: 1px solid #c3c4c7;
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+  border-left: 4px solid #2271b1;
+}
+
+@media (max-width: 980px) {
+  .adminPage {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    grid-row: auto;
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
+
+  .headerInner {
+    gap: 10px;
+    min-height: auto;
+  }
+
+  .nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .main {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .formGrid,
+  .gridCards,
+  .nav,
+  .pricingMatrix,
+  .pricingGrid,
+  .pricingTotalGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .table {
+    min-width: 720px;
+  }
+}

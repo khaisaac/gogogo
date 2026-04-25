@@ -1,0 +1,389 @@
+.senaruSection {
+  position: relative;
+  padding: 120px 0;
+  background: linear-gradient(135deg, #f2fbf4 0%, #dcefe1 100%);
+  overflow: hidden;
+}
+
+/* Foliage Pattern Overlay — Removed circular elements for a cleaner look */
+.senaruSection::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: none;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Foliage Decoration Top-Right — Pure CSS SVG */
+.senaruSection::after {
+  content: "";
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0C70 20 80 50 50 100C20 50 30 20 50 0' fill='%232a8742' fill-opacity='0.1'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.6;
+  transform: rotate(45deg);
+  pointer-events: none;
+  filter: blur(40px);
+  z-index: 1;
+}
+
+/* Foliage Decoration Bottom-Left — Pure CSS SVG */
+.forestDeco {
+  position: absolute;
+  bottom: -150px;
+  left: -150px;
+  width: 600px;
+  height: 600px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0C70 20 80 50 50 100C20 50 30 20 50 0' fill='%232a8742' fill-opacity='0.1'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.5;
+  transform: rotate(-30deg) scaleX(-1);
+  pointer-events: none;
+  filter: blur(60px);
+  z-index: 1;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--color-heading);
+  line-height: 1.25;
+}
+
+.desc {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text);
+  max-width: 700px;
+  margin: 20px auto 0;
+  line-height: 1.8;
+}
+
+.wrapper {
+  margin: 0 -20px;
+}
+
+.senaruSlider {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  padding: 0 20px;
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 1024px) {
+  .senaruSlider {
+    display: flex;
+    grid-template-columns: none;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 24px;
+    /* Hide scrollbar */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .senaruSlider.dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+    scroll-behavior: auto;
+  }
+
+  .senaruSlider::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.actions {
+  text-align: center;
+  margin-top: 64px;
+}
+
+.actions a {
+  padding: 16px 40px;
+  font-size: 0.85rem;
+  color: var(--color-heading);
+  border-color: var(--color-heading);
+}
+
+.actions a:hover {
+  background: var(--color-heading);
+  color: var(--color-white);
+}
+
+/* Sembalun Packages Styles (Destination Banner Layout) */
+.sembalunSection {
+  position: relative;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  padding: 120px 0;
+  overflow: hidden;
+  overflow-x: clip;
+}
+
+.sembalunBackground {
+  position: absolute;
+  inset: 0;
+  background: url("/top.jpg") center/cover no-repeat;
+  z-index: 0;
+}
+
+.sembalunOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 25, 35, 0.7) 0%,
+    rgba(15, 25, 35, 0.3) 50%,
+    rgba(15, 25, 35, 0) 100%
+  );
+}
+
+.sembalunContainer {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1400px;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 80px;
+  align-items: center;
+}
+
+.sembalunLeft {
+  color: var(--color-white);
+}
+
+.sembalunTitle {
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+  line-height: 1.1;
+  color: var(--color-white);
+}
+
+.sembalunDesc {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: var(--color-white);
+  line-height: 1.7;
+  opacity: 0.9;
+  margin-bottom: 40px;
+  max-width: 95%;
+}
+
+.sembalunControls {
+  display: flex;
+  gap: 16px;
+}
+
+.arrowBtn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-white);
+  color: var(--color-heading);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.arrowBtn:hover {
+  background: var(--color-dark);
+  color: var(--color-white);
+  transform: scale(1.05);
+}
+
+.sembalunRight {
+  position: relative;
+  width: 100%;
+}
+
+.mobileControls {
+  display: none;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.slider {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 24px;
+  /* Hide scrollbar */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  cursor: grab;
+  user-select: none;
+}
+
+.slider.dragging {
+  cursor: grabbing;
+  scroll-snap-type: none; /* remove snap feel while dragging for smoothness */
+  scroll-behavior: auto;
+}
+
+.slider::-webkit-scrollbar {
+  display: none;
+}
+
+.slideItem {
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  min-width: 100%;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+
+.slideItem a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.slideItem a:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+/* Responsiveness */
+@media (max-width: 1200px) {
+  .senaruSlider {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .senaruSlider > div:nth-child(4) {
+    display: none;
+  }
+  .sembalunContainer {
+    grid-template-columns: 1fr 1.5fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .senaruSlider {
+    display: flex; /* Override grid on mobile */
+  }
+  .senaruSlider > div:nth-child(4) {
+    display: block;
+  }
+  .sembalunContainer {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .sembalunOverlay {
+    background: rgba(15, 25, 35, 0.6);
+  }
+  .sembalunTitle {
+    font-size: 2.6rem;
+  }
+  .sembalunSection {
+    min-height: auto;
+    padding: 80px 0;
+  }
+  .sembalunRight {
+    width: 100%;
+    overflow: hidden;
+  }
+  .slideItem {
+    min-width: 100%;
+    max-width: 100%;
+  }
+  .sembalunControls {
+    display: none;
+  }
+  .mobileControls {
+    display: flex;
+  }
+}
+
+@media (max-width: 768px) {
+  .sembalunTitle {
+    font-size: 2rem;
+  }
+  .sembalunDesc {
+    font-size: 0.95rem;
+    max-width: 100%;
+    margin-bottom: 28px;
+  }
+  .sembalunSection {
+    padding: 60px 0;
+  }
+  .sembalunControls {
+    margin-bottom: 8px;
+  }
+  .slideItem {
+    min-width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .senaruSlider {
+    gap: 20px;
+  }
+  .title {
+    font-size: 1.8rem;
+  }
+  .container {
+    padding: 0 20px;
+  }
+  .sembalunTitle {
+    font-size: 1.7rem;
+    letter-spacing: 1px;
+  }
+  .sembalunDesc {
+    font-size: 0.9rem;
+  }
+  .slideItem {
+    min-width: 100%;
+    max-width: 100%;
+  }
+  .senaruSection {
+    padding: 60px 0;
+  }
+}

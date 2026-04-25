@@ -1,0 +1,204 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('/hero-banner.svg') center/cover no-repeat;
+  overflow: hidden;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 25, 35, 0.3) 0%,
+    rgba(15, 25, 35, 0.5) 100%
+  );
+  z-index: 1;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 140px 24px 80px;
+  max-width: 900px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 10px 24px;
+  background: var(--color-primary);
+  color: white;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 32px;
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 4.5rem;
+  font-weight: 900;
+  color: white;
+  line-height: 1.05;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  animation: fadeInUp 0.8s ease 0.1s forwards;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.highlight {
+  color: var(--color-primary);
+  display: block;
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.8;
+  margin-bottom: 40px;
+  animation: fadeInUp 0.8s ease 0.2s forwards;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.ctas {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease 0.3s forwards;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  margin-top: 72px;
+  padding: 28px 48px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  animation: fadeInUp 0.8s ease 0.5s forwards;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.stat {
+  text-align: center;
+  color: white;
+}
+
+.stat strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--color-primary);
+}
+
+.stat span {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.statDivider {
+  width: 1px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Rotating Badge */
+.rotatingBadgeWrapper {
+  position: absolute;
+  bottom: 100px;
+  right: 60px;
+  z-index: 3;
+  animation: fadeIn 1s ease 0.8s forwards;
+  opacity: 0;
+}
+
+.scrollIndicator {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  animation: fadeIn 1s ease 1s forwards;
+  opacity: 0;
+}
+
+.scrollDot {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scrollBounce {
+  0%, 100% { cy: 8; }
+  50% { cy: 16; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .stats {
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px;
+  }
+
+  .statDivider {
+    width: 60px;
+    height: 1px;
+  }
+
+  .scrollIndicator {
+    display: none;
+  }
+
+  .rotatingBadgeWrapper {
+    bottom: 20px;
+    right: 20px;
+  }
+}

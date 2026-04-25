@@ -1,0 +1,119 @@
+.wrapper {
+  display: grid;
+  gap: 14px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.helpText {
+  font-size: 0.78rem;
+  color: #646970;
+  line-height: 1.5;
+}
+
+.addBtn,
+.removeBtn {
+  border: 1px solid #2271b1;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #2271b1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.addBtn:hover,
+.removeBtn:hover {
+  border-color: #135e96;
+  color: #135e96;
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+}
+
+.dayCard {
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  background: #f9fbfd;
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.dayHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dayTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.fieldGrid {
+  display: grid;
+  gap: 12px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 0.82rem;
+  color: #1d2327;
+  font-weight: 600;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  background: #ffffff;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  color: #1d2327;
+}
+
+.textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: 2px solid transparent;
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+}
+
+.emptyState {
+  border: 1px dashed #c3c4c7;
+  border-radius: 4px;
+  background: #ffffff;
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.emptyState p {
+  margin: 0;
+  color: #50575e;
+  font-size: 0.9rem;
+}

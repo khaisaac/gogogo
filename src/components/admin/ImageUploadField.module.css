@@ -1,0 +1,58 @@
+.wrapper {
+  display: grid;
+  gap: 8px;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid #8c8f94;
+  border-radius: 3px;
+  background: #ffffff;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  color: #1d2327;
+}
+
+.previewCard {
+  border: 2px solid #72aee6;
+  background: #f0f6fc;
+  border-radius: 4px;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+  max-width: 340px;
+}
+
+.previewLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0a4b78;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.previewImage {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 2px;
+  border: 1px solid #c3c4c7;
+  background: #ffffff;
+}
+
+.cancelBtn {
+  justify-self: start;
+  border: 1px solid #b32d2e;
+  background: #ffffff;
+  color: #b32d2e;
+  border-radius: 3px;
+  padding: 6px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #b32d2e;
+  color: #ffffff;
+}
