@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStartingPrice, type PackagePricingFields } from "@/lib/pricing";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 export type PublicPackage = {
   id: string;
@@ -33,6 +34,26 @@ function getDisplayPrice(pkg: PackagePricingFields) {
 
 type DBPackage = Omit<PublicPackage, "slug" | "displayPrice">;
 
+function getPackagesClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl) {
+    return null;
+  }
+
+  if (serviceRoleKey) {
+    return createAdminClient();
+  }
+
+  if (publishableKey) {
+    return createSupabaseClient(supabaseUrl, publishableKey);
+  }
+
+  return null;
+}
+
 function mapPackage(pkg: DBPackage): PublicPackage {
   return {
     ...pkg,
@@ -43,17 +64,14 @@ function mapPackage(pkg: DBPackage): PublicPackage {
 
 /** Fetch all active packages, split by route */
 export async function getPublicPackages() {
-  if (
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.SUPABASE_SERVICE_ROLE_KEY
-  ) {
+  const supabase = getPackagesClient();
+  if (!supabase) {
     console.warn(
-      "Supabase env is not configured. Returning empty public package lists.",
+      "Supabase env is not configured. Returning empty package lists.",
     );
     return { sembalun: [] as PublicPackage[], senaru: [] as PublicPackage[] };
   }
 
-  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("packages")
     .select("*")
@@ -75,14 +93,11 @@ export async function getPublicPackages() {
 
 /** Fetch a single active package by its generated slug */
 export async function getPublicPackageBySlug(slug: string) {
-  if (
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    !process.env.SUPABASE_SERVICE_ROLE_KEY
-  ) {
+  const supabase = getPackagesClient();
+  if (!supabase) {
     return null;
   }
 
-  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("packages")
     .select("*")
