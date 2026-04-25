@@ -54,6 +54,7 @@ export default async function AdminBlogPage() {
           <tbody>
             {posts?.map((post) => {
               const deleteAction = deletePost.bind(null, post.id);
+              const categoryName = post.categories?.[0]?.name;
               return (
                 <tr key={post.id}>
                   <td>{post.title}</td>
@@ -67,10 +68,10 @@ export default async function AdminBlogPage() {
                       {post.is_published ? "Published" : "Draft"}
                     </span>
                   </td>
-                  <td>{post.categories?.name || "-"}</td>
+                  <td>{categoryName || "-"}</td>
                   <td>
                     {(post.post_tags || [])
-                      .map((item) => item.tags?.name)
+                      .map((item) => item.tags?.[0]?.name)
                       .filter(Boolean)
                       .join(", ") || "-"}
                   </td>

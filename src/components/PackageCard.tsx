@@ -1,4 +1,5 @@
 import styles from "./PackageCard.module.css";
+import type { CSSProperties } from "react";
 import {
   difficultyScoreToLabel,
   difficultyScoreToLevel,
@@ -30,6 +31,9 @@ export default function PackageCard({
   const difficultyLevel = difficultyScoreToLevel(difficulty);
   const difficultyText = difficultyScoreToLabel(difficulty).toUpperCase();
   const difficultyFill = `${(difficultyLevel / 3) * 100}%`;
+  const difficultyStyle: CSSProperties & Record<"--difficulty-fill", string> = {
+    "--difficulty-fill": difficultyFill,
+  };
 
   return (
     <div className={`${styles.card} ${hideImage ? styles.cardNoImage : ""}`}>
@@ -55,9 +59,7 @@ export default function PackageCard({
           <div className={styles.difficultyBadge}>
             <div
               className={styles.difficultyCircle}
-              style={{
-                ["--difficulty-fill" as "--difficulty-fill"]: difficultyFill,
-              }}
+              style={difficultyStyle}
             >
               <span className={styles.difficultyValue}>{difficultyLevel}</span>
             </div>
