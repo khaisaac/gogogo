@@ -13,7 +13,9 @@ export const metadata = {
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     redirect("/login");
@@ -25,7 +27,9 @@ export default async function DashboardPage() {
       <div className={styles.container}>
         <div className={styles.header}>
           <h1 className={styles.title}>Welcome back!</h1>
-          <p className={styles.subtitle}>Manage your bookings and account details.</p>
+          <p className={styles.subtitle}>
+            Manage your bookings and account details.
+          </p>
         </div>
         <DashboardClient user={user} />
       </div>

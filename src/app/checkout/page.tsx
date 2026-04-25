@@ -33,7 +33,9 @@ export default async function CheckoutPage({
   const total_days = Number(unresolvedSearchParams.total_days) || 2;
 
   // Reconstruct full url for callback
-  const qs = new URLSearchParams(unresolvedSearchParams as Record<string, string>).toString();
+  const qs = new URLSearchParams(
+    unresolvedSearchParams as Record<string, string>,
+  ).toString();
   const currentUrl = `/checkout?${qs}`;
 
   if (!user) {
@@ -61,7 +63,7 @@ export default async function CheckoutPage({
         const selectedTotalPrice = getTotalPackagePrice(
           pkg,
           price_type as any,
-          total_days as any
+          total_days as any,
         );
         summaryPrice = (selectedTotalPrice || 0) * pax;
       } else {
@@ -96,7 +98,7 @@ export default async function CheckoutPage({
             Please complete your booking details below.
           </p>
 
-          <CheckoutClient 
+          <CheckoutClient
             packageId={pkgData.id}
             packageTitle={pkgData.title}
             date={date || ""}

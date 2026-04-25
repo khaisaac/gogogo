@@ -96,8 +96,8 @@ function AdminLoginContent() {
       }
 
       // Wait a moment for session to persist before redirecting
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       router.push("/admin/packages");
       router.refresh();
     } catch {

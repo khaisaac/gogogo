@@ -57,10 +57,7 @@ export default function PackageCard({
             <span className={styles.durationText}>DAYS</span>
           </div>
           <div className={styles.difficultyBadge}>
-            <div
-              className={styles.difficultyCircle}
-              style={difficultyStyle}
-            >
+            <div className={styles.difficultyCircle} style={difficultyStyle}>
               <span className={styles.difficultyValue}>{difficultyLevel}</span>
             </div>
             <span className={styles.difficultyLabel}>{difficultyText}</span>
