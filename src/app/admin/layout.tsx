@@ -5,6 +5,8 @@ import { requireAdminClient } from "./_lib";
 import AdminSidebarNav from "./AdminSidebarNav";
 import styles from "./admin.module.css";
 
+export const dynamic = "force-dynamic";
+
 async function logout() {
   "use server";
 
