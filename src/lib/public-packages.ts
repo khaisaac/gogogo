@@ -43,6 +43,16 @@ function mapPackage(pkg: DBPackage): PublicPackage {
 
 /** Fetch all active packages, split by route */
 export async function getPublicPackages() {
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.SUPABASE_SERVICE_ROLE_KEY
+  ) {
+    console.warn(
+      "Supabase env is not configured. Returning empty public package lists.",
+    );
+    return { sembalun: [] as PublicPackage[], senaru: [] as PublicPackage[] };
+  }
+
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("packages")
@@ -65,6 +75,13 @@ export async function getPublicPackages() {
 
 /** Fetch a single active package by its generated slug */
 export async function getPublicPackageBySlug(slug: string) {
+  if (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+    !process.env.SUPABASE_SERVICE_ROLE_KEY
+  ) {
+    return null;
+  }
+
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("packages")
