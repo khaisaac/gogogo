@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { requireAdminClient } from "@/app/admin/_lib";
 import { difficultyValueToScore } from "@/lib/difficulty";
 import {
@@ -255,6 +256,10 @@ export async function createPackage(formData: FormData) {
     revalidatePath("/admin/packages");
     redirect("/admin/packages");
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
     const message = getErrorMessage(error);
     console.error("❌ createPackage failed:", error);
     redirect(`/admin/packages/new?error=${encodeURIComponent(message)}`);
@@ -312,6 +317,10 @@ export async function updatePackage(id: string, formData: FormData) {
     revalidatePath("/admin/packages");
     redirect("/admin/packages");
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
     const message = getErrorMessage(error);
     console.error("❌ updatePackage failed:", error);
     redirect(`/admin/packages/${id}/edit?error=${encodeURIComponent(message)}`);
