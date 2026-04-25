@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import DashboardClient from "./DashboardClient";
 import styles from "@/components/dashboard/dashboard.module.css";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "My Dashboard — Trekking Mount Rinjani",
 };

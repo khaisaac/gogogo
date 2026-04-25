@@ -7,6 +7,8 @@ import CheckoutClient from "./CheckoutClient";
 import styles from "./checkout.module.css";
 import { getPerPaxPrice, getTotalPackagePrice } from "@/lib/pricing";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Checkout — Trekking Mount Rinjani",
 };

@@ -15,6 +15,8 @@ import PackageSectionsAccordion from "./PackageSectionsAccordion";
 import BottomBookingScrollButton from "./BottomBookingScrollButton";
 import styles from "./PackageDetailPage.module.css";
 
+export const dynamic = "force-dynamic";
+
 function toList(value: string) {
   return value
     .split("\n")
