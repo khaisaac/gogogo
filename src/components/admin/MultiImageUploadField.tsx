@@ -115,36 +115,52 @@ export default function MultiImageUploadField({
 
           try {
             const newUrls: string[] = [];
+            const failedNames: string[] = [];
 
             for (const file of acceptedFiles) {
-              const payload = new FormData();
-              payload.append("file", file);
-              payload.append("folder", folder);
+              try {
+                const payload = new FormData();
+                payload.append("file", file);
+                payload.append("folder", folder);
 
-              const response = await fetch("/api/admin/uploads", {
-                method: "POST",
-                body: payload,
-              });
-              const data = await parseUploadResponse(response);
+                const response = await fetch("/api/admin/uploads", {
+                  method: "POST",
+                  body: payload,
+                });
+                const data = await parseUploadResponse(response);
 
-              if (!response.ok || !data.url) {
-                throw new Error(data.error || `Failed to upload ${file.name}`);
+                if (!response.ok || !data.url) {
+                  throw new Error(data.error || `Failed to upload ${file.name}`);
+                }
+
+                newUrls.push(String(data.url));
+              } catch {
+                failedNames.push(file.name || "unknown file");
               }
-
-              newUrls.push(String(data.url));
             }
 
             setUploadedUrls((current) => {
               const merged = [...current, ...newUrls];
               return merged.slice(0, Math.max(0, maxFiles - currentImages.length));
             });
-            setNotice(messages.length > 0 ? messages.join(" ") : "Upload complete.");
-          } catch (uploadError) {
-            const message =
-              uploadError instanceof Error
-                ? uploadError.message
-                : "Failed to upload images";
-            setNotice(message);
+
+            const statusMessages = [...messages];
+            if (newUrls.length > 0) {
+              statusMessages.push(`${newUrls.length} photo(s) uploaded.`);
+            }
+            if (failedNames.length > 0) {
+              statusMessages.push(
+                `${failedNames.length} photo(s) failed: ${failedNames.slice(0, 3).join(", ")}${failedNames.length > 3 ? ", ..." : ""}.`,
+              );
+            }
+
+            setNotice(
+              statusMessages.length > 0
+                ? statusMessages.join(" ")
+                : "Upload complete.",
+            );
+          } catch {
+            setNotice("Failed to upload images.");
           } finally {
             setIsUploading(false);
             if (inputRef.current) {
