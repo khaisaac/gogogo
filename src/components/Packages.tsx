@@ -188,7 +188,7 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
   const scrollLeft = () => {
     if (sliderRef.current) {
       const slideItem = sliderRef.current.querySelector(
-        `.${styles.slideItem}`,
+        `.${styles.senaruSlideItem}`,
       ) as HTMLElement;
       const scrollAmount = slideItem ? slideItem.offsetWidth + 20 : 320;
       sliderRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
@@ -198,7 +198,7 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
   const scrollRight = () => {
     if (sliderRef.current) {
       const slideItem = sliderRef.current.querySelector(
-        `.${styles.slideItem}`,
+        `.${styles.senaruSlideItem}`,
       ) as HTMLElement;
       const scrollAmount = slideItem ? slideItem.offsetWidth + 20 : 320;
       sliderRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
@@ -246,7 +246,7 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
             onMouseMove={handleMouseMove}
           >
             {packages.map((pkg) => (
-              <div className={styles.slideItem} key={pkg.id}>
+              <div className={styles.senaruSlideItem} key={pkg.id}>
                 <Link href={`/packages/${pkg.slug}`}>
                   <PackageCard
                     title={pkg.title}
