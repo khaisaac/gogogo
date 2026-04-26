@@ -2,12 +2,14 @@
 
 import { useMemo, useRef, useState } from "react";
 import {
+  GROUP_TIER_OPTIONS,
   PAX_OPTIONS,
   getGroupTierForPaxCount,
   PRICE_TYPES,
   TOTAL_DAY_OPTIONS,
   getPerPaxPrice,
   getTotalPackagePrice,
+  type GroupTierKey,
   type PaxNumber,
   type PriceType,
   type TotalDayOption,
@@ -83,6 +85,14 @@ export default function PackagePricingSelector({
     [prices, resolvedPriceType],
   );
 
+  const availableTierOptions = useMemo(
+    () =>
+      GROUP_TIER_OPTIONS.filter((tier) =>
+        tier.paxValues.some((value) => availablePerPaxOptions.includes(value)),
+      ),
+    [availablePerPaxOptions],
+  );
+
   const hasPerPaxPrices = availablePerPaxOptions.length > 0;
 
   const availableTotalDays = useMemo(
@@ -106,6 +116,7 @@ export default function PackagePricingSelector({
   const resolvedPax = availablePerPaxOptions.includes(pax)
     ? pax
     : (availablePerPaxOptions[0] ?? pax);
+  const resolvedTier = getGroupTierForPaxCount(resolvedPax);
   const resolvedTotalDays = availableTotalDays.includes(totalDays)
     ? totalDays
     : (availableTotalDays[0] ?? totalDays);
@@ -130,7 +141,7 @@ export default function PackagePricingSelector({
     PRICE_TYPES.find((item) => item.value === resolvedPriceType)?.label ||
     "Private";
   const hasModeChoice = hasPerPaxPrices && hasTotalPackagePrices;
-  const activeGroupTier = getGroupTierForPaxCount(resolvedPax);
+  const activeGroupTier = resolvedTier;
   const decrementAdult = () =>
     setPax((current) => Math.max(1, current - 1) as PaxNumber);
   const incrementAdult = () =>
@@ -154,8 +165,8 @@ export default function PackagePricingSelector({
 
       <p className={styles.bookingSummary}>
         {resolvedPricingMode === "total_package"
-          ? `${serviceLabel} service, ${resolvedTotalDays} days total (${resolvedPax} adults)`
-          : `${serviceLabel} service, ${resolvedPax} adults (${activeGroupTier.label})`}
+          ? `${serviceLabel} service, ${resolvedTotalDays} days total (${resolvedPax} persons)`
+          : `${serviceLabel} service, ${activeGroupTier.label}`}
         {resolvedPricingMode === "total_package"
           ? totalPackagePrice !== null
             ? ` - Total $${totalPackagePrice * resolvedPax}`
@@ -217,15 +228,19 @@ export default function PackagePricingSelector({
         <div className={styles.selector}>
           <select
             className={styles.bookingSelect}
-            value={resolvedPax}
+            value={resolvedTier.key}
             onChange={(event) =>
-              setPax(Number(event.target.value) as PaxNumber)
+              setPax(
+                (GROUP_TIER_OPTIONS.find(
+                  (tier) => tier.key === (event.target.value as GroupTierKey),
+                )?.paxValues[0] ?? 1) as PaxNumber,
+              )
             }
-            aria-label="Select adult count"
+            aria-label="Select group size"
           >
-            {availablePerPaxOptions.map((value) => (
-              <option key={value} value={value}>
-                {value} {value === 1 ? "adult" : "adults"}
+            {availableTierOptions.map((tier) => (
+              <option key={tier.key} value={tier.key}>
+                {tier.label}
               </option>
             ))}
           </select>
@@ -233,13 +248,13 @@ export default function PackagePricingSelector({
       )}
 
       <div className={styles.adultStepper}>
-        <span className={styles.adultStepperLabel}>Adult</span>
+        <span className={styles.adultStepperLabel}>Persons</span>
         <div className={styles.adultStepperControls}>
           <button
             type="button"
             className={styles.adultStepperButton}
             onClick={decrementAdult}
-            aria-label="Decrease adults"
+            aria-label="Decrease persons"
             disabled={resolvedPax <= 1}
           >
             −
@@ -249,7 +264,7 @@ export default function PackagePricingSelector({
             type="button"
             className={styles.adultStepperButton}
             onClick={incrementAdult}
-            aria-label="Increase adults"
+            aria-label="Increase persons"
             disabled={resolvedPax >= 10}
           >
             +
