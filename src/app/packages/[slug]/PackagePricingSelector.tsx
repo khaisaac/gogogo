@@ -45,19 +45,6 @@ export default function PackagePricingSelector({
 
   const minDate = getTodayDateString();
 
-  const openDatePicker = () => {
-    const input = dateInputRef.current;
-    if (!input) return;
-
-    if (typeof input.showPicker === "function") {
-      input.showPicker();
-      return;
-    }
-
-    input.focus();
-    input.click();
-  };
-
   const availableServiceTypes = useMemo(() => {
     return PRICE_TYPES.filter((typeDef) => {
       const hasPerPax = PAX_OPTIONS.some(
@@ -273,23 +260,18 @@ export default function PackagePricingSelector({
       </div>
 
       <div className={styles.selector}>
-        <button
-          type="button"
-          className={styles.dateTrigger}
-          onClick={openDatePicker}
-          aria-label="Select trek start date"
-        >
+        <span className={styles.dateTrigger} aria-hidden="true">
           {selectedDate || "Select date"}
-        </button>
+        </span>
         <input
           ref={dateInputRef}
+          id="trek-start-date"
           type="date"
           className={styles.datePickerInput}
           value={selectedDate}
           onChange={(event) => setSelectedDate(event.target.value)}
           min={minDate}
-          tabIndex={-1}
-          aria-hidden="true"
+          aria-label="Select trek start date"
         />
       </div>
       
@@ -300,7 +282,7 @@ export default function PackagePricingSelector({
           if (!selectedDate) {
             e.preventDefault();
             alert("Please select a trekking date first.");
-            openDatePicker();
+            dateInputRef.current?.focus();
           }
         }}
       >
