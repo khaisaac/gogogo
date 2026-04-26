@@ -11,7 +11,23 @@ type ImageUploadFieldProps = {
   folder?: "blog" | "packages";
 };
 
-const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
+type UploadApiResult = {
+  url?: string;
+  error?: string;
+};
+
+const MAX_IMAGE_SIZE_BYTES = 4 * 1024 * 1024;
+
+async function parseUploadResponse(response: Response): Promise<UploadApiResult> {
+  const rawText = await response.text();
+  if (!rawText) return {};
+
+  try {
+    return JSON.parse(rawText) as UploadApiResult;
+  } catch {
+    return { error: rawText };
+  }
+}
 
 export default function ImageUploadField({
   id,
@@ -54,7 +70,7 @@ export default function ImageUploadField({
           if (!file) return;
 
           if (file.size > MAX_IMAGE_SIZE_BYTES) {
-            setError("Image must be smaller than 8MB.");
+            setError("Image must be smaller than 4MB.");
             if (inputRef.current) {
               inputRef.current.value = "";
             }
@@ -73,7 +89,7 @@ export default function ImageUploadField({
               method: "POST",
               body: payload,
             });
-            const data = await response.json();
+            const data = await parseUploadResponse(response);
 
             if (!response.ok || !data.url) {
               throw new Error(data.error || "Failed to upload image");
