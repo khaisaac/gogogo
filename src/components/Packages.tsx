@@ -54,23 +54,6 @@ export function SembalunPackages({ packages }: PackageSliderProps) {
     sliderRef.current.scrollLeft = scrollLeftPos - walk;
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    if (sliderRef.current) {
-      setStartX(e.touches[0].pageX - sliderRef.current.offsetLeft);
-      setScrollLeftPos(sliderRef.current.scrollLeft);
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !sliderRef.current) return;
-    const x = e.touches[0].pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    sliderRef.current.scrollLeft = scrollLeftPos - walk;
-  };
-
-  const handleTouchEnd = () => setIsDragging(false);
-
   return (
     <section id="sembalun" className={styles.sembalunSection}>
       <div className={styles.sembalunBackground}>
@@ -137,9 +120,6 @@ export function SembalunPackages({ packages }: PackageSliderProps) {
             onMouseLeave={handleMouseLeave}
             onMouseUp={handleMouseUp}
             onMouseMove={handleMouseMove}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
           >
             {packages.map((pkg) => (
               <div className={styles.slideItem} key={pkg.id}>
@@ -243,23 +223,6 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
     sliderRef.current.scrollLeft = scrollLeftPos - walk;
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    if (sliderRef.current) {
-      setStartX(e.touches[0].pageX - sliderRef.current.offsetLeft);
-      setScrollLeftPos(sliderRef.current.scrollLeft);
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !sliderRef.current) return;
-    const x = e.touches[0].pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    sliderRef.current.scrollLeft = scrollLeftPos - walk;
-  };
-
-  const handleTouchEnd = () => setIsDragging(false);
-
   return (
     <section id="senaru" className={styles.senaruSection}>
       <div className={styles.forestDeco} />
@@ -281,9 +244,6 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
             onMouseLeave={handleMouseLeave}
             onMouseUp={handleMouseUp}
             onMouseMove={handleMouseMove}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
           >
             {packages.map((pkg) => (
               <div className={styles.slideItem} key={pkg.id}>

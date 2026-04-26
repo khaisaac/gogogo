@@ -273,7 +273,7 @@
 }
 
 .slideItem {
-  scroll-snap-align: center;
+  scroll-snap-align: start;
   scroll-snap-stop: always;
   min-width: 100%;
   max-width: 100%;
