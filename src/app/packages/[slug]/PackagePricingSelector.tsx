@@ -37,10 +37,13 @@ export default function PackagePricingSelector({
   const [selectedDate, setSelectedDate] = useState<string>("");
   const dateInputRef = useRef<HTMLInputElement>(null);
 
-  // Get today's date in YYYY-MM-DD format
+  // Get today's date in YYYY-MM-DD format based on local timezone
   const getTodayDateString = () => {
     const today = new Date();
-    return today.toISOString().split("T")[0];
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const minDate = getTodayDateString();
@@ -259,7 +262,18 @@ export default function PackagePricingSelector({
         </div>
       </div>
 
-      <div className={styles.selector}>
+      <div 
+        className={styles.selector}
+        onClick={() => {
+          try {
+            if (dateInputRef.current && 'showPicker' in HTMLInputElement.prototype) {
+              dateInputRef.current.showPicker();
+            }
+          } catch (e) {
+            // ignore
+          }
+        }}
+      >
         <span className={styles.dateTrigger} aria-hidden="true">
           {selectedDate || "Select date"}
         </span>
@@ -270,6 +284,15 @@ export default function PackagePricingSelector({
           className={styles.datePickerInput}
           value={selectedDate}
           onChange={(event) => setSelectedDate(event.target.value)}
+          onClick={(e) => {
+            try {
+              if ('showPicker' in HTMLInputElement.prototype) {
+                e.currentTarget.showPicker();
+              }
+            } catch (err) {
+              // ignore
+            }
+          }}
           min={minDate}
           aria-label="Select trek start date"
         />
