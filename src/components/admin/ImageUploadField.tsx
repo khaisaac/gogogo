@@ -10,7 +10,7 @@ type ImageUploadFieldProps = {
   currentImageFieldName?: string;
 };
 
-const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
 
 export default function ImageUploadField({
   id,
@@ -57,7 +57,7 @@ export default function ImageUploadField({
         onChange={(event) => {
           const file = event.target.files?.[0] || null;
           if (file && file.size > MAX_IMAGE_SIZE_BYTES) {
-            setError("Image must be smaller than 8MB.");
+            setError("Image must be smaller than 2MB.");
             setSelectedFile(null);
             if (inputRef.current) {
               inputRef.current.value = "";

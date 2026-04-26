@@ -11,7 +11,8 @@ type MultiImageUploadFieldProps = {
   maxFiles?: number;
 };
 
-const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
+const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
+const MAX_TOTAL_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 export default function MultiImageUploadField({
   id,
@@ -43,7 +44,7 @@ export default function MultiImageUploadField({
       ) : null}
 
       <p className={styles.helperText}>
-        Current images will stay and new uploads will be added. Max total: {maxFiles} photos.
+        Current images will stay and new uploads will be added. Max total: {maxFiles} photos. Each file max 2MB.
       </p>
 
       <input
@@ -58,16 +59,36 @@ export default function MultiImageUploadField({
           const files = Array.from(event.target.files || []);
           const oversized = files.filter((file) => file.size > MAX_IMAGE_SIZE_BYTES);
           const validBySize = files.filter((file) => file.size <= MAX_IMAGE_SIZE_BYTES);
+          const totalSelectedBytes = validBySize.reduce(
+            (sum, file) => sum + file.size,
+            0,
+          );
+          const validByTotal =
+            totalSelectedBytes > MAX_TOTAL_UPLOAD_BYTES
+              ? (() => {
+                  let runningTotal = 0;
+                  return validBySize.filter((file) => {
+                    if (runningTotal + file.size > MAX_TOTAL_UPLOAD_BYTES) {
+                      return false;
+                    }
+                    runningTotal += file.size;
+                    return true;
+                  });
+                })()
+              : validBySize;
           const remainingSlots = Math.max(0, maxFiles - currentImages.length);
-          const acceptedFiles = validBySize.slice(0, remainingSlots);
+          const acceptedFiles = validByTotal.slice(0, remainingSlots);
 
           setSelectedFiles(acceptedFiles);
 
           const messages: string[] = [];
           if (oversized.length > 0) {
-            messages.push(`${oversized.length} file(s) skipped: each image must be smaller than 8MB.`);
+            messages.push(`${oversized.length} file(s) skipped: each image must be smaller than 2MB.`);
           }
-          if (validBySize.length > acceptedFiles.length) {
+          if (totalSelectedBytes > MAX_TOTAL_UPLOAD_BYTES) {
+            messages.push("Total new uploads are capped at 4MB per submit.");
+          }
+          if (validByTotal.length > acceptedFiles.length) {
             messages.push(`Only ${remainingSlots} new photo(s) accepted. Total gallery limit is ${maxFiles}.`);
           }
           setNotice(messages.length > 0 ? messages.join(" ") : null);
