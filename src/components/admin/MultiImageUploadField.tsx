@@ -17,7 +17,7 @@ type UploadApiResult = {
   error?: string;
 };
 
-const MAX_IMAGE_SIZE_BYTES = 4 * 1024 * 1024;
+const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
 
 async function parseUploadResponse(response: Response): Promise<UploadApiResult> {
   const rawText = await response.text();
@@ -73,7 +73,7 @@ export default function MultiImageUploadField({
       />
 
       <p className={styles.helperText}>
-        Current images will stay and new uploads will be added. Max total: {maxFiles} photos. Each file max 4MB.
+        Current images will stay and new uploads will be added. Max total: {maxFiles} photos. Each file max 10MB.
       </p>
 
       <input
@@ -97,7 +97,7 @@ export default function MultiImageUploadField({
 
           const messages: string[] = [];
           if (oversized.length > 0) {
-            messages.push(`${oversized.length} file(s) skipped: each image must be smaller than 4MB.`);
+            messages.push(`${oversized.length} file(s) skipped: each image must be smaller than 10MB.`);
           }
           if (validBySize.length > acceptedFiles.length) {
             messages.push(`Only ${remainingSlots} new photo(s) accepted. Total gallery limit is ${maxFiles}.`);

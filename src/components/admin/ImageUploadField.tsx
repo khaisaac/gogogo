@@ -16,7 +16,7 @@ type UploadApiResult = {
   error?: string;
 };
 
-const MAX_IMAGE_SIZE_BYTES = 4 * 1024 * 1024;
+const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
 
 async function parseUploadResponse(response: Response): Promise<UploadApiResult> {
   const rawText = await response.text();
@@ -70,7 +70,7 @@ export default function ImageUploadField({
           if (!file) return;
 
           if (file.size > MAX_IMAGE_SIZE_BYTES) {
-            setError("Image must be smaller than 4MB.");
+            setError("Image must be smaller than 10MB.");
             if (inputRef.current) {
               inputRef.current.value = "";
             }
