@@ -9,10 +9,10 @@ type MultiImageUploadFieldProps = {
   currentImages?: string[];
   currentImagesFieldName?: string;
   maxFiles?: number;
+  folder?: "blog" | "packages";
 };
 
-const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
-const MAX_TOTAL_UPLOAD_BYTES = 4 * 1024 * 1024;
+const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
 
 export default function MultiImageUploadField({
   id,
@@ -20,18 +20,25 @@ export default function MultiImageUploadField({
   currentImages = [],
   currentImagesFieldName,
   maxFiles = 10,
+  folder = "packages",
 }: MultiImageUploadFieldProps) {
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const urls = selectedFiles.map((file) => URL.createObjectURL(file));
-    setPreviewUrls(urls);
+    if (uploadedUrls.length === 0) {
+      return;
+    }
 
-    return () => urls.forEach((url) => URL.revokeObjectURL(url));
-  }, [selectedFiles]);
+    const maxNewUploads = Math.max(0, maxFiles - currentImages.length);
+    if (uploadedUrls.length > maxNewUploads) {
+      setUploadedUrls((current) => current.slice(0, maxNewUploads));
+    }
+  }, [currentImages.length, maxFiles, uploadedUrls]);
+
+  const mergedImages = [...currentImages, ...uploadedUrls].slice(0, maxFiles);
 
   return (
     <div className={styles.wrapper}>
@@ -39,61 +46,99 @@ export default function MultiImageUploadField({
         <input
           type="hidden"
           name={currentImagesFieldName}
-          value={currentImages.join("\n")}
+          value={mergedImages.join("\n")}
         />
       ) : null}
 
+      <input
+        type="hidden"
+        name={`${name}_uploaded_urls`}
+        value={uploadedUrls.join("\n")}
+      />
+
       <p className={styles.helperText}>
-        Current images will stay and new uploads will be added. Max total: {maxFiles} photos. Each file max 2MB.
+        Current images will stay and new uploads will be added. Max total: {maxFiles} photos. Each file max 8MB.
       </p>
 
       <input
         ref={inputRef}
         id={id}
-        name={name}
+        name={`${name}_local`}
         type="file"
         accept="image/*"
         multiple
         className={styles.input}
-        onChange={(event) => {
+        disabled={isUploading}
+        onChange={async (event) => {
           const files = Array.from(event.target.files || []);
           const oversized = files.filter((file) => file.size > MAX_IMAGE_SIZE_BYTES);
           const validBySize = files.filter((file) => file.size <= MAX_IMAGE_SIZE_BYTES);
-          const totalSelectedBytes = validBySize.reduce(
-            (sum, file) => sum + file.size,
+          const remainingSlots = Math.max(
             0,
+            maxFiles - currentImages.length - uploadedUrls.length,
           );
-          const validByTotal =
-            totalSelectedBytes > MAX_TOTAL_UPLOAD_BYTES
-              ? (() => {
-                  let runningTotal = 0;
-                  return validBySize.filter((file) => {
-                    if (runningTotal + file.size > MAX_TOTAL_UPLOAD_BYTES) {
-                      return false;
-                    }
-                    runningTotal += file.size;
-                    return true;
-                  });
-                })()
-              : validBySize;
-          const remainingSlots = Math.max(0, maxFiles - currentImages.length);
-          const acceptedFiles = validByTotal.slice(0, remainingSlots);
-
-          setSelectedFiles(acceptedFiles);
+          const acceptedFiles = validBySize.slice(0, remainingSlots);
 
           const messages: string[] = [];
           if (oversized.length > 0) {
-            messages.push(`${oversized.length} file(s) skipped: each image must be smaller than 2MB.`);
+            messages.push(`${oversized.length} file(s) skipped: each image must be smaller than 8MB.`);
           }
-          if (totalSelectedBytes > MAX_TOTAL_UPLOAD_BYTES) {
-            messages.push("Total new uploads are capped at 4MB per submit.");
-          }
-          if (validByTotal.length > acceptedFiles.length) {
+          if (validBySize.length > acceptedFiles.length) {
             messages.push(`Only ${remainingSlots} new photo(s) accepted. Total gallery limit is ${maxFiles}.`);
           }
-          setNotice(messages.length > 0 ? messages.join(" ") : null);
+
+          if (acceptedFiles.length === 0) {
+            setNotice(messages.length > 0 ? messages.join(" ") : "No files to upload.");
+            if (inputRef.current) {
+              inputRef.current.value = "";
+            }
+            return;
+          }
+
+          setIsUploading(true);
+
+          try {
+            const newUrls: string[] = [];
+
+            for (const file of acceptedFiles) {
+              const payload = new FormData();
+              payload.append("file", file);
+              payload.append("folder", folder);
+
+              const response = await fetch("/api/admin/uploads", {
+                method: "POST",
+                body: payload,
+              });
+              const data = await response.json();
+
+              if (!response.ok || !data.url) {
+                throw new Error(data.error || `Failed to upload ${file.name}`);
+              }
+
+              newUrls.push(String(data.url));
+            }
+
+            setUploadedUrls((current) => {
+              const merged = [...current, ...newUrls];
+              return merged.slice(0, Math.max(0, maxFiles - currentImages.length));
+            });
+            setNotice(messages.length > 0 ? messages.join(" ") : "Upload complete.");
+          } catch (uploadError) {
+            const message =
+              uploadError instanceof Error
+                ? uploadError.message
+                : "Failed to upload images";
+            setNotice(message);
+          } finally {
+            setIsUploading(false);
+            if (inputRef.current) {
+              inputRef.current.value = "";
+            }
+          }
         }}
       />
+
+      {isUploading ? <p className={styles.noticeText}>Uploading images...</p> : null}
 
       {currentImages.length > 0 ? (
         <div className={styles.sectionBlock}>
@@ -112,11 +157,11 @@ export default function MultiImageUploadField({
         </div>
       ) : null}
 
-      {previewUrls.length > 0 ? (
+      {uploadedUrls.length > 0 ? (
         <div className={styles.sectionBlock}>
           <p className={styles.sectionLabel}>New Uploads</p>
           <div className={styles.grid}>
-            {previewUrls.map((src, index) => (
+            {uploadedUrls.map((src, index) => (
               <div key={`${src}-${index}`} className={styles.card}>
                 <img
                   src={src}
@@ -130,7 +175,7 @@ export default function MultiImageUploadField({
             type="button"
             className={styles.cancelBtn}
             onClick={() => {
-              setSelectedFiles([]);
+              setUploadedUrls([]);
               setNotice(null);
               if (inputRef.current) {
                 inputRef.current.value = "";

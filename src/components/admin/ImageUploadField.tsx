@@ -8,34 +8,28 @@ type ImageUploadFieldProps = {
   name: string;
   currentImage?: string | null;
   currentImageFieldName?: string;
+  folder?: "blog" | "packages";
 };
 
-const MAX_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
+const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
 
 export default function ImageUploadField({
   id,
   name,
   currentImage,
   currentImageFieldName,
+  folder = "packages",
 }: ImageUploadFieldProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [objectUrl, setObjectUrl] = useState("");
+  const [uploadedUrl, setUploadedUrl] = useState(currentImage || "");
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (!selectedFile) {
-      setObjectUrl("");
-      return;
-    }
+    setUploadedUrl(currentImage || "");
+  }, [currentImage]);
 
-    const url = URL.createObjectURL(selectedFile);
-    setObjectUrl(url);
-
-    return () => URL.revokeObjectURL(url);
-  }, [selectedFile]);
-
-  const previewUrl = objectUrl || currentImage || "";
+  const previewUrl = uploadedUrl || "";
 
   return (
     <div className={styles.wrapper}>
@@ -43,22 +37,24 @@ export default function ImageUploadField({
         <input
           type="hidden"
           name={currentImageFieldName}
-          value={currentImage || ""}
+          value={uploadedUrl}
         />
       ) : null}
 
       <input
         ref={inputRef}
         id={id}
-        name={name}
+        name={`${name}_local`}
         type="file"
         accept="image/*"
         className={styles.input}
-        onChange={(event) => {
+        disabled={isUploading}
+        onChange={async (event) => {
           const file = event.target.files?.[0] || null;
-          if (file && file.size > MAX_IMAGE_SIZE_BYTES) {
-            setError("Image must be smaller than 2MB.");
-            setSelectedFile(null);
+          if (!file) return;
+
+          if (file.size > MAX_IMAGE_SIZE_BYTES) {
+            setError("Image must be smaller than 8MB.");
             if (inputRef.current) {
               inputRef.current.value = "";
             }
@@ -66,37 +62,60 @@ export default function ImageUploadField({
           }
 
           setError("");
-          setSelectedFile(file);
+          setIsUploading(true);
+
+          try {
+            const payload = new FormData();
+            payload.append("file", file);
+            payload.append("folder", folder);
+
+            const response = await fetch("/api/admin/uploads", {
+              method: "POST",
+              body: payload,
+            });
+            const data = await response.json();
+
+            if (!response.ok || !data.url) {
+              throw new Error(data.error || "Failed to upload image");
+            }
+
+            setUploadedUrl(String(data.url));
+          } catch (uploadError) {
+            const message =
+              uploadError instanceof Error
+                ? uploadError.message
+                : "Failed to upload image";
+            setError(message);
+          } finally {
+            setIsUploading(false);
+            if (inputRef.current) {
+              inputRef.current.value = "";
+            }
+          }
         }}
       />
 
       {error ? <p className={styles.previewLabel}>{error}</p> : null}
+      {isUploading ? <p className={styles.previewLabel}>Uploading image...</p> : null}
 
       {previewUrl ? (
         <div className={styles.previewCard}>
-          <p className={styles.previewLabel}>
-            {selectedFile ? "Preview upload" : "Current image"}
-          </p>
+          <p className={styles.previewLabel}>Current image</p>
           <img
             src={previewUrl}
             alt="Image preview"
             className={styles.previewImage}
           />
-          {selectedFile ? (
-            <button
-              type="button"
-              className={styles.cancelBtn}
-              onClick={() => {
-                setSelectedFile(null);
-                setError("");
-                if (inputRef.current) {
-                  inputRef.current.value = "";
-                }
-              }}
-            >
-              Cancel upload
-            </button>
-          ) : null}
+          <button
+            type="button"
+            className={styles.cancelBtn}
+            onClick={() => {
+              setUploadedUrl("");
+              setError("");
+            }}
+          >
+            Remove image
+          </button>
         </div>
       ) : null}
     </div>

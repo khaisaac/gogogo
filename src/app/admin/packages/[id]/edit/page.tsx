@@ -173,6 +173,7 @@ export default async function AdminEditPackagePage({
               name="image_file"
               currentImage={pkg.image || ""}
               currentImageFieldName="current_image"
+              folder="packages"
             />
           </div>
 
@@ -185,6 +186,7 @@ export default async function AdminEditPackagePage({
               name="gallery_files"
               currentImages={content.gallery}
               currentImagesFieldName="current_gallery"
+              folder="packages"
             />
           </div>
 

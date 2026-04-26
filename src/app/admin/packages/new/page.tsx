@@ -160,14 +160,24 @@ export default async function AdminNewPackagePage({
 
           <div className={`${styles.field} ${styles.full}`}>
             <label htmlFor="image_file">Package Image</label>
-            <ImageUploadField id="image_file" name="image_file" />
+            <ImageUploadField
+              id="image_file"
+              name="image_file"
+              currentImageFieldName="current_image"
+              folder="packages"
+            />
           </div>
 
           <div className={`${styles.field} ${styles.full}`}>
             <label htmlFor="gallery_files">
               Package Gallery (multi photos)
             </label>
-            <MultiImageUploadField id="gallery_files" name="gallery_files" />
+            <MultiImageUploadField
+              id="gallery_files"
+              name="gallery_files"
+              currentImagesFieldName="current_gallery"
+              folder="packages"
+            />
           </div>
 
           <div className={`${styles.field} ${styles.full}`}>
