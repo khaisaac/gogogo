@@ -59,6 +59,15 @@ function getErrorMessage(error: unknown) {
   return "Failed to save package";
 }
 
+function compactErrorMessage(raw: string) {
+  const cleaned = raw.replace(/\s+/g, " ").trim();
+  if (!cleaned) {
+    return "Failed to save package";
+  }
+
+  return cleaned.length > 180 ? `${cleaned.slice(0, 177)}...` : cleaned;
+}
+
 async function insertWithSchemaFallback(
   supabase: Awaited<ReturnType<typeof requireAdminClient>>,
   payload: Record<string, unknown>,
@@ -260,7 +269,7 @@ export async function createPackage(formData: FormData) {
       throw error;
     }
 
-    const message = getErrorMessage(error);
+    const message = compactErrorMessage(getErrorMessage(error));
     console.error("❌ createPackage failed:", error);
     redirect(`/admin/packages/new?error=${encodeURIComponent(message)}`);
   }
@@ -321,7 +330,7 @@ export async function updatePackage(id: string, formData: FormData) {
       throw error;
     }
 
-    const message = getErrorMessage(error);
+    const message = compactErrorMessage(getErrorMessage(error));
     console.error("❌ updatePackage failed:", error);
     redirect(`/admin/packages/${id}/edit?error=${encodeURIComponent(message)}`);
   }
