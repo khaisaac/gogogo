@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import styles from "./ImageUploadField.module.css";
 
 type ImageUploadFieldProps = {
@@ -14,6 +15,10 @@ type ImageUploadFieldProps = {
 type UploadApiResult = {
   url?: string;
   error?: string;
+  bucket?: string;
+  path?: string;
+  token?: string;
+  publicUrl?: string;
 };
 
 const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
@@ -82,20 +87,33 @@ export default function ImageUploadField({
 
           try {
             const payload = new FormData();
-            payload.append("file", file);
-            payload.append("folder", folder);
-
-            const response = await fetch("/api/admin/uploads", {
+            const response = await fetch("/api/admin/uploads/sign", {
               method: "POST",
-              body: payload,
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                fileName: file.name,
+                fileSize: file.size,
+                folder,
+              }),
             });
             const data = await parseUploadResponse(response);
 
-            if (!response.ok || !data.url) {
+            if (!response.ok || !data.path || !data.token || !data.bucket || !data.publicUrl) {
               throw new Error(data.error || "Failed to upload image");
             }
 
-            setUploadedUrl(String(data.url));
+            const supabase = createClient();
+            const { error: uploadError } = await supabase.storage
+              .from(String(data.bucket))
+              .uploadToSignedUrl(String(data.path), String(data.token), file);
+
+            if (uploadError) {
+              throw new Error(uploadError.message || "Failed to upload image");
+            }
+
+            setUploadedUrl(String(data.publicUrl));
           } catch (uploadError) {
             const message =
               uploadError instanceof Error
