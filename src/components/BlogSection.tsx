@@ -8,7 +8,7 @@ const articles = [
     title: "Which Route Is Better: Sembalun or Senaru?",
     excerpt:
       "Choosing between Sembalun or Senaru is one of the most common questions for first-time Rinjani trekkers. Here's a detailed comparison.",
-    image: "/hero-banner.png",
+    image: "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/GOPR2283.JPG",
     date: "April 2026",
     slug: "#",
   },

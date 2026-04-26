@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url('/n.jpg') center/cover no-repeat;
+  background: url('https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/n.jpg') center/cover no-repeat;
   background-attachment: fixed; /* Parallax effect */
   overflow: hidden;
 }

@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: url('/hero-banner.svg') center/cover no-repeat;
+  background: url('https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/hero-banner.svg') center/cover no-repeat;
   overflow: hidden;
 }
 

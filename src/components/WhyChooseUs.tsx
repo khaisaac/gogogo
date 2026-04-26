@@ -5,7 +5,7 @@ import styles from "./WhyChooseUs.module.css";
 
 const whyUsCards = [
   {
-    image: "/hero-banner.png",
+    image: "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/GOPR2283.JPG",
     title: "LOCAL EXPERTS",
     text: "At our destination we have established our own local teams. We have partnered with the best local operators to ensure you benefit from unbeatable expertise. Wherever you choose to travel with us, you can be sure our guides and support staff have an unrivalled knowledge and understanding of Mount Rinjani.",
   },
