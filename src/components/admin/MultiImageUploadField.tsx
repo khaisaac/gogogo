@@ -11,6 +11,8 @@ type MultiImageUploadFieldProps = {
   maxFiles?: number;
 };
 
+const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
+
 export default function MultiImageUploadField({
   id,
   name,
@@ -54,15 +56,21 @@ export default function MultiImageUploadField({
         className={styles.input}
         onChange={(event) => {
           const files = Array.from(event.target.files || []);
+          const oversized = files.filter((file) => file.size > MAX_IMAGE_SIZE_BYTES);
+          const validBySize = files.filter((file) => file.size <= MAX_IMAGE_SIZE_BYTES);
           const remainingSlots = Math.max(0, maxFiles - currentImages.length);
-          const acceptedFiles = files.slice(0, remainingSlots);
+          const acceptedFiles = validBySize.slice(0, remainingSlots);
 
           setSelectedFiles(acceptedFiles);
-          setNotice(
-            files.length > acceptedFiles.length
-              ? `Only ${remainingSlots} new photo(s) accepted. Total gallery limit is ${maxFiles}.`
-              : null,
-          );
+
+          const messages: string[] = [];
+          if (oversized.length > 0) {
+            messages.push(`${oversized.length} file(s) skipped: each image must be smaller than 8MB.`);
+          }
+          if (validBySize.length > acceptedFiles.length) {
+            messages.push(`Only ${remainingSlots} new photo(s) accepted. Total gallery limit is ${maxFiles}.`);
+          }
+          setNotice(messages.length > 0 ? messages.join(" ") : null);
         }}
       />
 

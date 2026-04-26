@@ -10,6 +10,8 @@ type ImageUploadFieldProps = {
   currentImageFieldName?: string;
 };
 
+const MAX_IMAGE_SIZE_BYTES = 8 * 1024 * 1024;
+
 export default function ImageUploadField({
   id,
   name,
@@ -18,6 +20,7 @@ export default function ImageUploadField({
 }: ImageUploadFieldProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [objectUrl, setObjectUrl] = useState("");
+  const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -53,9 +56,21 @@ export default function ImageUploadField({
         className={styles.input}
         onChange={(event) => {
           const file = event.target.files?.[0] || null;
+          if (file && file.size > MAX_IMAGE_SIZE_BYTES) {
+            setError("Image must be smaller than 8MB.");
+            setSelectedFile(null);
+            if (inputRef.current) {
+              inputRef.current.value = "";
+            }
+            return;
+          }
+
+          setError("");
           setSelectedFile(file);
         }}
       />
+
+      {error ? <p className={styles.previewLabel}>{error}</p> : null}
 
       {previewUrl ? (
         <div className={styles.previewCard}>
@@ -73,6 +88,7 @@ export default function ImageUploadField({
               className={styles.cancelBtn}
               onClick={() => {
                 setSelectedFile(null);
+                setError("");
                 if (inputRef.current) {
                   inputRef.current.value = "";
                 }
