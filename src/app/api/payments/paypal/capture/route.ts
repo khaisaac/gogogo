@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createServerClient } from '@supabase/ssr'
 import { capturePayPalOrder } from '@/lib/payments/paypal'
 
 export async function POST(request: Request) {
@@ -33,7 +33,17 @@ export async function POST(request: Request) {
         paymentStatus = 'pending'
     }
 
-    const supabase = await createClient()
+    // Use service_role to bypass RLS — the user may not own the payment row
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        cookies: {
+          getAll() { return [] },
+          setAll() {},
+        },
+      }
+    )
 
     // Update payment record
     const { error: paymentError } = await supabase
@@ -59,9 +69,26 @@ export async function POST(request: Request) {
         .single()
 
       if (payment) {
+        const { data: booking } = await supabase
+          .from('bookings')
+          .select('payment_type, payment_status')
+          .eq('id', payment.booking_id)
+          .single()
+
+        let newPaymentStatus = 'fully_paid'
+        if (
+          booking?.payment_type === 'deposit' &&
+          booking?.payment_status === 'pending'
+        ) {
+          newPaymentStatus = 'deposit_paid'
+        }
+
         await supabase
           .from('bookings')
-          .update({ status: 'confirmed' })
+          .update({
+            status: 'confirmed',
+            payment_status: newPaymentStatus,
+          })
           .eq('id', payment.booking_id)
       }
     }

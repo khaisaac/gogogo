@@ -5,10 +5,10 @@ import RotatingBadge from "./RotatingBadge";
 import styles from "./About.module.css";
 
 const aboutImages = [
-  "/hero-banner.png",
-  "/senaru.jpg",
-  "/sembalun.jpg",
-  "/top.jpg"
+  "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/GOPR2354.JPG",
+  "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/PHOTO-2026-01-07-18-02-49.jpg",
+  "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/PHOTO-2026-01-07-18-02-49.jpg",
+  "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/n.jpg"
 ];
 
 export default function About() {

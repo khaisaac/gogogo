@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import PackageCard from "@/components/PackageCard";
 import PackageGallery from "./PackageGallery";
 import PackagePricingSelector from "./PackagePricingSelector";
+import PackagePricingTable from "./PackagePricingTable";
 import PackageSectionsAccordion from "./PackageSectionsAccordion";
 import BottomBookingScrollButton from "./BottomBookingScrollButton";
 import styles from "./PackageDetailPage.module.css";
@@ -141,21 +142,27 @@ export default async function PackageDetailPage({
             <p className={styles.locationLabel}>{routeLabel} Route</p>
             <h1 className={styles.title}>{trekkingPackage.title}</h1>
             <div className={styles.reviewRow}>
-              <span className={styles.stars}>★★★★☆</span>
+              <span className={styles.stars}></span>
               <span className={styles.rating}>
-                4.{trekkingPackage.difficulty}
+              
               </span>
-              <span className={styles.reviews}>249 reviews</span>
-              <span className={styles.provider}>
-                Activity Provider: Trekking Mount Rinjani
-              </span>
+              <span className={styles.reviews}></span>
+
             </div>
 
             <div className={styles.mediaAndBooking}>
-              <PackageGallery
-                images={galleryImages}
-                packageTitle={trekkingPackage.title}
-              />
+              <div>
+                <PackageGallery
+                  images={galleryImages}
+                  packageTitle={trekkingPackage.title}
+                />
+
+                <p className={styles.summary}>
+                  {content.detail || "Package detail belum tersedia."}
+                </p>
+
+                <PackagePricingTable prices={trekkingPackage} />
+              </div>
 
               <aside id="package-selection-card" className={styles.bookingCard}>
                 <PackagePricingSelector
@@ -181,10 +188,6 @@ export default async function PackageDetailPage({
                 </ul>
               </aside>
             </div>
-
-            <p className={styles.summary}>
-              {content.detail || "Package detail belum tersedia."}
-            </p>
           </div>
         </section>
 

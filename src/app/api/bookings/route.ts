@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Resend } from "resend";
 import {
   getPerPaxPrice,
@@ -66,12 +67,15 @@ export async function POST(request: Request) {
       data: { user },
     } = await supabase.auth.getUser();
 
+    // Use admin client (bypasses RLS) for DB operations
+    const adminSupabase = createAdminClient();
+
     // Get package details for pricing
     let package_title = null;
     let total_price = null;
 
     if (package_id) {
-      const { data: pkg } = await supabase
+      const { data: pkg } = await adminSupabase
         .from("packages")
         .select("*")
         .eq("id", package_id)
@@ -133,8 +137,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Insert booking
-    const { data: booking, error: bookingError } = await supabase
+    // Insert booking using admin client to bypass RLS
+    const { data: booking, error: bookingError } = await adminSupabase
       .from("bookings")
       .insert({
         user_id: user?.id || null,
@@ -159,7 +163,7 @@ export async function POST(request: Request) {
       .single();
 
     if (bookingError) {
-      console.error("Booking insert error:", bookingError);
+      console.error("Booking insert error:", bookingError.message, bookingError.code, bookingError.details);
       return NextResponse.json(
         { error: "Failed to create booking" },
         { status: 500 },
@@ -257,9 +261,12 @@ export async function GET() {
       );
     }
 
-    const { data: bookings, error } = await supabase
+    const adminSupabase = createAdminClient();
+
+    const { data: bookings, error } = await adminSupabase
       .from("bookings")
       .select("*, payments(*)")
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
     if (error) {

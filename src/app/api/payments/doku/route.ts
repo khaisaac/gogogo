@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { createDokuPayment } from '@/lib/payments/doku'
 
 export async function POST(request: Request) {
@@ -13,10 +13,10 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = await createClient()
+    const adminSupabase = createAdminClient()
 
     // Fetch the booking
-    const { data: booking, error: bookingError } = await supabase
+    const { data: booking, error: bookingError } = await adminSupabase
       .from('bookings')
       .select('*')
       .eq('id', booking_id)
@@ -36,12 +36,25 @@ export async function POST(request: Request) {
       )
     }
 
-    // Generate invoice number
-    const invoiceNumber = `INV-${booking.id.slice(0, 8).toUpperCase()}-${Date.now()}`
-
     const origin = new URL(request.url).origin
 
-    const amountToPay = booking.deposit_amount || booking.total_price;
+    if (booking.payment_status === 'fully_paid') {
+      return NextResponse.json(
+        { error: 'Booking is already fully paid' },
+        { status: 400 }
+      )
+    }
+
+    const isPayingBalance = booking.payment_status === 'deposit_paid' && booking.balance_amount > 0;
+    const amountToPay = isPayingBalance 
+      ? booking.balance_amount 
+      : (booking.deposit_amount || booking.total_price);
+
+    // Generate invoice number
+    let invoiceNumber = `INV-${booking.id.slice(0, 8).toUpperCase()}-${Date.now()}`
+    if (isPayingBalance) {
+      invoiceNumber += '-BAL';
+    }
 
     // Create DOKU payment
     const dokuResponse = await createDokuPayment({
@@ -54,15 +67,15 @@ export async function POST(request: Request) {
     })
 
     if (!dokuResponse?.response?.payment?.url) {
-      console.error('DOKU response error:', dokuResponse)
+      console.error('DOKU response error:', JSON.stringify(dokuResponse, null, 2))
       return NextResponse.json(
         { error: 'Failed to create DOKU payment' },
         { status: 500 }
       )
     }
 
-    // Create payment record in DB (using service role for insert)
-    const { error: paymentError } = await supabase
+    // Create payment record using admin client to bypass RLS
+    const { error: paymentError } = await adminSupabase
       .from('payments')
       .insert({
         booking_id: booking.id,

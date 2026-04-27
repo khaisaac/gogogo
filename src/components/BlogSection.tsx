@@ -145,7 +145,7 @@ export default function BlogSection() {
           </div>
         </div>
         <div className={styles.actions}>
-          <a href="#" className="btn-outline">See All Articles</a>
+          <a href="/blog" className="btn-outline">See All Articles</a>
         </div>
       </div>
     </section>

@@ -68,7 +68,7 @@ export default function Navbar() {
         </Link>
 
         <nav className={`${styles.nav} ${menuOpen ? styles.navOpen : ""}`}>
-          <a href="#hero" className={styles.navLink} onClick={closeMenu}>Home</a>
+          {/* <a href="#hero" className={styles.navLink} onClick={closeMenu}>Home</a> */}
 
           <div
             className={styles.dropdown}
@@ -86,26 +86,27 @@ export default function Navbar() {
               </svg>
             </button>
             <div className={`${styles.dropdownMenu} ${packagesOpen ? styles.dropdownOpen : ""}`}>
-              <a href="#sembalun" className={styles.dropdownItem} onClick={closeMenu}>
+              <Link href="/#sembalun" className={styles.dropdownItem} onClick={closeMenu}>
                 <span className={styles.dropdownIcon}>🏔️</span>
                 <div>
                   <strong>Sembalun Route</strong>
                   <small>Path to the Summit — 3,726m</small>
                 </div>
-              </a>
-              <a href="#senaru" className={styles.dropdownItem} onClick={closeMenu}>
+              </Link>
+              <Link href="/#senaru" className={styles.dropdownItem} onClick={closeMenu}>
                 <span className={styles.dropdownIcon}>🌿</span>
                 <div>
                   <strong>Senaru Route</strong>
                   <small>The Green Route — Forests & Waterfalls</small>
                 </div>
-              </a>
+              </Link>
             </div>
           </div>
 
-          <a href="#about" className={styles.navLink} onClick={closeMenu}>About</a>
-          <a href="#pricing" className={styles.navLink} onClick={closeMenu}>Pricing</a>
-          <a href="#contact" className={styles.navLink} onClick={closeMenu}>Contact</a>
+          <Link href="/#about" className={styles.navLink} onClick={closeMenu}>About</Link>
+          <Link href="/#pricing" className={styles.navLink} onClick={closeMenu}>Pricing</Link>
+          <Link href="/blog" className={styles.navLink} onClick={closeMenu}>Blog</Link>
+          <Link href="/#contact" className={styles.navLink} onClick={closeMenu}>Contact</Link>
         </nav>
 
         <div className={styles.actions}>
@@ -147,14 +148,12 @@ export default function Navbar() {
               </div>
             </div>
           ) : (
-            <Link href="/login" passHref legacyBehavior>
-              <button className={styles.loginBtn} id="login-button">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-                <span>Login</span>
-              </button>
+            <Link href="/login" className={styles.loginBtn} id="login-button">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <span>Login</span>
             </Link>
           )}
 

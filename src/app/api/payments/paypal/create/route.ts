@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { createPayPalOrder } from '@/lib/payments/paypal'
 
 export async function POST(request: Request) {
@@ -13,10 +13,10 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = await createClient()
+    const adminSupabase = createAdminClient()
 
     // Fetch the booking
-    const { data: booking, error: bookingError } = await supabase
+    const { data: booking, error: bookingError } = await adminSupabase
       .from('bookings')
       .select('*')
       .eq('id', booking_id)
@@ -39,16 +39,30 @@ export async function POST(request: Request) {
     const origin = new URL(request.url).origin
     const invoiceId = `PP-${booking.id.slice(0, 8).toUpperCase()}-${Date.now()}`
 
-    const amountToPay = booking.deposit_amount || booking.total_price;
+    if (booking.payment_status === 'fully_paid') {
+      return NextResponse.json(
+        { error: 'Booking is already fully paid' },
+        { status: 400 }
+      )
+    }
+
+    const isPayingBalance = booking.payment_status === 'deposit_paid' && booking.balance_amount > 0;
+    const amountToPay = isPayingBalance 
+      ? booking.balance_amount 
+      : (booking.deposit_amount || booking.total_price);
 
     // Create PayPal order
+    // returnUrl: PayPal appends ?token=<ORDER_ID>&PayerID=... on redirect
+    // The success page will detect the token and call /api/payments/paypal/capture
     const paypalOrder = await createPayPalOrder({
       amount: amountToPay,
       currency: 'USD',
-      description: booking.package_title || 'Rinjani Trekking Package',
+      description: isPayingBalance 
+        ? `${booking.package_title || 'Rinjani Trekking Package'} - Balance Payment`
+        : booking.package_title || 'Rinjani Trekking Package',
       invoiceId,
       returnUrl: `${origin}/booking/success?booking_id=${booking.id}`,
-      cancelUrl: `${origin}/booking/payment?booking_id=${booking.id}&cancelled=true`,
+      cancelUrl: `${origin}/booking/success?booking_id=${booking.id}&cancelled=true`,
     })
 
     // Extract the approval link
@@ -65,7 +79,7 @@ export async function POST(request: Request) {
     }
 
     // Create payment record
-    const { error: paymentError } = await supabase
+    const { error: paymentError } = await adminSupabase
       .from('payments')
       .insert({
         booking_id: booking.id,

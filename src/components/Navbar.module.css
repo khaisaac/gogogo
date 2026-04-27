@@ -326,6 +326,31 @@
   }
   
   .profileDropdown {
-    transform: none;
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    left: auto;
+    background: var(--color-white);
+    box-shadow: var(--shadow-lg);
+    width: 280px;
+    transform: translateY(8px);
+    border-radius: 8px;
+    z-index: 1005;
+  }
+
+  .dropdownOpen.profileDropdown {
+    transform: translateY(0);
+  }
+
+  .profileDropdown .dropdownItem {
+    color: var(--color-heading);
+  }
+  
+  .profileDropdown .dropdownItem strong {
+    color: var(--color-heading);
+  }
+
+  .profileDropdown .dropdownHeader {
+    color: var(--color-heading);
   }
 }
