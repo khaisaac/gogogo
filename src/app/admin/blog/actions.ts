@@ -12,6 +12,7 @@ type BlogPayload = {
   excerpt: string | null;
   content: string | null;
   featured_image: string | null;
+  cover_image_alignment: string;
   is_published: boolean;
   published_at: string | null;
 };
@@ -39,6 +40,8 @@ function getPayload(formData: FormData): BlogPayload {
     content: String(formData.get("content") || "").trim() || null,
     featured_image:
       String(formData.get("current_featured_image") || "").trim() || null,
+    cover_image_alignment:
+      String(formData.get("cover_image_alignment") || "center").trim(),
     is_published: isPublished,
     published_at: isPublished ? new Date().toISOString() : null,
   };

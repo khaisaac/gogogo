@@ -268,3 +268,25 @@ button {
     margin-bottom: 36px;
   }
 }
+
+/* ===== WYSIWYG CONTENT RESTORE ===== */
+.wysiwyg-content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.wysiwyg-content ul {
+  list-style: disc;
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.wysiwyg-content ol {
+  list-style: decimal;
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.wysiwyg-content li {
+  margin-bottom: 0.5rem;
+}

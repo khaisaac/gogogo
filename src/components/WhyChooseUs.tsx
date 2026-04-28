@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import styles from "./WhyChooseUs.module.css";
 
 const whyUsCards = [
@@ -88,9 +89,9 @@ export default function WhyChooseUs() {
             years of experience, Trekking Mount Rinjani is dedicated to
             responsible travel and your safety, whilst delivering exceptional service.
           </p>
-          <a href="#about" className={styles.learnMore}>
+          <Link href="/why-choose-us" className={styles.learnMore}>
             LEARN MORE
-          </a>
+          </Link>
         </div>
 
         {/* Center & Right: Image Cards Slider */}

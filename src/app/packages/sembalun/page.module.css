@@ -1,0 +1,94 @@
+.main {
+  min-height: 100vh;
+  padding-top: 80px; /* offset for fixed navbar */
+  background: var(--color-light);
+}
+
+.header {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-dark));
+  padding: 80px 0;
+  text-align: center;
+  color: var(--color-white);
+  margin-bottom: 60px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+  color: var(--color-white);
+}
+
+.desc {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.8;
+  opacity: 0.9;
+}
+
+.gridContainer {
+  padding-bottom: 100px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+}
+
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.cardLink:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 0;
+  font-size: 1.2rem;
+  color: var(--color-text);
+  background: var(--color-white);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .title {
+    font-size: 2.5rem;
+  }
+  .header {
+    padding: 60px 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .title {
+    font-size: 2rem;
+  }
+  .header {
+    padding: 40px 0;
+    margin-bottom: 40px;
+  }
+}

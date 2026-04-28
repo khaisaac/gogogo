@@ -1,0 +1,157 @@
+.main {
+  min-height: 100vh;
+  padding-top: 80px; /* offset for fixed navbar */
+  background: var(--color-light);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--color-dark), var(--color-heading));
+  padding: 100px 0;
+  text-align: center;
+  color: var(--color-white);
+  margin-bottom: 80px;
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+  color: var(--color-white);
+}
+
+.heroDesc {
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.8;
+  opacity: 0.9;
+}
+
+.contentContainer {
+  padding-bottom: 120px;
+}
+
+.featureBlock {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  margin-bottom: 100px;
+}
+
+.featureBlock:last-child {
+  margin-bottom: 0;
+}
+
+.featureBlock.reversed {
+  direction: rtl;
+}
+
+.featureBlock.reversed > * {
+  direction: ltr;
+}
+
+.textContent {
+  padding-right: 20px;
+}
+
+.featureBlock.reversed .textContent {
+  padding-right: 0;
+  padding-left: 20px;
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-heading);
+  margin-bottom: 24px;
+}
+
+.textContent p {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: var(--color-text);
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.textContent p:last-child {
+  margin-bottom: 0;
+}
+
+.imageContent {
+  position: relative;
+  width: 100%;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 75%; /* 4:3 Aspect Ratio */
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.image {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.imageWrapper:hover .image {
+  transform: scale(1.05);
+}
+
+@media (max-width: 992px) {
+  .hero {
+    padding: 80px 0;
+  }
+  .heroTitle {
+    font-size: 2.8rem;
+  }
+  .featureBlock {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin-bottom: 80px;
+  }
+  .featureBlock.reversed {
+    direction: ltr;
+  }
+  .textContent {
+    padding: 0;
+    order: 2;
+  }
+  .featureBlock.reversed .textContent {
+    padding: 0;
+  }
+  .imageContent {
+    order: 1;
+  }
+  .sectionTitle {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 60px 0;
+    margin-bottom: 60px;
+  }
+  .heroTitle {
+    font-size: 2.2rem;
+  }
+  .heroDesc {
+    font-size: 1.05rem;
+  }
+  .contentContainer {
+    padding-bottom: 80px;
+  }
+  .featureBlock {
+    margin-bottom: 60px;
+  }
+}

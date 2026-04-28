@@ -156,9 +156,6 @@
 /* Sembalun Packages Styles (Destination Banner Layout) */
 .sembalunSection {
   position: relative;
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
   padding: 120px 0;
   overflow: hidden;
   overflow-x: clip;
@@ -174,27 +171,14 @@
 .sembalunOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(15, 25, 35, 0.7) 0%,
-    rgba(15, 25, 35, 0.3) 50%,
-    rgba(15, 25, 35, 0) 100%
-  );
+  background: rgba(15, 25, 35, 0.85); /* Use a darker overlay for better contrast */
 }
 
-.sembalunContainer {
+.sembalunHeader {
+  text-align: center;
+  margin-bottom: 64px;
   position: relative;
   z-index: 1;
-  width: 100%;
-  max-width: 1400px;
-  display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 80px;
-  align-items: center;
-}
-
-.sembalunLeft {
-  color: var(--color-white);
 }
 
 .sembalunTitle {
@@ -214,13 +198,41 @@
   color: var(--color-white);
   line-height: 1.7;
   opacity: 0.9;
-  margin-bottom: 40px;
-  max-width: 95%;
+  margin: 0 auto;
+  max-width: 800px;
 }
 
-.sembalunControls {
-  display: flex;
-  gap: 16px;
+.sembalunSliderGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  padding: 0 20px;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.sembalunSlideItem {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sembalunSlideItem a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.sembalunSlideItem a:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 4px;
+}
+
+.sembalunActions {
+  text-align: center;
+  margin-top: 64px;
+  position: relative;
+  z-index: 1;
 }
 
 .arrowBtn {
@@ -241,59 +253,13 @@
   transform: scale(1.05);
 }
 
-.sembalunRight {
-  position: relative;
-  width: 100%;
-}
-
 .mobileControls {
   display: none;
   gap: 16px;
   justify-content: center;
   margin-top: 24px;
-}
-
-.slider {
-  display: flex;
-  gap: 20px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  padding-bottom: 24px;
-  /* Hide scrollbar */
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-  cursor: grab;
-  user-select: none;
-}
-
-.slider.dragging {
-  cursor: grabbing;
-  scroll-snap-type: none; /* remove snap feel while dragging for smoothness */
-  scroll-behavior: auto;
-}
-
-.slider::-webkit-scrollbar {
-  display: none;
-}
-
-.slideItem {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  min-width: 100%;
-  max-width: 100%;
-  flex-shrink: 0;
-}
-
-.slideItem a {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-}
-
-.slideItem a:focus-visible {
-  outline: 3px solid var(--color-primary);
-  outline-offset: 4px;
+  position: relative;
+  z-index: 1;
 }
 
 .senaruSlideItem a {
@@ -315,8 +281,11 @@
   .senaruSlider > div:nth-child(4) {
     display: none;
   }
-  .sembalunContainer {
-    grid-template-columns: 1fr 1.5fr;
+  .sembalunSliderGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .sembalunSliderGrid > div:nth-child(4) {
+    display: none;
   }
 }
 
@@ -326,7 +295,7 @@
   }
   .senaruSlider {
     display: flex; /* Override grid on mobile */
-    padding: 0 0 24px;
+    padding-bottom: 24px;
   }
   .senaruSlideItem {
     min-width: 100%;
@@ -338,9 +307,36 @@
   .senaruSlider > div:nth-child(4) {
     display: block;
   }
-  .sembalunContainer {
-    grid-template-columns: 1fr;
-    gap: 40px;
+  .sembalunSliderGrid {
+    display: flex; /* Override grid on mobile */
+    gap: 20px;
+    padding-bottom: 24px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    /* Hide scrollbar */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+    cursor: grab;
+    user-select: none;
+  }
+  .sembalunSliderGrid::-webkit-scrollbar {
+    display: none;
+  }
+  .sembalunSliderGrid.dragging {
+    cursor: grabbing;
+    scroll-snap-type: none; /* remove snap feel while dragging for smoothness */
+    scroll-behavior: auto;
+  }
+  .sembalunSlideItem {
+    min-width: 100%;
+    max-width: 100%;
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  .sembalunSliderGrid > div:nth-child(4) {
+    display: block;
   }
   .sembalunOverlay {
     background: rgba(15, 25, 35, 0.6);
@@ -349,19 +345,7 @@
     font-size: 2.6rem;
   }
   .sembalunSection {
-    min-height: auto;
     padding: 80px 0;
-  }
-  .sembalunRight {
-    width: 100%;
-    overflow: hidden;
-  }
-  .slideItem {
-    min-width: 100%;
-    max-width: 100%;
-  }
-  .sembalunControls {
-    display: none;
   }
   .mobileControls {
     display: flex;
@@ -379,13 +363,6 @@
   }
   .sembalunSection {
     padding: 60px 0;
-  }
-  .sembalunControls {
-    margin-bottom: 8px;
-  }
-  .slideItem {
-    min-width: 100%;
-    max-width: 100%;
   }
 }
 
@@ -406,9 +383,8 @@
   .sembalunDesc {
     font-size: 0.9rem;
   }
-  .slideItem {
-    min-width: 100%;
-    max-width: 100%;
+  .sembalunSliderGrid {
+    gap: 20px;
   }
   .senaruSection {
     padding: 60px 0;

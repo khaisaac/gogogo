@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -21,7 +21,7 @@ export default async function BlogPage({
   const limit = 8;
   const from = (currentPage - 1) * limit;
   const to = from + limit - 1;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: posts, error, count } = await supabase
     .from("posts")

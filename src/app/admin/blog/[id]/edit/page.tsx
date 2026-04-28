@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdminClient } from "@/app/admin/_lib";
 import ImageUploadField from "@/components/admin/ImageUploadField";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import { updatePost } from "../../actions";
 import styles from "../../../admin.module.css";
 
@@ -135,7 +136,7 @@ export default async function AdminEditPostPage({
 
           <div className={`${styles.field} ${styles.full}`}>
             <label htmlFor="content">Content</label>
-            <textarea
+            <RichTextEditor
               id="content"
               name="content"
               defaultValue={post.content || ""}
@@ -150,7 +151,21 @@ export default async function AdminEditPostPage({
               name="featured_image_file"
               currentImage={post.featured_image || ""}
               currentImageFieldName="current_featured_image"
+              folder="blog"
             />
+          </div>
+
+          <div className={`${styles.field} ${styles.full}`}>
+            <label htmlFor="cover_image_alignment">Cover Image Alignment</label>
+            <select
+              id="cover_image_alignment"
+              name="cover_image_alignment"
+              defaultValue={post.cover_image_alignment || "center"}
+            >
+              <option value="center">Center</option>
+              <option value="left">Left Edge</option>
+              <option value="right">Right Edge</option>
+            </select>
           </div>
         </div>
 

@@ -19,17 +19,25 @@ export async function GET(request: Request) {
 
     const adminSupabase = createAdminClient();
     
-    // 2. Get tomorrow's date in YYYY-MM-DD format
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const dateString = tomorrow.toISOString().split("T")[0];
+    // 2. Calculate timestamp for 24 hours ago
+    const now = new Date();
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-    // 3. Fetch bookings that are deposit_paid and trekking_date is tomorrow
+    // 3. Fetch bookings that have:
+    //    - payment_status = 'deposit_paid'
+    //    - payment_type = 'deposit'
+    //    - balance_amount > 0
+    //    - NOT already sent reminder (deposit_reminder_sent = false)
+    //    - updated_at is between 24-48 hours ago (to catch the 24 hour mark)
     const { data: bookings, error } = await adminSupabase
       .from("bookings")
       .select("*")
       .eq("payment_status", "deposit_paid")
-      .eq("trekking_date", dateString);
+      .eq("payment_type", "deposit")
+      .gt("balance_amount", 0)
+      .eq("deposit_reminder_sent", false)
+      .lt("updated_at", now.toISOString())
+      .gt("updated_at", twentyFourHoursAgo.toISOString());
 
     if (error) {
       console.error("Failed to fetch bookings for reminder:", error);
@@ -37,7 +45,7 @@ export async function GET(request: Request) {
     }
 
     if (!bookings || bookings.length === 0) {
-      return NextResponse.json({ message: "No reminders to send today." });
+      return NextResponse.json({ message: "No reminders to send at this time." });
     }
 
     const resendApiKey = process.env.RESEND_API_KEY;
@@ -49,7 +57,7 @@ export async function GET(request: Request) {
     const origin = new URL(request.url).origin;
     let sentCount = 0;
 
-    // 4. Send emails
+    // 4. Send emails and mark as sent
     for (const booking of bookings) {
       const paymentLink = `${origin}/booking/pay-balance?booking_id=${booking.id}`;
       
@@ -57,29 +65,44 @@ export async function GET(request: Request) {
         await resend.emails.send({
           from: "Trekking Mount Rinjani <noreply@trekkingmountrinjani.com>",
           to: booking.email,
-          subject: `Action Required: Pay Balance for Rinjani Trekking (${booking.package_title})`,
+          subject: `Reminder: Complete Payment for ${booking.package_title}`,
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; line-height: 1.5;">
-              <h2 style="color: #1a5c2e;">🏔️ Your Trek is Tomorrow!</h2>
+              <h2 style="color: #1a5c2e;">🏔️ Payment Reminder</h2>
               <p>Hi <strong>${booking.full_name}</strong>,</p>
-              <p>We are excited to welcome you tomorrow for your <strong>${booking.package_title || "Rinjani Trek"}</strong>!</p>
-              <p>Our records show that you have paid a 30% deposit for this booking. The remaining balance is due today.</p>
+              <p>We hope you're excited for your upcoming <strong>${booking.package_title || "Rinjani Trek"}</strong>!</p>
+              <p>We noticed you paid a 30% deposit for your booking. To complete your reservation, please pay the remaining balance at your earliest convenience.</p>
               
-              <div style="background-color: #f8fafc; padding: 16px; border-radius: 8px; margin: 24px 0;">
-                <p style="margin: 0 0 8px 0; color: #64748b;">Remaining Balance Due:</p>
+              <div style="background-color: #f8fafc; padding: 16px; border-radius: 8px; margin: 24px 0; border-left: 4px solid #f59e0b;">
+                <p style="margin: 0 0 8px 0; color: #64748b; font-size: 14px;">Remaining Balance Due:</p>
                 <p style="margin: 0; font-size: 24px; font-weight: bold; color: #0f172a;">$${booking.balance_amount} USD</p>
+                <p style="margin: 8px 0 0 0; color: #64748b; font-size: 14px;">Trek Date: <strong>${booking.trekking_date}</strong></p>
               </div>
 
-              <p>Please complete your payment securely using DOKU or PayPal by clicking the button below:</p>
+              <p>Secure your spot by completing the payment using PayPal:</p>
               
               <div style="margin: 32px 0; text-align: center;">
-                <a href="${paymentLink}" style="background-color: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Pay Remaining Balance</a>
+                <a href="${paymentLink}" style="background-color: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; font-size: 16px;">Pay Remaining Balance</a>
               </div>
               
-              <p style="color: #64748b; font-size: 14px;">If you have any questions or have already paid, please ignore this email or reply to contact our team.</p>
+              <p style="color: #64748b; font-size: 14px;">Our team will also reach out to you via WhatsApp at <strong>${booking.whatsapp}</strong> with additional details.</p>
+              <p style="color: #64748b; font-size: 14px;">Questions? Reply to this email or contact us directly.</p>
+              <p style="margin-top: 32px; color: #94a3b8; font-size: 12px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+                Booking Reference: ${booking.id.slice(0, 8).toUpperCase()}
+              </p>
             </div>
           `,
         });
+        
+        // Mark reminder as sent
+        await adminSupabase
+          .from("bookings")
+          .update({
+            deposit_reminder_sent: true,
+            deposit_reminder_sent_at: new Date().toISOString(),
+          })
+          .eq("id", booking.id);
+        
         sentCount++;
       } catch (emailErr) {
         console.error(`Failed to send reminder to ${booking.email}:`, emailErr);
@@ -87,7 +110,7 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({
-      message: `Successfully sent ${sentCount} reminders.`,
+      message: `Successfully sent ${sentCount} deposit reminders.`,
       bookingsProcessed: bookings.length,
     });
   } catch (err) {

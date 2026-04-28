@@ -34,6 +34,13 @@ export async function POST(request: Request) {
       special_requirements,
       order_note,
       payment_type,
+      passport_number,
+      nationality,
+      gender,
+      birthday,
+      height,
+      weight,
+      arrival_day,
     } = body;
 
     const trekkersCount = Number(number_of_trekkers);
@@ -158,12 +165,24 @@ export async function POST(request: Request) {
         balance_amount,
         payment_status: "pending",
         status: "pending",
+        passport_number: passport_number || null,
+        nationality: nationality || null,
+        gender: gender || null,
+        birthday: birthday || null,
+        height: height ? Number(height) : null,
+        weight: weight ? Number(weight) : null,
+        arrival_day: arrival_day || null,
       })
       .select()
       .single();
 
     if (bookingError) {
-      console.error("Booking insert error:", bookingError.message, bookingError.code, bookingError.details);
+      console.error(
+        "Booking insert error:",
+        bookingError.message,
+        bookingError.code,
+        bookingError.details,
+      );
       return NextResponse.json(
         { error: "Failed to create booking" },
         { status: 500 },
@@ -216,6 +235,14 @@ export async function POST(request: Request) {
               <p><strong>Name:</strong> ${full_name}</p>
               <p><strong>Email:</strong> ${email}</p>
               <p><strong>WhatsApp:</strong> ${whatsapp}</p>
+              <p><strong>Passport Number:</strong> ${passport_number || "-"}</p>
+              <p><strong>Nationality:</strong> ${nationality || "-"}</p>
+              <p><strong>Gender:</strong> ${gender ? gender.charAt(0).toUpperCase() + gender.slice(1) : "-"}</p>
+              <p><strong>Birthday:</strong> ${birthday || "-"}</p>
+              <p><strong>Height (cm):</strong> ${height || "-"}</p>
+              <p><strong>Weight (kg):</strong> ${weight || "-"}</p>
+              <p><strong>Arrival Day:</strong> ${arrival_day || "-"}</p>
+              <hr style="margin: 16px 0; border: none; border-top: 1px solid #eee;">
               <p><strong>Package:</strong> ${package_title || "Custom"}</p>
               <p><strong>Date:</strong> ${trekking_date}</p>
               <p><strong>Service Type:</strong> ${selectedPriceType}</p>

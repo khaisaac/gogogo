@@ -47,8 +47,8 @@ export default function PriceTable({ packages }: PriceTableProps) {
         <span className={styles.label}>Transparent Pricing</span>
         <h2 className="section-title">Global Price</h2>
         <p className="section-subtitle">
-          Pilih tipe layanan untuk melihat harga per person berdasarkan ukuran
-          grup 1, 2-3, 4-5, 6-8, dan 9-10+ orang.
+          Choose a service type to view the price per person based on group
+          sizes of 1, 2-3, 4-5, 6-8, and 9-10+ people.
         </p>
 
         <div className={styles.priceTypeSwitch}>

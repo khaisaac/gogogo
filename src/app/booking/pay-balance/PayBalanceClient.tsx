@@ -11,7 +11,6 @@ type PayBalanceClientProps = {
 export default function PayBalanceClient({ booking }: PayBalanceClientProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("doku");
   const [error, setError] = useState<string | null>(null);
 
   const isDepositPaid = booking.payment_status === "deposit_paid";
@@ -23,12 +22,7 @@ export default function PayBalanceClient({ booking }: PayBalanceClientProps) {
     setError(null);
 
     try {
-      const endpoint =
-        paymentMethod === "doku"
-          ? "/api/payments/doku"
-          : "/api/payments/paypal/create";
-
-      const res = await fetch(endpoint, {
+      const res = await fetch("/api/payments/paypal/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ booking_id: booking.id }),
@@ -40,9 +34,7 @@ export default function PayBalanceClient({ booking }: PayBalanceClientProps) {
         throw new Error(data.error || "Payment initiation failed");
       }
 
-      if (paymentMethod === "doku" && data.payment_url) {
-        window.location.href = data.payment_url;
-      } else if (paymentMethod === "paypal" && data.approval_url) {
+      if (data.approval_url) {
         window.location.href = data.approval_url;
       } else {
         throw new Error("Invalid payment response");
@@ -59,7 +51,8 @@ export default function PayBalanceClient({ booking }: PayBalanceClientProps) {
         <div className={styles.card}>
           <h2 className={styles.title}>Payment Not Required</h2>
           <p className={styles.description}>
-            This booking does not have a pending balance or is already fully paid.
+            This booking does not have a pending balance or is already fully
+            paid.
           </p>
           <button className={styles.submitBtn} onClick={() => router.push("/")}>
             Return Home
@@ -74,7 +67,8 @@ export default function PayBalanceClient({ booking }: PayBalanceClientProps) {
       <div className={styles.card}>
         <h2 className={styles.title}>Pay Remaining Balance</h2>
         <p className={styles.description}>
-          Please complete your payment for <strong>{booking.package_title}</strong>.
+          Please complete your payment for{" "}
+          <strong>{booking.package_title}</strong>.
         </p>
 
         <div className={styles.summaryBox}>
@@ -101,36 +95,25 @@ export default function PayBalanceClient({ booking }: PayBalanceClientProps) {
 
         <form onSubmit={handleSubmit}>
           <div className={styles.paymentMethods}>
-            <h3>Select Payment Method</h3>
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="doku"
-                checked={paymentMethod === "doku"}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                disabled={loading}
-              />
-              <div className={styles.radioContent}>
-                <strong>Credit Card / Virtual Account (via DOKU)</strong>
-                <span>Secure payment via Indonesian gateway.</span>
-              </div>
-            </label>
-
-            <label className={styles.radioLabel}>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="paypal"
-                checked={paymentMethod === "paypal"}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                disabled={loading}
-              />
-              <div className={styles.radioContent}>
-                <strong>PayPal</strong>
-                <span>Checkout quickly using your PayPal account.</span>
-              </div>
-            </label>
+            <h3>Payment Method</h3>
+            <div
+              style={{
+                padding: "12px",
+                backgroundColor: "#f5f5f5",
+                borderRadius: "4px",
+              }}
+            >
+              <strong>PayPal</strong>
+              <p
+                style={{
+                  margin: "8px 0 0 0",
+                  fontSize: "0.9em",
+                  color: "#666",
+                }}
+              >
+                Checkout securely using your PayPal account.
+              </p>
+            </div>
           </div>
 
           <button type="submit" className={styles.submitBtn} disabled={loading}>

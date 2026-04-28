@@ -19,7 +19,7 @@ export function SembalunPackages({ packages }: PackageSliderProps) {
   const scrollLeft = () => {
     if (sliderRef.current) {
       const slideItem = sliderRef.current.querySelector(
-        `.${styles.slideItem}`,
+        `.${styles.sembalunSlideItem}`,
       ) as HTMLElement;
       const scrollAmount = slideItem ? slideItem.offsetWidth + 20 : 320; // width + gap
       sliderRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
@@ -29,7 +29,7 @@ export function SembalunPackages({ packages }: PackageSliderProps) {
   const scrollRight = () => {
     if (sliderRef.current) {
       const slideItem = sliderRef.current.querySelector(
-        `.${styles.slideItem}`,
+        `.${styles.sembalunSlideItem}`,
       ) as HTMLElement;
       const scrollAmount = slideItem ? slideItem.offsetWidth + 20 : 320;
       sliderRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
@@ -59,8 +59,8 @@ export function SembalunPackages({ packages }: PackageSliderProps) {
       <div className={styles.sembalunBackground}>
         <div className={styles.sembalunOverlay} />
       </div>
-      <div className={`container ${styles.sembalunContainer}`}>
-        <div className={styles.sembalunLeft}>
+      <div className={styles.container}>
+        <div className={styles.sembalunHeader}>
           <h2 className={styles.sembalunTitle}>
             Sembalun Trekking Tour Packages
           </h2>
@@ -71,58 +71,19 @@ export function SembalunPackages({ packages }: PackageSliderProps) {
             vast landscapes and the most direct access to the top. Sembalun is
             famously known as the "Path to the Summit."
           </p>
-          <a href="#" className="btn-primary" style={{ marginBottom: "48px" }}>
-            SHOW MORE
-          </a>
-          <div className={styles.sembalunControls}>
-            <button
-              onClick={scrollLeft}
-              className={styles.arrowBtn}
-              aria-label="Previous"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="square"
-              >
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={scrollRight}
-              className={styles.arrowBtn}
-              aria-label="Next"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="square"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
         </div>
 
-        <div className={styles.sembalunRight}>
+        <div className={styles.wrapper}>
           <div
-            className={`${styles.slider} ${isDragging ? styles.dragging : ""}`}
+            className={`${styles.sembalunSliderGrid} ${isDragging ? styles.dragging : ""}`}
             ref={sliderRef}
             onMouseDown={handleMouseDown}
             onMouseLeave={handleMouseLeave}
             onMouseUp={handleMouseUp}
             onMouseMove={handleMouseMove}
           >
-            {packages.map((pkg) => (
-              <div className={styles.slideItem} key={pkg.id}>
+            {packages.slice(0, 4).map((pkg) => (
+              <div className={styles.sembalunSlideItem} key={pkg.id}>
                 <Link href={`/packages/${pkg.slug}`}>
                   <PackageCard
                     title={pkg.title}
@@ -173,6 +134,11 @@ export function SembalunPackages({ packages }: PackageSliderProps) {
               </svg>
             </button>
           </div>
+        </div>
+        <div className={styles.sembalunActions}>
+          <Link href="/packages/sembalun" className="btn-primary">
+            SHOW MORE
+          </Link>
         </div>
       </div>
     </section>
@@ -245,7 +211,7 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
             onMouseUp={handleMouseUp}
             onMouseMove={handleMouseMove}
           >
-            {packages.map((pkg) => (
+            {packages.slice(0, 4).map((pkg) => (
               <div className={styles.senaruSlideItem} key={pkg.id}>
                 <Link href={`/packages/${pkg.slug}`}>
                   <PackageCard
@@ -300,9 +266,9 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
           </div>
         </div>
         <div className={styles.actions}>
-          <a href="#" className="btn-outline">
+          <Link href="/packages/senaru" className="btn-outline">
             SHOW ME MORE
-          </a>
+          </Link>
         </div>
       </div>
     </section>

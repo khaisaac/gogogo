@@ -8,7 +8,7 @@ export default async function AdminBlogPage() {
   const { data: posts, error } = await supabase
     .from("posts")
     .select(
-      "id, title, slug, is_published, published_at, created_at, categories(name), post_tags(tags(name))",
+      "id, title, slug, is_published, published_at, created_at",
     )
     .order("created_at", { ascending: false });
 
@@ -45,8 +45,6 @@ export default async function AdminBlogPage() {
               <th>Title</th>
               <th>Slug</th>
               <th>Status</th>
-              <th>Category</th>
-              <th>Tags</th>
               <th>Published At</th>
               <th>Actions</th>
             </tr>
@@ -54,7 +52,6 @@ export default async function AdminBlogPage() {
           <tbody>
             {posts?.map((post) => {
               const deleteAction = deletePost.bind(null, post.id);
-              const categoryName = post.categories?.[0]?.name;
               return (
                 <tr key={post.id}>
                   <td>{post.title}</td>
@@ -67,13 +64,6 @@ export default async function AdminBlogPage() {
                     >
                       {post.is_published ? "Published" : "Draft"}
                     </span>
-                  </td>
-                  <td>{categoryName || "-"}</td>
-                  <td>
-                    {(post.post_tags || [])
-                      .map((item) => item.tags?.[0]?.name)
-                      .filter(Boolean)
-                      .join(", ") || "-"}
                   </td>
                   <td>
                     {post.published_at

@@ -5,6 +5,17 @@ export default function AdminHomePage() {
   return (
     <section className={styles.gridCards}>
       <article className={styles.quickCard}>
+        <p className={styles.kicker}>Management</p>
+        <h2 className={styles.heading}>Bookings</h2>
+        <p className={styles.helper}>
+          Monitor all customer bookings, payment status, and refund requests.
+        </p>
+        <Link href="/admin/bookings" className={styles.primaryLink}>
+          Manage Bookings
+        </Link>
+      </article>
+
+      <article className={styles.quickCard}>
         <p className={styles.kicker}>Content</p>
         <h2 className={styles.heading}>Posts</h2>
         <p className={styles.helper}>
