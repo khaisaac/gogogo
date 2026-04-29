@@ -10,17 +10,19 @@ export async function POST(request: Request) {
     if (!booking_id || !reason) {
       return NextResponse.json(
         { error: "booking_id and reason are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json(
         { error: "Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -34,18 +36,12 @@ export async function POST(request: Request) {
       .single();
 
     if (bookingError || !booking) {
-      return NextResponse.json(
-        { error: "Booking not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
     // Check if user is the booking owner
     if (booking.user_id !== user.id && booking.email !== user.email) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     // Check if booking can be refunded (must be paid)
@@ -55,15 +51,18 @@ export async function POST(request: Request) {
     ) {
       return NextResponse.json(
         { error: "Booking must be paid to request refund" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Check if refund already requested
-    if (booking.refund_status === "requested" || booking.refund_status === "approved") {
+    if (
+      booking.refund_status === "requested" ||
+      booking.refund_status === "approved"
+    ) {
       return NextResponse.json(
         { error: "Refund request already in progress" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -78,7 +77,8 @@ export async function POST(request: Request) {
         amount: refundAmount,
         reason,
         status: "requested",
-        payment_method: booking.payment_type === "deposit" ? "paypal_deposit" : "paypal_full",
+        payment_method:
+          booking.payment_type === "deposit" ? "paypal_deposit" : "paypal_full",
       })
       .select()
       .single();
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
       console.error("Refund insert error:", refundError);
       return NextResponse.json(
         { error: "Failed to create refund request" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -138,7 +138,7 @@ export async function POST(request: Request) {
     console.error("Refund request error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

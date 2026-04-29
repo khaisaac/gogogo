@@ -96,9 +96,7 @@ export default function RefundRequestModal({
                 minLength={10}
                 rows={5}
               />
-              <p className={styles.helpText}>
-                Minimum 10 characters required
-              </p>
+              <p className={styles.helpText}>Minimum 10 characters required</p>
             </div>
 
             <div className={styles.actions}>

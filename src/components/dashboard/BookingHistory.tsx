@@ -99,8 +99,8 @@ export default function BookingHistory({ user }: { user: any }) {
   return (
     <div>
       <h2 className={styles.contentTitle}>My Bookings</h2>
-      
-      {bookings.map(booking => {
+
+      {bookings.map((booking) => {
         const isPaid =
           booking.payment_status === "fully_paid" ||
           booking.payment_status === "deposit_paid";
@@ -113,7 +113,9 @@ export default function BookingHistory({ user }: { user: any }) {
           <div key={booking.id} className={styles.bookingCard}>
             <div className={styles.bookingHeader}>
               <div>
-                <div className={styles.bookingTitle}>{booking.package_title}</div>
+                <div className={styles.bookingTitle}>
+                  {booking.package_title}
+                </div>
                 <div className={styles.bookingDate}>
                   Booked on: {new Date(booking.created_at).toLocaleDateString()}
                 </div>
@@ -122,7 +124,7 @@ export default function BookingHistory({ user }: { user: any }) {
                 className={styles.statusBadge}
                 style={{
                   backgroundColor: getPaymentStatusColor(
-                    booking.payment_status
+                    booking.payment_status,
                   ),
                   color: "white",
                   padding: "0.5rem 1rem",
@@ -140,11 +142,13 @@ export default function BookingHistory({ user }: { user: any }) {
                       : "Payment Failed"}
               </div>
             </div>
-            
+
             <div className={styles.bookingDetails}>
               <div className={styles.detailItem}>
                 <span>Trekking Date</span>
-                <strong>{new Date(booking.trekking_date).toLocaleDateString()}</strong>
+                <strong>
+                  {new Date(booking.trekking_date).toLocaleDateString()}
+                </strong>
               </div>
               <div className={styles.detailItem}>
                 <span>Participants</span>
@@ -154,12 +158,13 @@ export default function BookingHistory({ user }: { user: any }) {
                 <span>Total Price</span>
                 <strong>${booking.total_price}</strong>
               </div>
-              {booking.payment_type === "deposit" && booking.balance_amount > 0 && (
-                <div className={styles.detailItem}>
-                  <span>Balance Due</span>
-                  <strong>${booking.balance_amount}</strong>
-                </div>
-              )}
+              {booking.payment_type === "deposit" &&
+                booking.balance_amount > 0 && (
+                  <div className={styles.detailItem}>
+                    <span>Balance Due</span>
+                    <strong>${booking.balance_amount}</strong>
+                  </div>
+                )}
             </div>
 
             {booking.refund_status && (
@@ -172,7 +177,13 @@ export default function BookingHistory({ user }: { user: any }) {
                   borderLeft: `4px solid ${getRefundStatusColor(booking.refund_status)}`,
                 }}
               >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
                   <div>
                     <p
                       style={{
@@ -187,7 +198,9 @@ export default function BookingHistory({ user }: { user: any }) {
                       style={{
                         display: "inline-block",
                         padding: "0.25rem 0.75rem",
-                        backgroundColor: getRefundStatusColor(booking.refund_status),
+                        backgroundColor: getRefundStatusColor(
+                          booking.refund_status,
+                        ),
                         color: "white",
                         borderRadius: "999px",
                         fontWeight: 600,
@@ -205,7 +218,13 @@ export default function BookingHistory({ user }: { user: any }) {
                   </div>
                 </div>
                 {booking.refund_reason && (
-                  <p style={{ margin: "0.5rem 0 0 0", fontSize: "0.85rem", color: "#475569" }}>
+                  <p
+                    style={{
+                      margin: "0.5rem 0 0 0",
+                      fontSize: "0.85rem",
+                      color: "#475569",
+                    }}
+                  >
                     Reason: {booking.refund_reason}
                   </p>
                 )}
@@ -227,8 +246,12 @@ export default function BookingHistory({ user }: { user: any }) {
                   cursor: "pointer",
                   transition: "background 0.2s",
                 }}
-                onMouseOver={(e) => ((e.target as any).style.backgroundColor = "#dc2626")}
-                onMouseOut={(e) => ((e.target as any).style.backgroundColor = "#ef4444")}
+                onMouseOver={(e) =>
+                  ((e.target as any).style.backgroundColor = "#dc2626")
+                }
+                onMouseOut={(e) =>
+                  ((e.target as any).style.backgroundColor = "#ef4444")
+                }
               >
                 Request Refund
               </button>

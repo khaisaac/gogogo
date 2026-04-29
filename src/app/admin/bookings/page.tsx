@@ -13,7 +13,9 @@ export default async function AdminBookingsPage() {
   const adminSupabase = createAdminClient();
 
   // Verify user is admin
-  const { data: { user } } = await adminSupabase.auth.getUser();
+  const {
+    data: { user },
+  } = await adminSupabase.auth.getUser();
 
   if (!user) {
     redirect("/admin/login");

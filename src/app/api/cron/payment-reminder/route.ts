@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     // 1. Verify cron secret to prevent unauthorized access
     const authHeader = request.headers.get("authorization");
     const cronSecret = process.env.CRON_SECRET;
-    
+
     if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
       // In development, allow bypassing if CRON_SECRET is not set
       if (process.env.NODE_ENV === "production") {
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     }
 
     const adminSupabase = createAdminClient();
-    
+
     // 2. Calculate timestamp for 24 hours ago
     const now = new Date();
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -45,12 +45,17 @@ export async function GET(request: Request) {
     }
 
     if (!bookings || bookings.length === 0) {
-      return NextResponse.json({ message: "No reminders to send at this time." });
+      return NextResponse.json({
+        message: "No reminders to send at this time.",
+      });
     }
 
     const resendApiKey = process.env.RESEND_API_KEY;
     if (!resendApiKey) {
-      return NextResponse.json({ error: "Missing Resend API Key" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Missing Resend API Key" },
+        { status: 500 },
+      );
     }
     const resend = new Resend(resendApiKey);
 
@@ -60,7 +65,7 @@ export async function GET(request: Request) {
     // 4. Send emails and mark as sent
     for (const booking of bookings) {
       const paymentLink = `${origin}/booking/pay-balance?booking_id=${booking.id}`;
-      
+
       try {
         await resend.emails.send({
           from: "Trekking Mount Rinjani <noreply@trekkingmountrinjani.com>",
@@ -93,7 +98,7 @@ export async function GET(request: Request) {
             </div>
           `,
         });
-        
+
         // Mark reminder as sent
         await adminSupabase
           .from("bookings")
@@ -102,7 +107,7 @@ export async function GET(request: Request) {
             deposit_reminder_sent_at: new Date().toISOString(),
           })
           .eq("id", booking.id);
-        
+
         sentCount++;
       } catch (emailErr) {
         console.error(`Failed to send reminder to ${booking.email}:`, emailErr);
@@ -115,6 +120,9 @@ export async function GET(request: Request) {
     });
   } catch (err) {
     console.error("Cron job error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

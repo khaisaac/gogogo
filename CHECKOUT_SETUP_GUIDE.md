@@ -3,8 +3,9 @@
 Semua komponen sudah diimplementasikan. Berikut adalah checklist untuk production setup:
 
 ## ✅ Database
+
 - [x] Migration sudah di-run di Supabase
-- Tabel bookings: field baru ditambah (payment_status, payment_type, deposit_amount, balance_amount, refund_*, etc)
+- Tabel bookings: field baru ditambah (payment*status, payment_type, deposit_amount, balance_amount, refund*\*, etc)
 - Tabel refunds: created untuk audit trail
 
 ## ✅ Environment Variables (Pastikan sudah set)
@@ -26,6 +27,7 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ## ✅ Payment Flow (End-to-End)
 
 ### Checkout Process:
+
 1. Customer fills form dengan detail (Full Name, Passport, Nationality, etc)
 2. Pilih Payment Option: Full (100%) atau Deposit (30%)
 3. Submit → Create Booking → Get PayPal Order → Redirect ke PayPal
@@ -36,6 +38,7 @@ NEXT_PUBLIC_SITE_URL=https://your-domain.com
 8. Redirect ke `/dashboard` (My Bookings)
 
 ### Status Flow:
+
 ```
 pending → deposit_paid (30% paid)
 pending → fully_paid (100% paid)
@@ -46,12 +49,14 @@ pending → fully_paid (100% paid)
 Navigate to: `/admin/bookings`
 
 ### Features:
+
 - View semua bookings dengan payment status
 - Filter: All, Pending Payment, Paid, Refund Requests
 - Click "View" → Modal dengan detail lengkap
 - Refund section dengan Approve/Reject buttons
 
 ### Refund Workflow:
+
 1. Customer: Request Refund di `/dashboard` → My Bookings
 2. Modal form: Select reason (min 10 chars)
 3. Submit → Create refund record
@@ -61,10 +66,13 @@ Navigate to: `/admin/bookings`
 ## ✅ Deposit Reminder Email (Cron Job)
 
 ### Setup:
+
 Cron endpoint: `/api/cron/payment-reminder`
 
 #### Option 1: Vercel Cron (Recommended)
+
 Create file `vercel.json` di root:
+
 ```json
 {
   "crons": [
@@ -77,6 +85,7 @@ Create file `vercel.json` di root:
 ```
 
 Runs every 30 minutes. Akan send email hanya ke bookings yang:
+
 - payment_status = 'deposit_paid'
 - payment_type = 'deposit'
 - balance_amount > 0
@@ -84,9 +93,11 @@ Runs every 30 minutes. Akan send email hanya ke bookings yang:
 - updated_at antara 24-48 jam lalu
 
 #### Option 2: External Cron Service
+
 Gunakan: cron-job.org, easycron.com, atau Vercel Cron
 
 Request:
+
 ```
 GET /api/cron/payment-reminder
 Header: Authorization: Bearer {CRON_SECRET}
@@ -95,6 +106,7 @@ Header: Authorization: Bearer {CRON_SECRET}
 ## ✅ My Bookings (Dashboard) Features
 
 User dapat:
+
 1. Lihat semua bookings mereka dengan status
 2. Lihat payment status (Fully Paid, Deposit Paid, Pending, Failed)
 3. Lihat balance due (jika deposit)
@@ -107,12 +119,14 @@ User dapat:
 ## ✅ Payment Methods
 
 Saat ini hanya **PayPal**:
+
 - Tidak ada DOKU lagi
 - Semua payment via PayPal
 
 ## 🔧 Manual Testing Checklist
 
 ### Test 1: Full Payment Checkout
+
 - [ ] Fill semua form fields
 - [ ] Select "Pay in Full (100%)"
 - [ ] Submit → redirects ke PayPal
@@ -122,6 +136,7 @@ Saat ini hanya **PayPal**:
 - [ ] Terima email konfirmasi (2 email: customer + admin)
 
 ### Test 2: Deposit Checkout
+
 - [ ] Fill form, select "Pay Deposit Only (30%)"
 - [ ] Amount to pay: 30% dari total
 - [ ] Submit → PayPal → Approve
@@ -130,6 +145,7 @@ Saat ini hanya **PayPal**:
 - [ ] Dashboard: Tombol "Pay Balance Due" muncul
 
 ### Test 3: Pay Balance
+
 - [ ] Customer: Klik "Pay Balance Due" dari booking
 - [ ] Masuk ke `/booking/pay-balance?booking_id=...`
 - [ ] Modal muncul dengan amount yg benar
@@ -139,6 +155,7 @@ Saat ini hanya **PayPal**:
 - [ ] Dashboard: Update ke "Fully Paid"
 
 ### Test 4: Deposit Reminder Email
+
 - [ ] Create booking dengan deposit
 - [ ] Wait 24-25 hours (atau manual test):
   ```bash
@@ -149,6 +166,7 @@ Saat ini hanya **PayPal**:
 - [ ] Email berisi: remaining balance, payment link, trek date
 
 ### Test 5: Refund Request
+
 - [ ] Go to `/dashboard` → My Bookings
 - [ ] Klik "Request Refund" pada booking yg eligible
 - [ ] Fill reason
@@ -187,17 +205,20 @@ Saat ini hanya **PayPal**:
 ## 🐛 Debugging Commands
 
 ### Check Cron Secret Setup:
+
 ```bash
 echo $CRON_SECRET  # Should print your secret
 ```
 
 ### Manual Cron Test:
+
 ```bash
 curl -v -H "Authorization: Bearer $CRON_SECRET" \
   http://localhost:3000/api/cron/payment-reminder
 ```
 
 ### Database Check (Supabase):
+
 ```sql
 -- Check bookings with payment status
 SELECT id, full_name, payment_status, payment_type, deposit_amount, balance_amount, refund_status

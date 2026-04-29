@@ -43,7 +43,7 @@ const getRefundStatusColor = (status: string | null) => {
 export default function BookingsTable({ bookings }: BookingsTableProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "paid" | "refund">(
-    "all"
+    "all",
   );
 
   const filteredBookings = bookings.filter((booking) => {
@@ -82,11 +82,13 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
           onClick={() => setFilter("paid")}
         >
           Paid (
-          {bookings.filter(
-            (b) =>
-              b.payment_status === "fully_paid" ||
-              b.payment_status === "deposit_paid"
-          ).length}
+          {
+            bookings.filter(
+              (b) =>
+                b.payment_status === "fully_paid" ||
+                b.payment_status === "deposit_paid",
+            ).length
+          }
           )
         </button>
         <button
@@ -114,7 +116,10 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
           <tbody>
             {filteredBookings.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ textAlign: "center", padding: "2rem" }}>
+                <td
+                  colSpan={7}
+                  style={{ textAlign: "center", padding: "2rem" }}
+                >
                   No bookings found
                 </td>
               </tr>
@@ -128,7 +133,9 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
                 >
                   <td>
                     <div className={styles.guestInfo}>
-                      <div className={styles.guestName}>{booking.full_name}</div>
+                      <div className={styles.guestName}>
+                        {booking.full_name}
+                      </div>
                       <div className={styles.guestEmail}>{booking.email}</div>
                     </div>
                   </td>
@@ -143,7 +150,7 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
                       className={styles.badge}
                       style={{
                         backgroundColor: getPaymentStatusColor(
-                          booking.payment_status
+                          booking.payment_status,
                         ),
                       }}
                     >
@@ -172,7 +179,7 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
                         className={styles.badge}
                         style={{
                           backgroundColor: getRefundStatusColor(
-                            booking.refund_status
+                            booking.refund_status,
                           ),
                         }}
                       >
@@ -193,7 +200,7 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
                       className={styles.expandBtn}
                       onClick={() =>
                         setExpandedId(
-                          expandedId === booking.id ? null : booking.id
+                          expandedId === booking.id ? null : booking.id,
                         )
                       }
                     >
@@ -247,7 +254,9 @@ function BookingDetail({
         alert("Error: " + (data.error || "Failed to process refund"));
       } else {
         alert(
-          approved ? "Refund approved and processed" : "Refund request rejected"
+          approved
+            ? "Refund approved and processed"
+            : "Refund request rejected",
         );
         onClose();
       }
@@ -302,8 +311,7 @@ function BookingDetail({
               <strong>Arrival Day:</strong> {booking.arrival_day || "N/A"}
             </p>
             <p>
-              <strong>Pickup Location:</strong>{" "}
-              {booking.hotel_pickup_location}
+              <strong>Pickup Location:</strong> {booking.hotel_pickup_location}
             </p>
             <p>
               <strong>Participants:</strong> {booking.number_of_trekkers}
@@ -322,8 +330,7 @@ function BookingDetail({
             {booking.payment_type === "deposit" && (
               <>
                 <p>
-                  <strong>Deposit Amount:</strong> ${booking.deposit_amount}{" "}
-                  USD
+                  <strong>Deposit Amount:</strong> ${booking.deposit_amount} USD
                 </p>
                 <p>
                   <strong>Balance Due:</strong> ${booking.balance_amount} USD

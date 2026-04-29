@@ -10,19 +10,21 @@ export async function POST(request: Request) {
     if (!refund_id || approved === undefined) {
       return NextResponse.json(
         { error: "refund_id and approved are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const adminSupabase = createAdminClient();
 
     // Verify admin user
-    const { data: { user } } = await adminSupabase.auth.getUser();
+    const {
+      data: { user },
+    } = await adminSupabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json(
         { error: "Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -33,10 +35,7 @@ export async function POST(request: Request) {
       .single();
 
     if (profile?.role !== "admin") {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     // Get refund record
@@ -47,10 +46,7 @@ export async function POST(request: Request) {
       .single();
 
     if (refundError || !refund) {
-      return NextResponse.json(
-        { error: "Refund not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Refund not found" }, { status: 404 });
     }
 
     // Get booking
@@ -61,10 +57,7 @@ export async function POST(request: Request) {
       .single();
 
     if (!booking) {
-      return NextResponse.json(
-        { error: "Booking not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
     const newStatus = approved ? "approved" : "rejected";
@@ -157,7 +150,7 @@ export async function POST(request: Request) {
     console.error("Refund approval error:", err);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
