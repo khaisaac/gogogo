@@ -5,7 +5,7 @@ import ClientSlider from "./ClientSlider";
 
 export default async function BlogSection() {
   const supabase = createAdminClient();
-  const { data: articles = [], error } = await supabase
+  const { data, error } = await supabase
     .from("posts")
     .select(
       "id, title, slug, excerpt, featured_image, published_at, categories(name)",
@@ -13,6 +13,16 @@ export default async function BlogSection() {
     .eq("is_published", true)
     .order("published_at", { ascending: false })
     .limit(4);
+
+  const articles = (data ?? []) as Array<{
+    id: string;
+    title: string;
+    slug: string;
+    excerpt: string;
+    featured_image: string | null;
+    published_at: string;
+    categories?: Array<{ name: string }> | null;
+  }>;
 
   return (
     <section className={styles.blogSection}>
