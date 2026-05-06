@@ -89,3 +89,20 @@
   color: #b32d2e;
   line-height: 1.4;
 }
+
+.removeBtn {
+  border: 1px solid #b32d2e;
+  background: #ffffff;
+  color: #b32d2e;
+  border-radius: 3px;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+.removeBtn:hover {
+  background: #b32d2e;
+  color: #ffffff;
+}

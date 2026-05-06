@@ -364,6 +364,38 @@
   max-width: 760px;
 }
 
+.summary p {
+  margin-bottom: 1em;
+}
+
+.summary p:last-child {
+  margin-bottom: 0;
+}
+
+.summary ul,
+.summary ol {
+  margin-bottom: 1em;
+  padding-left: 24px;
+}
+
+.summary li {
+  margin-bottom: 0.5em;
+}
+
+.summary h1,
+.summary h2,
+.summary h3,
+.summary h4 {
+  color: #12345a;
+  margin: 1.5em 0 0.5em;
+  line-height: 1.3;
+}
+
+.summary a {
+  color: #0f6ddf;
+  text-decoration: underline;
+}
+
 .contentBlock {
   padding: 8px 0 68px;
 }

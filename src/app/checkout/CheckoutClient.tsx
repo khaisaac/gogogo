@@ -34,14 +34,18 @@ export default function CheckoutClient({
     fullName: "",
     whatsapp: "",
     hotelPickup: "",
-    specialRequirements: "",
+    specialRequirements: `Member 1:
+1. Full Name: 
+2. Passport Number: 
+3. Nationality: 
+4. Gender: 
+5. Birthday: 
+6. Height (cm): 
+7. Weight (kg): 
+
+(Copy the format above for member 2, 3, etc.)
+Special/Dietary Requirements: `,
     orderNote: "",
-    passportNumber: "",
-    nationality: "",
-    gender: "",
-    birthday: "",
-    height: "",
-    weight: "",
     arrivalDay: "",
     paymentType: "full", // full | deposit
   });
@@ -96,12 +100,6 @@ export default function CheckoutClient({
         special_requirements: formData.specialRequirements,
         order_note: formData.orderNote,
         payment_type: formData.paymentType,
-        passport_number: formData.passportNumber,
-        nationality: formData.nationality,
-        gender: formData.gender,
-        birthday: formData.birthday,
-        height: formData.height,
-        weight: formData.weight,
         arrival_day: formData.arrivalDay,
       };
 
@@ -119,7 +117,12 @@ export default function CheckoutClient({
 
       const bookingId = bookingData.booking.id;
 
-      // 2. Generate Payment URL (PayPal only)
+      // 2. Generate Payment URL (PayPal only / DOKU) or Skip if Pay Later
+      if (formData.paymentType === "pay_later") {
+        window.location.href = `/booking/success?booking_id=${bookingId}`;
+        return;
+      }
+
       const paymentRes = await fetch("/api/payments/paypal/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -145,10 +148,12 @@ export default function CheckoutClient({
     }
   };
 
-  const amountToPay =
-    formData.paymentType === "deposit"
-      ? Math.round(totalPrice * 0.3)
-      : totalPrice;
+  let amountToPay = totalPrice;
+  if (formData.paymentType === "deposit") {
+    amountToPay = Math.round(totalPrice * 0.3);
+  } else if (formData.paymentType === "pay_later") {
+    amountToPay = 0;
+  }
 
   return (
     <div className={styles.grid}>
@@ -163,90 +168,6 @@ export default function CheckoutClient({
               name="fullName"
               required
               value={formData.fullName}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Passport Number *</label>
-            <input
-              type="text"
-              name="passportNumber"
-              placeholder="e.g. ABC123456"
-              required
-              value={formData.passportNumber}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Nationality *</label>
-            <input
-              type="text"
-              name="nationality"
-              placeholder="e.g. Indonesian, American"
-              required
-              value={formData.nationality}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Gender *</label>
-            <select
-              name="gender"
-              required
-              value={formData.gender}
-              onChange={handleChange}
-              disabled={loading}
-            >
-              <option value="">-- Select Gender --</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Birthday *</label>
-            <input
-              type="date"
-              name="birthday"
-              required
-              value={formData.birthday}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Height (cm) *</label>
-            <input
-              type="number"
-              name="height"
-              placeholder="e.g. 170"
-              required
-              min="100"
-              max="250"
-              value={formData.height}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Weight (kg) *</label>
-            <input
-              type="number"
-              name="weight"
-              placeholder="e.g. 70"
-              required
-              min="30"
-              max="300"
-              value={formData.weight}
               onChange={handleChange}
               disabled={loading}
             />
@@ -308,13 +229,18 @@ export default function CheckoutClient({
           </div>
 
           <div className={styles.formGroup}>
-            <label>Special Requirements (Optional)</label>
+            <label>Members data and special request *</label>
+            <span className={styles.helpText} style={{ marginBottom: "8px", display: "block" }}>
+              (the data for registration at national park mount rinjani)
+            </span>
             <textarea
               name="specialRequirements"
-              placeholder="Dietary requirements, medical conditions, etc."
+              placeholder="Enter members data here..."
+              required
               value={formData.specialRequirements}
               onChange={handleChange}
               disabled={loading}
+              rows={12}
             />
           </div>
 
@@ -362,42 +288,63 @@ export default function CheckoutClient({
                 </span>
               </div>
             </label>
+
+            <label className={styles.radioLabel}>
+              <input
+                type="radio"
+                name="paymentType"
+                value="pay_later"
+                checked={formData.paymentType === "pay_later"}
+                onChange={handleChange}
+                disabled={loading}
+              />
+              <div className={styles.radioContent}>
+                <strong>Pay Later (On Arrival)</strong>
+                <span>
+                  Secure your booking now and pay the full amount ($
+                  {totalPrice} USD) when you arrive.
+                </span>
+              </div>
+            </label>
           </div>
 
-          <div className={styles.paymentMethods}>
-            <h3>Payment Method</h3>
-            <div
-              style={{
-                padding: "12px",
-                backgroundColor: "#f5f5f5",
-                borderRadius: "4px",
-              }}
-            >
+          {formData.paymentType !== "pay_later" && (
+            <div className={styles.paymentMethods}>
+              <h3>Payment Method</h3>
               <div
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  marginBottom: "8px",
+                  padding: "12px",
+                  backgroundColor: "#f5f5f5",
+                  borderRadius: "4px",
                 }}
               >
-                <img
-                  src="/PayPal.png"
-                  alt="PayPal"
-                  style={{ height: "24px", objectFit: "contain" }}
-                />
-                {/* <strong>PayPal</strong> */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    marginBottom: "8px",
+                  }}
+                >
+                  <img
+                    src="/PayPal.png"
+                    alt="PayPal"
+                    style={{ height: "24px", objectFit: "contain" }}
+                  />
+                </div>
+                <p style={{ margin: "0", fontSize: "0.9em", color: "#666" }}>
+                  Checkout securely using your PayPal account.
+                </p>
               </div>
-              <p style={{ margin: "0", fontSize: "0.9em", color: "#666" }}>
-                Checkout securely using your PayPal account.
-              </p>
             </div>
-          </div>
+          )}
 
           <button type="submit" className={styles.submitBtn} disabled={loading}>
             {loading
               ? "Processing..."
-              : `Proceed to Payment ($${amountToPay} USD)`}
+              : formData.paymentType === "pay_later"
+                ? "Complete Booking (Pay on Arrival)"
+                : `Proceed to Payment ($${amountToPay} USD)`}
           </button>
         </form>
       </div>

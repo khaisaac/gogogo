@@ -45,6 +45,8 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
   const [filter, setFilter] = useState<"all" | "pending" | "paid" | "refund">(
     "all",
   );
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   const filteredBookings = bookings.filter((booking) => {
     if (filter === "pending") return booking.payment_status === "pending";
@@ -61,25 +63,31 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
     return true;
   });
 
+  const totalPages = Math.ceil(filteredBookings.length / ITEMS_PER_PAGE);
+  const paginatedBookings = filteredBookings.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
   return (
     <div>
       <div className={styles.filterBar}>
         <button
           className={`${styles.filterBtn} ${filter === "all" ? styles.active : ""}`}
-          onClick={() => setFilter("all")}
+          onClick={() => { setFilter("all"); setCurrentPage(1); }}
         >
           All ({bookings.length})
         </button>
         <button
           className={`${styles.filterBtn} ${filter === "pending" ? styles.active : ""}`}
-          onClick={() => setFilter("pending")}
+          onClick={() => { setFilter("pending"); setCurrentPage(1); }}
         >
           Pending Payment (
           {bookings.filter((b) => b.payment_status === "pending").length})
         </button>
         <button
           className={`${styles.filterBtn} ${filter === "paid" ? styles.active : ""}`}
-          onClick={() => setFilter("paid")}
+          onClick={() => { setFilter("paid"); setCurrentPage(1); }}
         >
           Paid (
           {
@@ -93,7 +101,7 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
         </button>
         <button
           className={`${styles.filterBtn} ${filter === "refund" ? styles.active : ""}`}
-          onClick={() => setFilter("refund")}
+          onClick={() => { setFilter("refund"); setCurrentPage(1); }}
         >
           Refund Requests (
           {bookings.filter((b) => b.refund_status === "requested").length})
@@ -114,7 +122,7 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
             </tr>
           </thead>
           <tbody>
-            {filteredBookings.length === 0 ? (
+            {paginatedBookings.length === 0 ? (
               <tr>
                 <td
                   colSpan={7}
@@ -124,7 +132,7 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
                 </td>
               </tr>
             ) : (
-              filteredBookings.map((booking) => (
+              paginatedBookings.map((booking: any) => (
                 <tr
                   key={booking.id}
                   className={
@@ -213,6 +221,28 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button
+            className={styles.pageBtn}
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          >
+            Previous
+          </button>
+          <span className={styles.pageInfo}>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            className={styles.pageBtn}
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {expandedId && (
         <BookingDetail

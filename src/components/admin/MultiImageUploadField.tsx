@@ -44,22 +44,25 @@ export default function MultiImageUploadField({
   folder = "packages",
 }: MultiImageUploadFieldProps) {
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
+  const [removedCurrentImages, setRemovedCurrentImages] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const activeCurrentImages = currentImages.filter((src) => !removedCurrentImages.includes(src));
 
   useEffect(() => {
     if (uploadedUrls.length === 0) {
       return;
     }
 
-    const maxNewUploads = Math.max(0, maxFiles - currentImages.length);
+    const maxNewUploads = Math.max(0, maxFiles - activeCurrentImages.length);
     if (uploadedUrls.length > maxNewUploads) {
       setUploadedUrls((current) => current.slice(0, maxNewUploads));
     }
-  }, [currentImages.length, maxFiles, uploadedUrls]);
+  }, [activeCurrentImages.length, maxFiles, uploadedUrls]);
 
-  const mergedImages = [...currentImages, ...uploadedUrls].slice(0, maxFiles);
+  const mergedImages = [...activeCurrentImages, ...uploadedUrls].slice(0, maxFiles);
 
   return (
     <div className={styles.wrapper}>
@@ -96,7 +99,7 @@ export default function MultiImageUploadField({
           const validBySize = files.filter((file) => file.size <= MAX_IMAGE_SIZE_BYTES);
           const remainingSlots = Math.max(
             0,
-            maxFiles - currentImages.length - uploadedUrls.length,
+            maxFiles - activeCurrentImages.length - uploadedUrls.length,
           );
           const acceptedFiles = validBySize.slice(0, remainingSlots);
 
@@ -158,7 +161,7 @@ export default function MultiImageUploadField({
 
             setUploadedUrls((current) => {
               const merged = [...current, ...newUrls];
-              return merged.slice(0, Math.max(0, maxFiles - currentImages.length));
+              return merged.slice(0, Math.max(0, maxFiles - activeCurrentImages.length));
             });
 
             const statusMessages = [...messages];
@@ -189,17 +192,24 @@ export default function MultiImageUploadField({
 
       {isUploading ? <p className={styles.noticeText}>Uploading images...</p> : null}
 
-      {currentImages.length > 0 ? (
+      {activeCurrentImages.length > 0 ? (
         <div className={styles.sectionBlock}>
           <p className={styles.sectionLabel}>Current</p>
           <div className={styles.grid}>
-            {currentImages.map((src, index) => (
+            {activeCurrentImages.map((src, index) => (
               <div key={`${src}-${index}`} className={styles.card}>
                 <img
                   src={src}
                   alt={`Current gallery ${index + 1}`}
                   className={styles.img}
                 />
+                <button
+                  type="button"
+                  onClick={() => setRemovedCurrentImages([...removedCurrentImages, src])}
+                  className={styles.removeBtn}
+                >
+                  Remove image
+                </button>
               </div>
             ))}
           </div>
@@ -217,6 +227,13 @@ export default function MultiImageUploadField({
                   alt={`Upload preview ${index + 1}`}
                   className={styles.img}
                 />
+                <button
+                  type="button"
+                  onClick={() => setUploadedUrls(uploadedUrls.filter(url => url !== src))}
+                  className={styles.removeBtn}
+                >
+                  Remove image
+                </button>
               </div>
             ))}
           </div>

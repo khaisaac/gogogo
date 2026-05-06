@@ -157,9 +157,12 @@ export default async function PackageDetailPage({
                   packageTitle={trekkingPackage.title}
                 />
 
-                <p className={styles.summary}>
-                  {content.detail || "Package detail belum tersedia."}
-                </p>
+                <div
+                  className={styles.summary}
+                  dangerouslySetInnerHTML={{
+                    __html: content.detail || "Package detail belum tersedia."
+                  }}
+                />
 
                 <PackagePricingTable prices={trekkingPackage} />
               </div>

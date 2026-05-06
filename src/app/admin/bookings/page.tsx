@@ -1,5 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin";
-import { redirect } from "next/navigation";
+import { requireAdminClient } from "@/app/admin/_lib";
 import BookingsTable from "./BookingsTable";
 import styles from "./bookings.module.css";
 
@@ -10,26 +9,8 @@ export const metadata = {
 };
 
 export default async function AdminBookingsPage() {
-  const adminSupabase = createAdminClient();
-
-  // Verify user is admin
-  const {
-    data: { user },
-  } = await adminSupabase.auth.getUser();
-
-  if (!user) {
-    redirect("/admin/login");
-  }
-
-  const { data: profile } = await adminSupabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role !== "admin") {
-    redirect("/");
-  }
+  // requireAdminClient handles checking if the user is logged in and is an admin
+  const adminSupabase = await requireAdminClient();
 
   // Fetch all bookings with payment info
   const { data: bookings, error } = await adminSupabase

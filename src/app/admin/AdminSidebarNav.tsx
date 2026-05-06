@@ -16,6 +16,7 @@ export default function AdminSidebarNav() {
 
   const links = [
     { href: "/admin", label: "Dashboard" },
+    { href: "/admin/bookings", label: "Bookings" },
     { href: "/admin/blog", label: "Posts" },
     { href: "/admin/blog/categories", label: "Categories" },
     { href: "/admin/blog/new", label: "Add New Post" },

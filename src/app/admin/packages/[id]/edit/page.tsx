@@ -4,6 +4,7 @@ import { requireAdminClient } from "@/app/admin/_lib";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import ItineraryEditor from "@/components/admin/ItineraryEditor";
 import MultiImageUploadField from "@/components/admin/MultiImageUploadField";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 import { DIFFICULTY_OPTIONS, difficultyScoreToValue } from "@/lib/difficulty";
 import {
   GROUP_TIER_OPTIONS,
@@ -192,7 +193,7 @@ export default async function AdminEditPackagePage({
 
           <div className={`${styles.field} ${styles.full}`}>
             <label htmlFor="detail">Package Detail</label>
-            <textarea
+            <RichTextEditor
               id="detail"
               name="detail"
               defaultValue={content.detail}
