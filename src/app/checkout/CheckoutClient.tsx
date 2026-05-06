@@ -299,10 +299,10 @@ Special/Dietary Requirements: `,
                 disabled={loading}
               />
               <div className={styles.radioContent}>
-                <strong>Pay Later (On Arrival)</strong>
+                <strong>Pay Later</strong>
                 <span>
                   Secure your booking now and pay the full amount ($
-                  {totalPrice} USD) when you arrive.
+                  {totalPrice} USD) later.
                 </span>
               </div>
             </label>
