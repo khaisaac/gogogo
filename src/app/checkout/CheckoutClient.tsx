@@ -327,13 +327,13 @@ Special/Dietary Requirements: `,
                   }}
                 >
                   <img
-                    src="/PayPal.png"
-                    alt="PayPal"
+                    src="/doku.svg"
+                    alt="DOKU"
                     style={{ height: "24px", objectFit: "contain" }}
                   />
                 </div>
                 <p style={{ margin: "0", fontSize: "0.9em", color: "#666" }}>
-                  Checkout securely using your PayPal account.
+                  Checkout securely using DOKU payment gateway.
                 </p>
               </div>
             </div>
