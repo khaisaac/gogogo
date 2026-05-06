@@ -8,9 +8,10 @@ type Props = {
   defaultValue?: string;
   id?: string;
   required?: boolean;
+  placeholder?: string;
 };
 
-export default function RichTextEditor({ name, defaultValue, id, required }: Props) {
+export default function RichTextEditor({ name, defaultValue, id, required, placeholder }: Props) {
   const [value, setValue] = useState(defaultValue || "");
   const [copiedFormat, setCopiedFormat] = useState<Record<string, string> | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -86,6 +87,11 @@ export default function RichTextEditor({ name, defaultValue, id, required }: Pro
       return;
     }
     document.execCommand("removeFormat", false);
+  };
+
+  const focusEditor = () => {
+    const editable = editorRef.current?.querySelector('[contenteditable="true"]') as HTMLElement | null;
+    if (editable) editable.focus();
   };
 
   return (
@@ -172,8 +178,26 @@ export default function RichTextEditor({ name, defaultValue, id, required }: Pro
           borderRadius: "4px",
           minHeight: "300px",
           border: "1px solid #ddd",
+          position: "relative",
         }}
       >
+        {placeholder && value.length === 0 && (
+          <div
+            onClick={focusEditor}
+            style={{
+              position: "absolute",
+              top: 8,
+              left: 8,
+              right: 8,
+              color: "#6b7280",
+              pointerEvents: "auto",
+              whiteSpace: "pre-wrap",
+              cursor: "text",
+            }}
+          >
+            {placeholder}
+          </div>
+        )}
         <Editor
           value={value}
           onChange={(e) => setValue(e.target.value)}
