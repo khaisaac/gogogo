@@ -5,7 +5,7 @@ import RotatingBadge from "./RotatingBadge";
 import styles from "./About.module.css";
 
 const aboutImages = [
-  "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/GOPR2354.JPG",
+  "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/WhatsApp%20Image%202026-05-06%20at%2022.03.24.jpeg",
   "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/PHOTO-2026-01-07-18-02-49.jpg",
   "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/PHOTO-2026-01-07-18-02-49.jpg",
   "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/n.jpg"
