@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import styles from "./Navbar.module.css";
 
@@ -64,7 +65,7 @@ export default function Navbar() {
     <header className={`${styles.header} ${headerIsSolid ? styles.scrolled : ""}`}>
       <div className={styles.container}>
         <Link href="/" className={styles.logo} onClick={closeMenu}>
-          <img src="/logo.png" alt="Trekking Mount Rinjani" className={styles.logoImg} />
+          <Image src="/logo.png" alt="Trekking Mount Rinjani" width={160} height={50} className={styles.logoImg} priority />
         </Link>
 
         <nav className={`${styles.nav} ${menuOpen ? styles.navOpen : ""}`}>

@@ -11,7 +11,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { getPublicPackages } from "@/lib/public-packages";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // ISR: re-generate every 60 seconds
 
 export default async function Home() {
   const { sembalun, senaru } = await getPublicPackages();

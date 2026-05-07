@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import styles from "./WhyChooseUs.module.css";
 
@@ -110,7 +111,7 @@ export default function WhyChooseUs() {
             {whyUsCards.map((card, i) => (
               <div key={i} className={styles.card}>
                 <div className={styles.imageWrapper}>
-                  <img src={card.image} alt={card.title} className={styles.image} />
+                  <Image src={card.image} alt={card.title} fill sizes="(max-width: 768px) 100vw, 33vw" className={styles.image} loading="lazy" />
                 </div>
                 <h3 className={styles.cardTitle}>{card.title}</h3>
                 <p className={styles.cardText}>{card.text}</p>

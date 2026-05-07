@@ -1,3 +1,4 @@
+import Image from "next/image";
 import styles from "./Footer.module.css";
 
 export default function Footer() {
@@ -5,7 +6,7 @@ export default function Footer() {
     <footer id="contact" className={styles.footer}>
       <div className={`container ${styles.grid}`}>
         <div className={styles.col}>
-          <img src="/logo.png" alt="Trekking Mount Rinjani" className={styles.logo} />
+          <Image src="/logo.png" alt="Trekking Mount Rinjani" width={180} height={60} className={styles.logo} loading="lazy" />
           <p className={styles.desc}>
             Local &amp; licensed Rinjani trekking agency. Direct booking without
             intermediaries — better price, better experience.

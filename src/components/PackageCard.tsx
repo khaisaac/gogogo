@@ -1,3 +1,4 @@
+import Image from "next/image";
 import styles from "./PackageCard.module.css";
 import type { CSSProperties } from "react";
 import {
@@ -39,7 +40,14 @@ export default function PackageCard({
     <div className={`${styles.card} ${hideImage ? styles.cardNoImage : ""}`}>
       {!hideImage && (
         <div className={styles.imageWrapper}>
-          <img src={image} alt={title} className={styles.image} />
+          <Image
+            src={image}
+            alt={title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+            className={styles.image}
+            loading="lazy"
+          />
         </div>
       )}
       <div className={styles.content}>
@@ -67,3 +75,4 @@ export default function PackageCard({
     </div>
   );
 }
+

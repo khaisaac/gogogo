@@ -107,6 +107,7 @@
 .imageWrapper {
   height: 200px;
   overflow: hidden;
+  position: relative;
 }
 
 .image {

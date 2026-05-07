@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useState, UIEvent } from "react";
+import Image from "next/image";
 import RotatingBadge from "./RotatingBadge";
 import styles from "./About.module.css";
 
 const aboutImages = [
   "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/WhatsApp%20Image%202026-05-06%20at%2022.03.24.jpeg",
-  "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/PHOTO-2026-01-07-18-02-49.jpg",
+  "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/GOPR2283.JPG",
   "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/PHOTO-2026-01-07-18-02-49.jpg",
   "https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/n.jpg"
 ];
@@ -55,11 +56,14 @@ export default function About() {
   return (
     <section id="about" className={`section ${styles.about}`}>
       <div className={styles.mapBg}>
-        <img
-          src="/indonesia-map.svg"
+        <Image
+          src="/indonesia-map.png"
           alt=""
+          width={800}
+          height={400}
           className={styles.mapImage}
           aria-hidden="true"
+          loading="lazy"
         />
       </div>
       {/* Centered Header */}
@@ -121,11 +125,15 @@ export default function About() {
                 onMouseMove={handleMouseMove}
               >
                 {aboutImages.map((src, i) => (
-                  <img
+                  <Image
                     key={i}
                     src={src}
                     alt={`Rinjani Trip Highlights ${i + 1}`}
+                    width={600}
+                    height={400}
                     className={styles.slideImage}
+                    loading={i === 0 ? "eager" : "lazy"}
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                 ))}
               </div>
@@ -152,3 +160,4 @@ export default function About() {
     </section>
   );
 }
+

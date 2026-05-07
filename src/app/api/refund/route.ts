@@ -9,7 +9,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 const DOKU_CLIENT_ID = process.env.DOKU_CLIENT_ID || '';
 const DOKU_SECRET_KEY = process.env.DOKU_SECRET_KEY || '';
-const DOKU_API_URL = process.env.DOKU_API_URL || 'https://api-sandbox.doku.com';
+const DOKU_BASE_URL = process.env.DOKU_BASE_URL || 'https://api.doku.com';
 
 function generateDokuSignature(clientId: string, requestId: string, requestTimestamp: string, requestTarget: string, digest: string, secretKey: string) {
   const componentSignature = `Client-Id:${clientId}\nRequest-Id:${requestId}\nRequest-Timestamp:${requestTimestamp}\nRequest-Target:${requestTarget}\nDigest:${digest}`;
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     let dokuResponse;
 
     try {
-      dokuResponse = await axios.post(`${DOKU_API_URL}${requestTarget}`, dokuRefundPayload, {
+      dokuResponse = await axios.post(`${DOKU_BASE_URL}${requestTarget}`, dokuRefundPayload, {
         headers: {
           'Client-Id': DOKU_CLIENT_ID,
           'Request-Id': requestId,

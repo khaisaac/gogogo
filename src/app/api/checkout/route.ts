@@ -11,7 +11,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 // DOKU Credentials
 const DOKU_CLIENT_ID = process.env.DOKU_CLIENT_ID || '';
 const DOKU_SECRET_KEY = process.env.DOKU_SECRET_KEY || '';
-const DOKU_API_URL = process.env.DOKU_API_URL || 'https://api-sandbox.doku.com'; // Use sandbox for testing
+const DOKU_BASE_URL = process.env.DOKU_BASE_URL || 'https://api.doku.com';
 
 // Function to get Exchange Rate (USD to IDR)
 async function getExchangeRate() {
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
     const signature = generateDokuSignature(DOKU_CLIENT_ID, requestId, requestTimestamp, requestTarget, digest, DOKU_SECRET_KEY);
 
     // 4. Call DOKU Checkout API
-    const dokuResponse = await axios.post(`${DOKU_API_URL}${requestTarget}`, dokuPayload, {
+    const dokuResponse = await axios.post(`${DOKU_BASE_URL}${requestTarget}`, dokuPayload, {
       headers: {
         'Client-Id': DOKU_CLIENT_ID,
         'Request-Id': requestId,

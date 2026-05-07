@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./BlogSection.module.css";
 
 interface Article {
@@ -105,10 +106,13 @@ export default function ClientSlider({ items }: ClientSliderProps) {
         {items.map((a) => (
           <Link key={a.id} href={`/blog/${a.slug}`} className={styles.card}>
             <div className={styles.imageWrapper}>
-              <img
+              <Image
                 src={a.featured_image || "/hero-banner.png"}
                 alt={a.title}
+                fill
+                sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 25vw"
                 className={styles.image}
+                loading="lazy"
               />
             </div>
             <div className={styles.content}>

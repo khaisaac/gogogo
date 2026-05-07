@@ -1,0 +1,14 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /admin
+Disallow: /admin-login
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /checkout
+Disallow: /login
+
+# Sitemap
+Sitemap: https://trekkingmountrinjani.com/sitemap.xml
