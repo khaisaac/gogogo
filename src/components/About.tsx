@@ -57,7 +57,7 @@ export default function About() {
     <section id="about" className={`section ${styles.about}`}>
       <div className={styles.mapBg}>
         <Image
-          src="/indonesia-map.png"
+          src="/indonesia-map.svg"
           alt=""
           width={800}
           height={400}
