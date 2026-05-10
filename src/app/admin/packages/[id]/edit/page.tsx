@@ -39,7 +39,7 @@ export default async function AdminEditPackagePage({
 
   const updateAction = updatePackage.bind(null, id);
   const content = parsePackageContent(pkg.description);
-  const packageValues = pkg as Record<string, number | null | undefined>;
+  const packageValues = pkg as unknown as Record<string, number | null | undefined>;
 
   return (
     <section className={styles.card}>
