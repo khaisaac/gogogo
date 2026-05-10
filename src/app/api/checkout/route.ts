@@ -62,6 +62,8 @@ export async function POST(req: Request) {
       await prisma.payment.create({
         data: {
           invoice: invoiceNumber,
+          provider: "doku",
+          amount: Math.round(finalAmountUSD),
           parent_invoice: parentInvoice || null,
           amount_usd: finalAmountUSD,
           amount_idr: amountIDR,
