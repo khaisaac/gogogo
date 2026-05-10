@@ -9,7 +9,7 @@ interface Article {
   id: string;
   title: string;
   slug: string;
-  excerpt: string;
+  excerpt: string | null;
   featured_image: string | null;
   published_at: string;
   categories?: Array<{
