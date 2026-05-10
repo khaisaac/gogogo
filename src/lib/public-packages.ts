@@ -13,7 +13,7 @@ type PackageRow = {
   [key: string]: any;
 };
 
-export async function getActivePackages(route?: string): Promise<PackageRow[]> {
+export async function getPublicPackages(route?: string): Promise<PackageRow[]> {
   const where: any = { is_active: true };
   if (route) {
     where.route = route;
@@ -27,7 +27,7 @@ export async function getActivePackages(route?: string): Promise<PackageRow[]> {
   return packages as unknown as PackageRow[];
 }
 
-export async function getPackageBySlug(slug: string): Promise<PackageRow | null> {
+export async function getPublicPackageBySlug(slug: string): Promise<PackageRow | null> {
   const pkg = await prisma.package.findFirst({
     where: { slug, is_active: true },
   });
