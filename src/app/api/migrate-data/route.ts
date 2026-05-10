@@ -4,17 +4,15 @@ import { createClient } from "@supabase/supabase-js";
 
 export async function GET(request: Request) {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      return NextResponse.json({ error: "Missing Supabase env vars" }, { status: 500 });
-    }
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://pvhtohzmttglkuauibhg.supabase.co";
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2aHRvaHptdHRnbGt1YXVpYmhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDQ0MzMsImV4cCI6MjA5MjE4MDQzM30.qQdWcExJmdQoTJkefPcQ4QfX-ZN7Ya8w9W5mKxErOLo";
 
     const supabase = createClient(supabaseUrl, supabaseKey);
+    const errors: any[] = [];
 
     // 1. Packages
-    const { data: packages } = await supabase.from("packages").select("*");
+    const { data: packages, error: pkgError } = await supabase.from("packages").select("*");
+    if (pkgError) errors.push({ entity: "packages", error: pkgError });
     if (packages) {
       for (const pkg of packages) {
         await prisma.package.upsert({
@@ -30,7 +28,8 @@ export async function GET(request: Request) {
     }
 
     // 2. Categories
-    const { data: categories } = await supabase.from("categories").select("*");
+    const { data: categories, error: catError } = await supabase.from("categories").select("*");
+    if (catError) errors.push({ entity: "categories", error: catError });
     if (categories) {
       for (const cat of categories) {
         await prisma.category.upsert({
@@ -47,7 +46,8 @@ export async function GET(request: Request) {
     }
 
     // 3. Posts
-    const { data: posts } = await supabase.from("posts").select("*");
+    const { data: posts, error: postError } = await supabase.from("posts").select("*");
+    if (postError) errors.push({ entity: "posts", error: postError });
     if (posts) {
       for (const post of posts) {
         await prisma.post.upsert({
@@ -75,6 +75,7 @@ export async function GET(request: Request) {
       packagesMigrated: packages?.length || 0,
       categoriesMigrated: categories?.length || 0,
       postsMigrated: posts?.length || 0,
+      errors
     });
   } catch (error) {
     console.error("Migration error:", error);
