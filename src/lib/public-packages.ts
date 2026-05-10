@@ -1,36 +1,67 @@
 import { prisma } from "@/lib/db";
+import { getStartingPrice, type PackagePricingFields } from "@/lib/pricing";
 
-type PackageRow = {
+export type PublicPackage = {
   id: string;
-  title: string;
   slug: string;
+  title: string;
   route: string;
   duration: string;
+  difficulty: number | null;
   image: string | null;
   description: string | null;
   is_active: boolean;
-  difficulty: number | null;
-  [key: string]: any;
-};
+  displayPrice: number;
+} & PackagePricingFields;
 
-export async function getPublicPackages(route?: string): Promise<PackageRow[]> {
-  const where: any = { is_active: true };
-  if (route) {
-    where.route = route;
-  }
-
-  const packages = await prisma.package.findMany({
-    where,
-    orderBy: { created_at: "desc" },
-  });
-
-  return packages as unknown as PackageRow[];
+export function slugifyPackageTitle(input: string) {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
 }
 
-export async function getPublicPackageBySlug(slug: string): Promise<PackageRow | null> {
+function getDisplayPrice(pkg: any) {
+  return getStartingPrice(pkg);
+}
+
+function mapPackage(pkg: any): PublicPackage {
+  // If slug is not in DB, generate one dynamically
+  const slug = pkg.slug || slugifyPackageTitle(pkg.title);
+  return {
+    ...pkg,
+    slug,
+    displayPrice: getDisplayPrice(pkg),
+  };
+}
+
+export async function getPublicPackages() {
+  const packages = await prisma.package.findMany({
+    where: { is_active: true },
+    orderBy: { created_at: "asc" },
+  });
+
+  const all = packages.map(mapPackage);
+
+  return {
+    sembalun: all.filter((p) => p.route === "sembalun"),
+    senaru: all.filter((p) => p.route === "senaru"),
+  };
+}
+
+export async function getPublicPackageBySlug(slug: string): Promise<PublicPackage | null> {
   const pkg = await prisma.package.findFirst({
     where: { slug, is_active: true },
   });
 
-  return pkg as unknown as PackageRow | null;
+  if (!pkg) {
+    // Fallback: search all and match dynamically generated slug
+    const packages = await prisma.package.findMany({ where: { is_active: true } });
+    const all = packages.map(mapPackage);
+    return all.find((p) => p.slug === slug) || null;
+  }
+
+  return mapPackage(pkg);
 }
