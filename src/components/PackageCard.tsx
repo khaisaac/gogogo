@@ -13,7 +13,7 @@ interface PackageCardProps {
   image: string;
   badge?: string;
   rating?: number;
-  difficulty?: number;
+  difficulty?: number | null;
   location?: string;
   hideImage?: boolean;
 }
@@ -29,8 +29,9 @@ export default function PackageCard({
 }: PackageCardProps) {
   // Map duration string to just number and "DAYS"
   const durationNum = duration.match(/\d+/)?.[0] || "3";
-  const difficultyLevel = difficultyScoreToLevel(difficulty);
-  const difficultyText = difficultyScoreToLabel(difficulty).toUpperCase();
+  const safeDifficulty = difficulty ?? 1;
+  const difficultyLevel = difficultyScoreToLevel(safeDifficulty);
+  const difficultyText = difficultyScoreToLabel(safeDifficulty).toUpperCase();
   const difficultyFill = `${(difficultyLevel / 3) * 100}%`;
   const difficultyStyle: CSSProperties & Record<"--difficulty-fill", string> = {
     "--difficulty-fill": difficultyFill,
