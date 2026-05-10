@@ -96,6 +96,7 @@ export async function requireUser(): Promise<SessionUser> {
     // We use dynamic import to avoid circular dependency issues
     const { redirect } = await import("next/navigation");
     redirect("/login");
+    return null as never;
   }
   return user;
 }
@@ -106,12 +107,14 @@ export async function requireAdmin(): Promise<SessionUser> {
   if (!user) {
     const { redirect } = await import("next/navigation");
     redirect("/admin-login");
+    return null as never;
   }
   if (user.role !== "admin") {
     const { redirect } = await import("next/navigation");
     redirect(
       `/admin-login?error=not_admin&email=${encodeURIComponent(user.email)}`,
     );
+    return null as never;
   }
   return user;
 }
