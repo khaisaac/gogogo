@@ -1,28 +1,22 @@
 import Link from "next/link";
-import { requireAdminClient } from "@/app/admin/_lib";
+import { requireAdmin } from "@/app/admin/_lib";
+import { prisma } from "@/lib/db";
 import { deletePost } from "./actions";
 import styles from "../admin.module.css";
 
 export default async function AdminBlogPage() {
-  const supabase = await requireAdminClient();
-  const { data: posts, error } = await supabase
-    .from("posts")
-    .select(
-      "id, title, slug, is_published, published_at, created_at",
-    )
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    return (
-      <section className={styles.card}>
-        <h2 className={styles.heading}>Posts</h2>
-        <p className={styles.helper}>
-          Gagal membaca tabel posts: {error.message}. Pastikan migration blog
-          sudah dijalankan di Supabase.
-        </p>
-      </section>
-    );
-  }
+  await requireAdmin();
+  const posts = await prisma.post.findMany({
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      is_published: true,
+      published_at: true,
+      created_at: true,
+    },
+    orderBy: { created_at: "desc" },
+  });
 
   return (
     <section className={styles.card}>

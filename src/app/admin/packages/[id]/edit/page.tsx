@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireAdminClient } from "@/app/admin/_lib";
+import { requireAdmin } from "@/app/admin/_lib";
+import { prisma } from "@/lib/db";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import ItineraryEditor from "@/components/admin/ItineraryEditor";
 import MultiImageUploadField from "@/components/admin/MultiImageUploadField";
@@ -28,12 +29,9 @@ export default async function AdminEditPackagePage({
 }) {
   const { id } = await params;
   const { error: actionError } = await searchParams;
-  const supabase = await requireAdminClient();
-  const { data: pkg } = await supabase
-    .from("packages")
-    .select("*")
-    .eq("id", id)
-    .single();
+  await requireAdmin();
+
+  const pkg = await prisma.package.findUnique({ where: { id } });
 
   if (!pkg) {
     notFound();

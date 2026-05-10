@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin";
+import { prisma } from "@/lib/db";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -19,18 +19,19 @@ export default async function BlogPage({
   const params = await searchParams;
   const currentPage = Math.max(1, parseInt(params.page || "1", 10));
   const limit = 8;
-  const from = (currentPage - 1) * limit;
-  const to = from + limit - 1;
-  const supabase = createAdminClient();
+  const skip = (currentPage - 1) * limit;
 
-  const { data: posts, error, count } = await supabase
-    .from("posts")
-    .select("id, title, slug, excerpt, featured_image, published_at, categories(name)", { count: "exact" })
-    .eq("is_published", true)
-    .order("published_at", { ascending: false })
-    .range(from, to);
+  const [posts, totalCount] = await Promise.all([
+    prisma.post.findMany({
+      where: { is_published: true },
+      select: { id: true, title: true, slug: true, excerpt: true, featured_image: true, published_at: true, category: { select: { name: true } } },
+      orderBy: { published_at: "desc" },
+      skip, take: limit,
+    }),
+    prisma.post.count({ where: { is_published: true } }),
+  ]);
 
-  const totalPages = Math.ceil((count || 0) / limit);
+  const totalPages = Math.ceil(totalCount / limit);
 
   return (
     <>
@@ -40,38 +41,25 @@ export default async function BlogPage({
           <div className={styles.container}>
             <span className={styles.label}>Travel Tips & Guides</span>
             <h1 className={styles.title}>Our Blog</h1>
-            <p className={styles.subtitle}>
-              Everything you need to know before your climb.
-            </p>
+            <p className={styles.subtitle}>Everything you need to know before your climb.</p>
           </div>
         </section>
-
         <section className={styles.content}>
           <div className={styles.container}>
-            {error ? (
-              <p className={styles.error}>Failed to load articles. Please try again later.</p>
-            ) : posts && posts.length > 0 ? (
+            {posts && posts.length > 0 ? (
               <>
                 <div className={styles.grid}>
                 {posts.map((post) => {
-                  const categoryName = post.categories?.[0]?.name || "Uncategorized";
+                  const categoryName = post.category?.name || "Uncategorized";
                   return (
                     <Link key={post.id} href={`/blog/${post.slug}`} className={styles.card}>
                       <div className={styles.imageWrapper}>
-                        <img 
-                          src={post.featured_image || "/hero-banner.png"} 
-                          alt={post.title} 
-                          className={styles.image} 
-                        />
+                        <img src={post.featured_image || "/hero-banner.png"} alt={post.title} className={styles.image} />
                         <span className={styles.categoryBadge}>{categoryName}</span>
                       </div>
                       <div className={styles.cardContent}>
                         <span className={styles.date}>
-                          {new Date(post.published_at || new Date()).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
+                          {new Date(post.published_at || new Date()).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
                         </span>
                         <h3 className={styles.cardTitle}>{post.title}</h3>
                         <p className={styles.excerpt}>{post.excerpt || ""}</p>
@@ -81,35 +69,14 @@ export default async function BlogPage({
                   );
                 })}
                 </div>
-                
                 {totalPages > 1 && (
                   <div className={styles.pagination}>
-                    <Link 
-                      href={`/blog?page=${currentPage - 1}`}
-                      className={`${styles.pageBtn} ${currentPage === 1 ? styles.disabled : ""}`}
-                    >
-                      &laquo;
-                    </Link>
-                    
+                    <Link href={`/blog?page=${currentPage - 1}`} className={`${styles.pageBtn} ${currentPage === 1 ? styles.disabled : ""}`}>&laquo;</Link>
                     {Array.from({ length: totalPages }).map((_, i) => {
                       const pageNum = i + 1;
-                      return (
-                        <Link 
-                          key={pageNum}
-                          href={`/blog?page=${pageNum}`}
-                          className={`${styles.pageBtn} ${currentPage === pageNum ? styles.active : ""}`}
-                        >
-                          {pageNum}
-                        </Link>
-                      );
+                      return (<Link key={pageNum} href={`/blog?page=${pageNum}`} className={`${styles.pageBtn} ${currentPage === pageNum ? styles.active : ""}`}>{pageNum}</Link>);
                     })}
-
-                    <Link 
-                      href={`/blog?page=${currentPage + 1}`}
-                      className={`${styles.pageBtn} ${currentPage === totalPages ? styles.disabled : ""}`}
-                    >
-                      &raquo;
-                    </Link>
+                    <Link href={`/blog?page=${currentPage + 1}`} className={`${styles.pageBtn} ${currentPage === totalPages ? styles.disabled : ""}`}>&raquo;</Link>
                   </div>
                 )}
               </>

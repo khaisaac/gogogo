@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import styles from "./ImageUploadField.module.css";
 
 type ImageUploadFieldProps = {
@@ -12,27 +11,7 @@ type ImageUploadFieldProps = {
   folder?: "blog" | "packages";
 };
 
-type UploadApiResult = {
-  url?: string;
-  error?: string;
-  bucket?: string;
-  path?: string;
-  token?: string;
-  publicUrl?: string;
-};
-
 const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
-
-async function parseUploadResponse(response: Response): Promise<UploadApiResult> {
-  const rawText = await response.text();
-  if (!rawText) return {};
-
-  try {
-    return JSON.parse(rawText) as UploadApiResult;
-  } catch {
-    return { error: rawText };
-  }
-}
 
 export default function ImageUploadField({
   id,
@@ -55,11 +34,7 @@ export default function ImageUploadField({
   return (
     <div className={styles.wrapper}>
       {currentImageFieldName ? (
-        <input
-          type="hidden"
-          name={currentImageFieldName}
-          value={uploadedUrl}
-        />
+        <input type="hidden" name={currentImageFieldName} value={uploadedUrl} />
       ) : null}
 
       <input
@@ -76,9 +51,7 @@ export default function ImageUploadField({
 
           if (file.size > MAX_IMAGE_SIZE_BYTES) {
             setError("Image must be smaller than 10MB.");
-            if (inputRef.current) {
-              inputRef.current.value = "";
-            }
+            if (inputRef.current) inputRef.current.value = "";
             return;
           }
 
@@ -86,34 +59,22 @@ export default function ImageUploadField({
           setIsUploading(true);
 
           try {
-            const payload = new FormData();
-            const response = await fetch("/api/admin/uploads/sign", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                fileName: file.name,
-                fileSize: file.size,
-                folder,
-              }),
-            });
-            const data = await parseUploadResponse(response);
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("folder", folder);
 
-            if (!response.ok || !data.path || !data.token || !data.bucket || !data.publicUrl) {
+            const response = await fetch("/api/admin/uploads", {
+              method: "POST",
+              body: formData,
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.url) {
               throw new Error(data.error || "Failed to upload image");
             }
 
-            const supabase = createClient();
-            const { error: uploadError } = await supabase.storage
-              .from(String(data.bucket))
-              .uploadToSignedUrl(String(data.path), String(data.token), file);
-
-            if (uploadError) {
-              throw new Error(uploadError.message || "Failed to upload image");
-            }
-
-            setUploadedUrl(String(data.publicUrl));
+            setUploadedUrl(data.url);
           } catch (uploadError) {
             const message =
               uploadError instanceof Error
@@ -122,9 +83,7 @@ export default function ImageUploadField({
             setError(message);
           } finally {
             setIsUploading(false);
-            if (inputRef.current) {
-              inputRef.current.value = "";
-            }
+            if (inputRef.current) inputRef.current.value = "";
           }
         }}
       />
@@ -135,18 +94,11 @@ export default function ImageUploadField({
       {previewUrl ? (
         <div className={styles.previewCard}>
           <p className={styles.previewLabel}>Current image</p>
-          <img
-            src={previewUrl}
-            alt="Image preview"
-            className={styles.previewImage}
-          />
+          <img src={previewUrl} alt="Image preview" className={styles.previewImage} />
           <button
             type="button"
             className={styles.cancelBtn}
-            onClick={() => {
-              setUploadedUrl("");
-              setError("");
-            }}
+            onClick={() => { setUploadedUrl(""); setError(""); }}
           >
             Remove image
           </button>

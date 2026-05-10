@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { prisma } from "@/lib/db";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SuccessClient from "./SuccessClient";
@@ -19,28 +19,19 @@ export default async function BookingSuccessPage({
   const params = await searchParams;
   const bookingId = params.booking_id;
   const cancelled = params.cancelled === "true";
-  const paypalToken = params.token; // PayPal passes token= on return
+  const paypalToken = params.token;
 
-  if (!bookingId) {
-    redirect("/");
-  }
+  if (!bookingId) redirect("/");
 
-  const adminSupabase = createAdminClient();
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: { payments: true },
+  });
 
-  // Fetch booking details using admin client to bypass RLS
-  const { data: booking } = await adminSupabase
-    .from("bookings")
-    .select("*, payments(*)")
-    .eq("id", bookingId)
-    .single();
+  if (!booking) redirect("/");
 
-  if (!booking) {
-    redirect("/");
-  }
-
-  // Check if this is a PayPal return that needs capturing
   const paypalPayment = booking.payments?.find(
-    (p: any) => p.provider === "paypal" && p.status === "pending"
+    (p: any) => p.provider === "paypal" && p.status === "pending",
   );
   const needsCapture = !!paypalToken && !!paypalPayment && !cancelled;
 

@@ -294,9 +294,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${montserrat.variable} ${dmSans.variable}`}>
       <head>
-        {/* Preconnect to critical origins */}
-        <link rel="preconnect" href="https://pvhtohzmttglkuauibhg.supabase.co" />
-        <link rel="dns-prefetch" href="https://pvhtohzmttglkuauibhg.supabase.co" />
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"

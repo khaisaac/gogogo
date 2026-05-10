@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
-import { requireAdminClient } from "@/app/admin/_lib";
+import { requireAdmin } from "@/app/admin/_lib";
+import { prisma } from "@/lib/db";
 import { difficultyValueToScore } from "@/lib/difficulty";
 import {
   GROUP_TIER_OPTIONS,
@@ -21,11 +22,9 @@ import {
   parseItineraryInput,
   serializePackageContent,
 } from "@/lib/package-content";
-import { uploadAdminImage, uploadAdminImages } from "@/lib/supabase/storage";
+import { uploadImage, uploadImages } from "@/lib/storage";
 
 const MAX_GALLERY_IMAGES = 10;
-
-const MISSING_COLUMN_PATTERN = /Could not find the '([^']+)' column/i;
 
 type PackagePayload = {
   title: string;
@@ -46,11 +45,6 @@ function parseOptionalNumber(value: FormDataEntryValue | null) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function getMissingColumnName(message: string) {
-  const match = message.match(MISSING_COLUMN_PATTERN);
-  return match ? match[1] : null;
-}
-
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) {
     return error.message;
@@ -66,58 +60,6 @@ function compactErrorMessage(raw: string) {
   }
 
   return cleaned.length > 180 ? `${cleaned.slice(0, 177)}...` : cleaned;
-}
-
-async function insertWithSchemaFallback(
-  supabase: Awaited<ReturnType<typeof requireAdminClient>>,
-  payload: Record<string, unknown>,
-) {
-  const candidatePayload = { ...payload };
-
-  while (true) {
-    const { error, data } = await supabase
-      .from("packages")
-      .insert(candidatePayload);
-
-    if (!error) {
-      return { data };
-    }
-
-    const missingColumn = getMissingColumnName(error.message || "");
-    if (!missingColumn || !(missingColumn in candidatePayload)) {
-      throw new Error(
-        `Failed to save package: ${error.message} (${error.code})`,
-      );
-    }
-
-    delete candidatePayload[missingColumn];
-  }
-}
-
-async function updateWithSchemaFallback(
-  supabase: Awaited<ReturnType<typeof requireAdminClient>>,
-  id: string,
-  payload: Record<string, unknown>,
-) {
-  const candidatePayload = { ...payload };
-
-  while (true) {
-    const { error } = await supabase
-      .from("packages")
-      .update(candidatePayload)
-      .eq("id", id);
-
-    if (!error) {
-      return;
-    }
-
-    const missingColumn = getMissingColumnName(error.message || "");
-    if (!missingColumn || !(missingColumn in candidatePayload)) {
-      throw new Error(error.message);
-    }
-
-    delete candidatePayload[missingColumn];
-  }
 }
 
 function parsePricingFields(
@@ -206,26 +148,22 @@ function getPayload(formData: FormData): PackagePayload {
 export async function createPackage(formData: FormData) {
   try {
     const payload = getPayload(formData);
-    console.log("📦 Payload to save:", JSON.stringify(payload, null, 2));
 
     if (!payload.title || !payload.duration) {
       throw new Error("Title and duration are required");
     }
 
-    const supabase = await requireAdminClient();
+    await requireAdmin();
     const imageFile = formData.get("image_file");
     const galleryFiles = formData
       .getAll("gallery_files")
       .filter((entry): entry is File => entry instanceof File);
 
     if (imageFile instanceof File && imageFile.size > 0) {
-      console.log("📸 Uploading main image...");
-      payload.image = await uploadAdminImage(supabase, imageFile, "packages");
-      console.log("✅ Main image uploaded:", payload.image);
+      payload.image = await uploadImage(imageFile, "packages");
     }
 
     if (galleryFiles.length > 0) {
-      console.log("🖼️ Uploading gallery files...", galleryFiles.length);
       const existingGallery = String(formData.get("current_gallery") || "")
         .split("\n")
         .map((value) => value.trim())
@@ -235,12 +173,10 @@ export async function createPackage(formData: FormData) {
         0,
         MAX_GALLERY_IMAGES - existingGallery.length,
       );
-      const galleryUrls = await uploadAdminImages(
-        supabase,
+      const galleryUrls = await uploadImages(
         galleryFiles.slice(0, remainingSlots),
         "packages",
       );
-      console.log("✅ Gallery uploaded:", galleryUrls);
       payload.description = serializePackageContent({
         detail: String(formData.get("detail") || "").trim(),
         highlights: String(formData.get("highlights") || "").trim(),
@@ -256,12 +192,9 @@ export async function createPackage(formData: FormData) {
       });
     }
 
-    console.log("📦 Final payload:", JSON.stringify(payload, null, 2));
-    console.log("💾 Inserting into Supabase...");
     const { itinerary: _itinerary, ...databasePayload } = payload;
-    const { data } = await insertWithSchemaFallback(supabase, databasePayload);
+    await prisma.package.create({ data: databasePayload as any });
 
-    console.log("✅ Package saved successfully:", data);
     revalidatePath("/admin/packages");
     redirect("/admin/packages");
   } catch (error) {
@@ -283,21 +216,17 @@ export async function updatePackage(id: string, formData: FormData) {
       throw new Error("Title and duration are required");
     }
 
-    const supabase = await requireAdminClient();
+    await requireAdmin();
     const imageFile = formData.get("image_file");
     const galleryFiles = formData
       .getAll("gallery_files")
       .filter((entry): entry is File => entry instanceof File);
 
     if (imageFile instanceof File && imageFile.size > 0) {
-      payload.image = await uploadAdminImage(supabase, imageFile, "packages");
+      payload.image = await uploadImage(imageFile, "packages");
     }
 
-    const uploadedGallery = await uploadAdminImages(
-      supabase,
-      galleryFiles,
-      "packages",
-    );
+    const uploadedGallery = await uploadImages(galleryFiles, "packages");
     if (uploadedGallery.length > 0) {
       const existingGallery = String(formData.get("current_gallery") || "")
         .split("\n")
@@ -321,7 +250,10 @@ export async function updatePackage(id: string, formData: FormData) {
     }
 
     const { itinerary: _itinerary, ...databasePayload } = payload;
-    await updateWithSchemaFallback(supabase, id, databasePayload);
+    await prisma.package.update({
+      where: { id },
+      data: databasePayload as any,
+    });
 
     revalidatePath("/admin/packages");
     redirect("/admin/packages");
@@ -337,12 +269,7 @@ export async function updatePackage(id: string, formData: FormData) {
 }
 
 export async function deletePackage(id: string) {
-  const supabase = await requireAdminClient();
-  const { error } = await supabase.from("packages").delete().eq("id", id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
+  await requireAdmin();
+  await prisma.package.delete({ where: { id } });
   revalidatePath("/admin/packages");
 }

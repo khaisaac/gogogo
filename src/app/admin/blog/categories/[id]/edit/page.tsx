@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireAdminClient } from "@/app/admin/_lib";
+import { requireAdmin } from "@/app/admin/_lib";
+import { prisma } from "@/lib/db";
 import { updateCategory } from "../../actions";
 import styles from "../../../../admin.module.css";
 
@@ -10,15 +11,14 @@ export default async function AdminEditCategoryPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await requireAdminClient();
+  await requireAdmin();
 
-  const { data: category, error } = await supabase
-    .from("categories")
-    .select("id, name, slug")
-    .eq("id", id)
-    .single();
+  const category = await prisma.category.findUnique({
+    where: { id },
+    select: { id: true, name: true, slug: true },
+  });
 
-  if (error || !category) {
+  if (!category) {
     notFound();
   }
 
@@ -28,28 +28,14 @@ export default async function AdminEditCategoryPage({
     <section className={styles.card}>
       <div className={styles.row}>
         <h2 className={styles.heading}>Edit Category</h2>
-        <Link href="/admin/blog/categories" className={styles.outlineLink}>
-          Back to Categories
-        </Link>
+        <Link href="/admin/blog/categories" className={styles.outlineLink}>Back to Categories</Link>
       </div>
-
       <form action={updateAction}>
         <div className={styles.formGrid}>
-          <div className={styles.field}>
-            <label htmlFor="name">Name</label>
-            <input id="name" name="name" defaultValue={category.name} required />
-          </div>
-          <div className={styles.field}>
-            <label htmlFor="slug">Slug</label>
-            <input id="slug" name="slug" defaultValue={category.slug} required />
-          </div>
+          <div className={styles.field}><label htmlFor="name">Name</label><input id="name" name="name" defaultValue={category.name} required /></div>
+          <div className={styles.field}><label htmlFor="slug">Slug</label><input id="slug" name="slug" defaultValue={category.slug} required /></div>
         </div>
-
-        <div className={styles.formActions}>
-          <button type="submit" className={styles.submitBtn}>
-            Update Category
-          </button>
-        </div>
+        <div className={styles.formActions}><button type="submit" className={styles.submitBtn}>Update Category</button></div>
       </form>
     </section>
   );

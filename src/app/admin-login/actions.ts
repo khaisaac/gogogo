@@ -1,20 +1,17 @@
 "use server";
 
-import { createAdminClient } from "@/lib/supabase/admin";
+import { prisma } from "@/lib/db";
 
 export async function verifyAdminRole(userId: string) {
-  const adminSupabase = createAdminClient();
+  try {
+    const profile = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
 
-  const { data: profile, error } = await adminSupabase
-    .from("profiles")
-    .select("role")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (error) {
+    return profile;
+  } catch (error) {
     console.error("Error fetching profile:", error);
     return null;
   }
-
-  return profile;
 }

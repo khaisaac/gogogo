@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import RefundRequestModal from "@/app/dashboard/RefundRequestModal";
 import styles from "./dashboard.module.css";
 
@@ -16,16 +15,15 @@ export default function BookingHistory({ user }: { user: any }) {
 
   useEffect(() => {
     const fetchBookings = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from("bookings")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (data) {
-        setBookings(data);
-      }
+      try {
+        const res = await fetch("/api/bookings");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.bookings) {
+            setBookings(data.bookings);
+          }
+        }
+      } catch {}
       setLoading(false);
     };
 
@@ -44,16 +42,15 @@ export default function BookingHistory({ user }: { user: any }) {
   const handleRefundSuccess = () => {
     // Refresh bookings
     const fetchBookings = async () => {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("bookings")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (data) {
-        setBookings(data);
-      }
+      try {
+        const res = await fetch("/api/bookings");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.bookings) {
+            setBookings(data.bookings);
+          }
+        }
+      } catch {}
     };
     fetchBookings();
   };

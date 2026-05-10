@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireAdminClient } from "@/app/admin/_lib";
+import { requireAdmin } from "@/app/admin/_lib";
+import { prisma } from "@/lib/db";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { updatePost } from "../../actions";
@@ -12,29 +13,26 @@ export default async function AdminEditPostPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await requireAdminClient();
-  const { data: post, error } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("id", id)
-    .single();
+  await requireAdmin();
 
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("id, name")
-    .order("name", { ascending: true });
+  const post = await prisma.post.findUnique({ where: { id } });
 
-  const { data: tags } = await supabase
-    .from("tags")
-    .select("id, name")
-    .order("name", { ascending: true });
+  const categories = await prisma.category.findMany({
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
 
-  const { data: tagRelations } = await supabase
-    .from("post_tags")
-    .select("tag_id")
-    .eq("post_id", id);
+  const tags = await prisma.tag.findMany({
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
 
-  if (error || !post) {
+  const tagRelations = await prisma.postTag.findMany({
+    where: { post_id: id },
+    select: { tag_id: true },
+  });
+
+  if (!post) {
     notFound();
   }
 

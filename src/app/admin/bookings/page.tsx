@@ -1,4 +1,5 @@
-import { requireAdminClient } from "@/app/admin/_lib";
+import { requireAdmin } from "@/app/admin/_lib";
+import { prisma } from "@/lib/db";
 import BookingsTable from "./BookingsTable";
 import styles from "./bookings.module.css";
 
@@ -9,18 +10,15 @@ export const metadata = {
 };
 
 export default async function AdminBookingsPage() {
-  // requireAdminClient handles checking if the user is logged in and is an admin
-  const adminSupabase = await requireAdminClient();
+  await requireAdmin();
 
-  // Fetch all bookings with payment info
-  const { data: bookings, error } = await adminSupabase
-    .from("bookings")
-    .select("*, payments(*), refunds(*)")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Fetch bookings error:", error);
-  }
+  const bookings = await prisma.booking.findMany({
+    include: {
+      payments: true,
+      refunds: true,
+    },
+    orderBy: { created_at: "desc" },
+  });
 
   return (
     <div className={styles.container}>

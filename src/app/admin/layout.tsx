@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { requireAdminClient } from "./_lib";
+import { requireAdmin } from "./_lib";
 import AdminSidebarNav from "./AdminSidebarNav";
 import styles from "./admin.module.css";
 
@@ -20,7 +20,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireAdminClient();
+  await requireAdmin();
 
   return (
     <div className={styles.adminPage}>

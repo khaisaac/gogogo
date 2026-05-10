@@ -57,14 +57,15 @@ Special/Dietary Requirements: `,
       const { data } = await supabase.auth.getUser();
       if (data.user?.email) {
         setEmail(data.user.email);
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", data.user.id)
-          .single();
-        if (profile?.role === "admin") {
-          setIsAdmin(true);
-        }
+        try {
+          const res = await fetch("/api/user/profile");
+          if (res.ok) {
+            const profileData = await res.json();
+            if (profileData.profile?.role === "admin") {
+              setIsAdmin(true);
+            }
+          }
+        } catch {}
       }
     };
     fetchUser();

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { prisma } from "@/lib/db";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PayBalanceClient from "./PayBalanceClient";
@@ -18,23 +18,10 @@ export default async function PayBalancePage({
 }) {
   const params = await searchParams;
   const bookingId = params.booking_id;
+  if (!bookingId) redirect("/");
 
-  if (!bookingId) {
-    redirect("/");
-  }
-
-  const adminSupabase = createAdminClient();
-
-  // Fetch booking details
-  const { data: booking } = await adminSupabase
-    .from("bookings")
-    .select("*")
-    .eq("id", bookingId)
-    .single();
-
-  if (!booking) {
-    redirect("/");
-  }
+  const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+  if (!booking) redirect("/");
 
   return (
     <>

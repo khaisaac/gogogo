@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireAdminClient, requireAdminContext } from "@/app/admin/_lib";
-import { uploadAdminImage } from "@/lib/supabase/storage";
+import { requireAdmin, requireAdminContext } from "@/app/admin/_lib";
+import { prisma } from "@/lib/db";
+import { uploadImage } from "@/lib/storage";
 
 type BlogPayload = {
   title: string;
@@ -48,7 +49,6 @@ function getPayload(formData: FormData): BlogPayload {
 }
 
 async function resolveCategoryId(
-  supabase: Awaited<ReturnType<typeof requireAdminClient>>,
   formData: FormData,
   fallbackCategoryId: string | null = null,
 ) {
@@ -60,26 +60,16 @@ async function resolveCategoryId(
 
   const categorySlug = slugify(newCategoryName);
 
-  const { data, error } = await supabase
-    .from("categories")
-    .upsert(
-      { name: newCategoryName, slug: categorySlug },
-      { onConflict: "slug" },
-    )
-    .select("id")
-    .single();
+  const category = await prisma.category.upsert({
+    where: { slug: categorySlug },
+    update: { name: newCategoryName },
+    create: { name: newCategoryName, slug: categorySlug },
+  });
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data.id as string;
+  return category.id;
 }
 
-async function resolveTagIds(
-  supabase: Awaited<ReturnType<typeof requireAdminClient>>,
-  formData: FormData,
-) {
+async function resolveTagIds(formData: FormData) {
   const selectedTagIds = formData
     .getAll("tag_ids")
     .map((value) => String(value))
@@ -99,70 +89,60 @@ async function resolveTagIds(
     return selectedTagIds;
   }
 
-  const tagRows = names.map((name) => ({
-    name,
-    slug: slugify(name),
-  }));
-
-  const { data, error } = await supabase
-    .from("tags")
-    .upsert(tagRows, { onConflict: "slug" })
-    .select("id");
-
-  if (error) {
-    throw new Error(error.message);
+  const newTagIds: string[] = [];
+  for (const name of names) {
+    const slug = slugify(name);
+    const tag = await prisma.tag.upsert({
+      where: { slug },
+      update: { name },
+      create: { name, slug },
+    });
+    newTagIds.push(tag.id);
   }
 
-  const newTagIds = (data || []).map((row) => String(row.id));
   return Array.from(new Set([...selectedTagIds, ...newTagIds]));
 }
 
 export async function createPost(formData: FormData) {
   const basePayload = getPayload(formData);
-  const { adminSupabase: supabase, user } = await requireAdminContext();
-  const categoryId = await resolveCategoryId(
-    supabase,
-    formData,
-    basePayload.category_id,
-  );
+  const { user } = await requireAdminContext();
+  const categoryId = await resolveCategoryId(formData, basePayload.category_id);
   const payload: BlogPayload = {
     ...basePayload,
     category_id: categoryId,
   };
   const imageFile = formData.get("featured_image_file");
   if (imageFile instanceof File && imageFile.size > 0) {
-    payload.featured_image = await uploadAdminImage(supabase, imageFile, "blog");
+    payload.featured_image = await uploadImage(imageFile, "blog");
   }
 
   if (!payload.title || !payload.slug) {
     throw new Error("Title and slug are required");
   }
 
-  const { data: post, error } = await supabase
-    .from("posts")
-    .insert({
-      ...payload,
+  const post = await prisma.post.create({
+    data: {
+      title: payload.title,
+      slug: payload.slug,
+      category_id: payload.category_id,
+      excerpt: payload.excerpt,
+      content: payload.content,
+      featured_image: payload.featured_image,
+      cover_image_alignment: payload.cover_image_alignment,
+      is_published: payload.is_published,
+      published_at: payload.published_at ? new Date(payload.published_at) : null,
       author_id: user.id,
-    })
-    .select("id")
-    .single();
+    },
+  });
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const tagIds = await resolveTagIds(supabase, formData);
+  const tagIds = await resolveTagIds(formData);
   if (tagIds.length > 0) {
-    const relations = tagIds.map((tagId) => ({
-      post_id: post.id,
-      tag_id: tagId,
-    }));
-    const { error: tagRelError } = await supabase
-      .from("post_tags")
-      .insert(relations);
-    if (tagRelError) {
-      throw new Error(tagRelError.message);
-    }
+    await prisma.postTag.createMany({
+      data: tagIds.map((tagId) => ({
+        post_id: post.id,
+        tag_id: tagId,
+      })),
+    });
   }
 
   revalidatePath("/admin/blog");
@@ -171,51 +151,47 @@ export async function createPost(formData: FormData) {
 
 export async function updatePost(id: string, formData: FormData) {
   const basePayload = getPayload(formData);
-  const supabase = await requireAdminClient();
-  const categoryId = await resolveCategoryId(
-    supabase,
-    formData,
-    basePayload.category_id,
-  );
+  await requireAdmin();
+  const categoryId = await resolveCategoryId(formData, basePayload.category_id);
   const payload: BlogPayload = {
     ...basePayload,
     category_id: categoryId,
   };
   const imageFile = formData.get("featured_image_file");
   if (imageFile instanceof File && imageFile.size > 0) {
-    payload.featured_image = await uploadAdminImage(supabase, imageFile, "blog");
+    payload.featured_image = await uploadImage(imageFile, "blog");
   }
 
   if (!payload.title || !payload.slug) {
     throw new Error("Title and slug are required");
   }
 
-  const { error } = await supabase.from("posts").update(payload).eq("id", id);
+  await prisma.post.update({
+    where: { id },
+    data: {
+      title: payload.title,
+      slug: payload.slug,
+      category_id: payload.category_id,
+      excerpt: payload.excerpt,
+      content: payload.content,
+      featured_image: payload.featured_image,
+      cover_image_alignment: payload.cover_image_alignment,
+      is_published: payload.is_published,
+      published_at: payload.published_at ? new Date(payload.published_at) : null,
+    },
+  });
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  // Clear existing tags
+  await prisma.postTag.deleteMany({ where: { post_id: id } });
 
-  const { error: clearTagError } = await supabase
-    .from("post_tags")
-    .delete()
-    .eq("post_id", id);
-  if (clearTagError) {
-    throw new Error(clearTagError.message);
-  }
-
-  const tagIds = await resolveTagIds(supabase, formData);
+  const tagIds = await resolveTagIds(formData);
   if (tagIds.length > 0) {
-    const relations = tagIds.map((tagId) => ({
-      post_id: id,
-      tag_id: tagId,
-    }));
-    const { error: tagRelError } = await supabase
-      .from("post_tags")
-      .insert(relations);
-    if (tagRelError) {
-      throw new Error(tagRelError.message);
-    }
+    await prisma.postTag.createMany({
+      data: tagIds.map((tagId) => ({
+        post_id: id,
+        tag_id: tagId,
+      })),
+    });
   }
 
   revalidatePath("/admin/blog");
@@ -223,12 +199,7 @@ export async function updatePost(id: string, formData: FormData) {
 }
 
 export async function deletePost(id: string) {
-  const supabase = await requireAdminClient();
-  const { error } = await supabase.from("posts").delete().eq("id", id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
+  await requireAdmin();
+  await prisma.post.delete({ where: { id } });
   revalidatePath("/admin/blog");
 }

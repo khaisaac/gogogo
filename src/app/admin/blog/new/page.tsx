@@ -1,21 +1,22 @@
 import Link from "next/link";
-import { requireAdminClient } from "@/app/admin/_lib";
+import { requireAdmin } from "@/app/admin/_lib";
+import { prisma } from "@/lib/db";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { createPost } from "../actions";
 import styles from "../../admin.module.css";
 
 export default async function AdminNewPostPage() {
-  const supabase = await requireAdminClient();
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("id, name")
-    .order("name", { ascending: true });
+  await requireAdmin();
+  const categories = await prisma.category.findMany({
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
 
-  const { data: tags } = await supabase
-    .from("tags")
-    .select("id, name")
-    .order("name", { ascending: true });
+  const tags = await prisma.tag.findMany({
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
 
   return (
     <section className={styles.card}>

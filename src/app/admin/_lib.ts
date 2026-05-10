@@ -1,15 +1,13 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { prisma } from "@/lib/db";
 import type { User } from "@supabase/supabase-js";
 
 type AdminContext = {
   user: User;
-  adminSupabase: ReturnType<typeof createAdminClient>;
 };
 
 export async function requireAdminContext(): Promise<AdminContext> {
-  const adminSupabase = createAdminClient();
   const supabase = await createClient();
   const {
     data: { user },
@@ -19,22 +17,21 @@ export async function requireAdminContext(): Promise<AdminContext> {
     redirect("/admin-login");
   }
 
-  const { data: profile, error } = await adminSupabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
+  const profile = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { role: true },
+  });
 
-  if (error || profile?.role !== "admin") {
+  if (!profile || profile.role !== "admin") {
     redirect(
       `/admin-login?error=not_admin&email=${encodeURIComponent(user.email || "unknown")}`,
     );
   }
 
-  return { user, adminSupabase };
+  return { user };
 }
 
-export async function requireAdminClient() {
-  const { adminSupabase } = await requireAdminContext();
-  return adminSupabase;
+export async function requireAdmin(): Promise<User> {
+  const { user } = await requireAdminContext();
+  return user;
 }

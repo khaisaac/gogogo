@@ -1,0 +1,284 @@
+// =============================================
+// Trekking Mount Rinjani — Prisma Schema (MySQL)
+// Migrated from Supabase PostgreSQL
+// =============================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. Users table (replaces Supabase auth.users)
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password_hash String?   // Only for admin (bcrypt hash)
+  full_name     String?
+  whatsapp      String?
+  role          String    @default("client") // 'client' | 'admin'
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  // Relations
+  bookings      Booking[]
+  posts         Post[]    @relation("PostAuthor")
+  refunds_requested Refund[] @relation("RefundRequester")
+  refunds_approved  Refund[] @relation("RefundApprover")
+
+  @@map("users")
+}
+
+// 2. OTP codes for email verification (replaces Supabase Auth OTP)
+model OtpCode {
+  id         String   @id @default(uuid())
+  email      String
+  code       String
+  expires_at DateTime
+  used       Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  @@index([email, code])
+  @@map("otp_codes")
+}
+
+// 3. Packages table
+model Package {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String?  @unique
+  route       String   // 'sembalun' | 'senaru'
+  duration    String
+  // Legacy tiered columns (kept for backward compatibility)
+  price_1pax      Int?
+  price_2_3pax    Int?
+  price_4_5pax    Int?
+  price_6plus     Int?
+  // New pricing matrix: private (1-10 pax)
+  private_price_1pax  Int?
+  private_price_2pax  Int?
+  private_price_3pax  Int?
+  private_price_4pax  Int?
+  private_price_5pax  Int?
+  private_price_6pax  Int?
+  private_price_7pax  Int?
+  private_price_8pax  Int?
+  private_price_9pax  Int?
+  private_price_10pax Int?
+  // New pricing matrix: standard (1-10 pax)
+  standard_price_1pax  Int?
+  standard_price_2pax  Int?
+  standard_price_3pax  Int?
+  standard_price_4pax  Int?
+  standard_price_5pax  Int?
+  standard_price_6pax  Int?
+  standard_price_7pax  Int?
+  standard_price_8pax  Int?
+  standard_price_9pax  Int?
+  standard_price_10pax Int?
+  // Total package pricing
+  private_total_2_days  Int?
+  private_total_3_days  Int?
+  standard_total_2_days Int?
+  standard_total_3_days Int?
+
+  difficulty  Int      @default(3)
+  image       String?  @db.Text
+  description String?  @db.LongText
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // Relations
+  bookings    Booking[]
+
+  @@map("packages")
+}
+
+// 4. Bookings table
+model Booking {
+  id                    String    @id @default(uuid())
+  user_id               String?
+  package_id            String?
+  full_name             String
+  email                 String
+  whatsapp              String
+  trekking_date         DateTime  @db.Date
+  number_of_trekkers    Int
+  hotel_pickup_location String
+  special_requirements  String?   @db.Text
+  order_note            String?   @db.Text
+  status                String    @default("pending") // 'pending' | 'confirmed' | 'cancelled' | 'completed'
+  total_price           Int?
+  package_title         String?   // Denormalized for quick access
+
+  // Split payment fields
+  payment_type          String    @default("full") // 'full' | 'deposit'
+  deposit_amount        Int?
+  balance_amount        Int?
+  payment_status        String    @default("pending") // 'pending' | 'deposit_paid' | 'fully_paid' | 'payment_failed'
+
+  // Refund fields
+  cancellation_status   String    @default("none") // 'none' | 'requested' | 'approved' | 'rejected' | 'refunded'
+  refund_status         String?   // 'requested' | 'approved' | 'rejected' | 'completed'
+  refund_reason         String?   @db.Text
+  refund_amount         Int?
+  refund_requested_at   DateTime?
+  refund_approval_notes String?   @db.Text
+  refund_processed_at   DateTime?
+
+  // Deposit reminder
+  deposit_reminder_sent    Boolean   @default(false)
+  deposit_reminder_sent_at DateTime?
+
+  // Additional booking details
+  passport_number       String?
+  nationality           String?
+  gender                String?   // 'male' | 'female' | 'other'
+  birthday              DateTime? @db.Date
+  height                Int?
+  weight                Int?
+  arrival_day           DateTime? @db.Date
+
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  // Relations
+  user                  User?     @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  package               Package?  @relation(fields: [package_id], references: [id], onDelete: SetNull)
+  payments              Payment[]
+  refunds               Refund[]
+
+  @@index([user_id])
+  @@index([package_id])
+  @@index([payment_status])
+  @@index([refund_status])
+  @@map("bookings")
+}
+
+// 5. Payments table (DOKU & PayPal)
+model Payment {
+  id                       String    @id @default(uuid())
+  booking_id               String
+  provider                 String    // 'doku' | 'paypal'
+  provider_order_id        String?   // DOKU invoice number or PayPal order ID
+  provider_transaction_id  String?   // Transaction ID from provider
+  amount                   Int       // Amount in smallest currency unit (cents/rupiah)
+  currency                 String    @default("USD")
+  status                   String    @default("pending") // 'pending' | 'paid' | 'failed' | 'expired' | 'refunded'
+  raw_response             String?   @db.LongText // JSON string (was JSONB in PostgreSQL)
+
+  // DOKU-specific fields
+  invoice                  String?   @unique
+  parent_invoice           String?
+  amount_usd               Decimal?  @db.Decimal(10, 2)
+  amount_idr               Decimal?  @db.Decimal(15, 2)
+  payment_type             String?   // 'dp' | 'full' | 'pelunasan'
+  refund_status            String?
+
+  paid_at                  DateTime?
+  created_at               DateTime  @default(now())
+  updated_at               DateTime  @updatedAt
+
+  // Relations
+  booking                  Booking   @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+
+  @@index([booking_id])
+  @@index([invoice])
+  @@index([parent_invoice])
+  @@map("payments")
+}
+
+// 6. Categories table (Blog)
+model Category {
+  id         String   @id @default(uuid())
+  name       String
+  slug       String   @unique
+  created_at DateTime @default(now())
+
+  // Relations
+  posts      Post[]
+
+  @@map("categories")
+}
+
+// 7. Tags table (Blog)
+model Tag {
+  id         String    @id @default(uuid())
+  name       String
+  slug       String    @unique
+  created_at DateTime  @default(now())
+
+  // Relations
+  posts      PostTag[]
+
+  @@map("tags")
+}
+
+// 8. Posts table (Blog)
+model Post {
+  id                    String    @id @default(uuid())
+  author_id             String?
+  category_id           String?
+  title                 String
+  slug                  String    @unique
+  excerpt               String?   @db.Text
+  content               String?   @db.LongText
+  featured_image        String?   @db.Text
+  cover_image_alignment String    @default("center")
+  is_published          Boolean   @default(false)
+  published_at          DateTime?
+  created_at            DateTime  @default(now())
+  updated_at            DateTime  @updatedAt
+
+  // Relations
+  author                User?     @relation("PostAuthor", fields: [author_id], references: [id], onDelete: SetNull)
+  category              Category? @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  tags                  PostTag[]
+
+  @@index([author_id])
+  @@index([category_id])
+  @@map("posts")
+}
+
+// 9. Post Tags junction table
+model PostTag {
+  post_id String
+  tag_id  String
+
+  post    Post @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  tag     Tag  @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@id([post_id, tag_id])
+  @@map("post_tags")
+}
+
+// 10. Refunds table (audit trail)
+model Refund {
+  id                 String    @id @default(uuid())
+  booking_id         String
+  requested_by       String?
+  approved_by        String?
+  amount             Int
+  reason             String    @db.Text
+  status             String    @default("requested") // 'requested' | 'approved' | 'rejected' | 'completed'
+  approval_notes     String?   @db.Text
+  provider_refund_id String?
+  payment_method     String?
+  requested_at       DateTime  @default(now())
+  approved_at        DateTime?
+  processed_at       DateTime?
+  created_at         DateTime  @default(now())
+
+  // Relations
+  booking            Booking   @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  requester          User?     @relation("RefundRequester", fields: [requested_by], references: [id], onDelete: SetNull)
+  approver           User?     @relation("RefundApprover", fields: [approved_by], references: [id], onDelete: SetNull)
+
+  @@index([booking_id])
+  @@index([status])
+  @@map("refunds")
+}

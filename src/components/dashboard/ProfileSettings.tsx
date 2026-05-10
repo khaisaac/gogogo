@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import styles from "./dashboard.module.css";
 
 export default function ProfileSettings({ user }: { user: any }) {
@@ -15,19 +14,18 @@ export default function ProfileSettings({ user }: { user: any }) {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("profiles")
-        .select("full_name, whatsapp")
-        .eq("id", user.id)
-        .single();
-        
-      if (data) {
-        setFormData({
-          full_name: data.full_name || "",
-          whatsapp: data.whatsapp || "",
-        });
-      }
+      try {
+        const res = await fetch("/api/user/profile");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.profile) {
+            setFormData({
+              full_name: data.profile.full_name || "",
+              whatsapp: data.profile.whatsapp || "",
+            });
+          }
+        }
+      } catch {}
     };
     fetchProfile();
   }, [user.id]);
@@ -38,19 +36,24 @@ export default function ProfileSettings({ user }: { user: any }) {
     setSuccess("");
     setError("");
 
-    const supabase = createClient();
-    const { error: updateError } = await supabase
-      .from("profiles")
-      .update({
-        full_name: formData.full_name,
-        whatsapp: formData.whatsapp,
-      })
-      .eq("id", user.id);
+    try {
+      const res = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: formData.full_name,
+          phone: formData.whatsapp,
+        }),
+      });
 
-    if (updateError) {
-      setError(updateError.message);
-    } else {
-      setSuccess("Profile updated successfully!");
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error || "Failed to update profile");
+      } else {
+        setSuccess("Profile updated successfully!");
+      }
+    } catch {
+      setError("Failed to update profile");
     }
     
     setLoading(false);

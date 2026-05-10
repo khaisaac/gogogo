@@ -1,15 +1,15 @@
 import Link from "next/link";
-import { requireAdminClient } from "@/app/admin/_lib";
+import { requireAdmin } from "@/app/admin/_lib";
+import { prisma } from "@/lib/db";
 import { difficultyScoreToLabel } from "@/lib/difficulty";
 import { deletePackage } from "./actions";
 import styles from "../admin.module.css";
 
 export default async function AdminPackagesPage() {
-  const supabase = await requireAdminClient();
-  const { data: packages, error } = await supabase
-    .from("packages")
-    .select("*")
-    .order("created_at", { ascending: false });
+  await requireAdmin();
+  const packages = await prisma.package.findMany({
+    orderBy: { created_at: "desc" },
+  });
 
   return (
     <section className={styles.card}>

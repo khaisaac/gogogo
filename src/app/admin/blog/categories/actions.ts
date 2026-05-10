@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireAdminClient } from "@/app/admin/_lib";
+import { requireAdmin } from "@/app/admin/_lib";
+import { prisma } from "@/lib/db";
 
 function slugify(input: string) {
   return input
@@ -21,14 +22,8 @@ export async function createCategory(formData: FormData) {
     throw new Error("Name and slug are required");
   }
 
-  const supabase = await requireAdminClient();
-  const { error } = await supabase
-    .from("categories")
-    .insert({ name, slug });
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await requireAdmin();
+  await prisma.category.create({ data: { name, slug } });
 
   revalidatePath("/admin/blog/categories");
   revalidatePath("/admin/blog");
@@ -43,30 +38,19 @@ export async function updateCategory(id: string, formData: FormData) {
     throw new Error("Name and slug are required");
   }
 
-  const supabase = await requireAdminClient();
-  const { error } = await supabase
-    .from("categories")
-    .update({ name, slug })
-    .eq("id", id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await requireAdmin();
+  await prisma.category.update({
+    where: { id },
+    data: { name, slug },
+  });
 
   revalidatePath("/admin/blog/categories");
   revalidatePath("/admin/blog");
 }
 
 export async function deleteCategory(id: string) {
-  const supabase = await requireAdminClient();
-  const { error } = await supabase
-    .from("categories")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  await requireAdmin();
+  await prisma.category.delete({ where: { id } });
 
   revalidatePath("/admin/blog/categories");
   revalidatePath("/admin/blog");

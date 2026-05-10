@@ -34,14 +34,15 @@ export default function Navbar() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUser(user);
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .single();
-        if (profile?.role === "admin") {
-          setIsAdmin(true);
-        }
+        try {
+          const res = await fetch("/api/user/profile");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.profile?.role === "admin") {
+              setIsAdmin(true);
+            }
+          }
+        } catch {}
       }
     };
     fetchUser();
