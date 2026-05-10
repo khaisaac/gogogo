@@ -5,10 +5,30 @@ import { createClient } from "@supabase/supabase-js";
 export async function GET(request: Request) {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://pvhtohzmttglkuauibhg.supabase.co";
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2aHRvaHptdHRnbGt1YXVpYmhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDQ0MzMsImV4cCI6MjA5MjE4MDQzM30.qQdWcExJmdQoTJkefPcQ4QfX-ZN7Ya8w9W5mKxErOLo";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2aHRvaHptdHRnbGt1YXVpYmhnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjYwNDQzMywiZXhwIjoyMDkyMTgwNDMzfQ.aIh_5jAqB9fj4Rj59yVztSlpk3fLdky3oj2xXsE2ATo"; // Service Role Key
 
     const supabase = createClient(supabaseUrl, supabaseKey);
     const errors: any[] = [];
+
+    // 0. Users (from auth.users)
+    const { data: { users }, error: userError } = await supabase.auth.admin.listUsers();
+    if (userError) errors.push({ entity: "users", error: userError });
+    if (users) {
+      for (const u of users) {
+        const fullName = u.user_metadata?.full_name || null;
+        await prisma.user.upsert({
+          where: { email: u.email || "" },
+          update: { full_name: fullName },
+          create: {
+            id: u.id,
+            email: u.email || "",
+            full_name: fullName,
+            role: u.user_metadata?.role === "admin" ? "admin" : "client",
+            created_at: new Date(u.created_at),
+          }
+        });
+      }
+    }
 
     // 1. Packages
     const { data: packages, error: pkgError } = await supabase.from("packages").select("*");
@@ -70,11 +90,62 @@ export async function GET(request: Request) {
       }
     }
 
+    // 4. Bookings
+    const { data: bookings, error: bookingError } = await supabase.from("bookings").select("*");
+    if (bookingError) errors.push({ entity: "bookings", error: bookingError });
+    if (bookings) {
+      for (const booking of bookings) {
+        // Need to ensure the referenced package exists, otherwise set to null or handle
+        const pkgExists = booking.package_id ? packages?.find(p => p.id === booking.package_id) : null;
+        
+        await prisma.booking.upsert({
+          where: { id: booking.id },
+          update: { ...booking, package_id: pkgExists ? booking.package_id : null },
+          create: {
+            ...booking,
+            package_id: pkgExists ? booking.package_id : null,
+            created_at: new Date(booking.created_at),
+            updated_at: booking.updated_at ? new Date(booking.updated_at) : new Date(booking.created_at),
+            trekking_date: new Date(booking.trekking_date),
+            birthday: booking.birthday ? new Date(booking.birthday) : null,
+            arrival_day: booking.arrival_day ? new Date(booking.arrival_day) : null,
+            refund_requested_at: booking.refund_requested_at ? new Date(booking.refund_requested_at) : null,
+            refund_processed_at: booking.refund_processed_at ? new Date(booking.refund_processed_at) : null,
+            deposit_reminder_sent_at: booking.deposit_reminder_sent_at ? new Date(booking.deposit_reminder_sent_at) : null,
+          }
+        });
+      }
+    }
+
+    // 5. Payments
+    const { data: payments, error: paymentError } = await supabase.from("payments").select("*");
+    if (paymentError) errors.push({ entity: "payments", error: paymentError });
+    if (payments) {
+      for (const payment of payments) {
+        const bookingExists = payment.booking_id ? bookings?.find(b => b.id === payment.booking_id) : null;
+
+        await prisma.payment.upsert({
+          where: { id: payment.id },
+          update: { ...payment, booking_id: bookingExists ? payment.booking_id : null },
+          create: {
+            ...payment,
+            booking_id: bookingExists ? payment.booking_id : null,
+            created_at: new Date(payment.created_at),
+            updated_at: payment.updated_at ? new Date(payment.updated_at) : new Date(payment.created_at),
+            paid_at: payment.paid_at ? new Date(payment.paid_at) : null,
+          }
+        });
+      }
+    }
+
     return NextResponse.json({
-      message: "Migration completed successfully!",
+      message: "FULL Migration completed successfully!",
+      usersMigrated: users?.length || 0,
       packagesMigrated: packages?.length || 0,
       categoriesMigrated: categories?.length || 0,
       postsMigrated: posts?.length || 0,
+      bookingsMigrated: bookings?.length || 0,
+      paymentsMigrated: payments?.length || 0,
       errors
     });
   } catch (error) {
