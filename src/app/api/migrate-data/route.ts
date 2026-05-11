@@ -148,8 +148,12 @@ export async function GET(request: Request) {
       paymentsMigrated: payments?.length || 0,
       errors
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Migration error:", error);
-    return NextResponse.json({ error: "Migration failed" }, { status: 500 });
+    return NextResponse.json({ 
+      error: "Migration failed", 
+      details: error?.message || String(error),
+      stack: error?.stack
+    }, { status: 500 });
   }
 }
