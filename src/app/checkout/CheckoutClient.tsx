@@ -13,6 +13,8 @@ type CheckoutClientProps = {
   priceMode: string;
   totalDays: number;
   totalPrice: number;
+  userEmail: string;
+  userRole: string;
 };
 
 export default function CheckoutClient({
@@ -24,11 +26,13 @@ export default function CheckoutClient({
   priceMode,
   totalDays,
   totalPrice,
+  userEmail,
+  userRole,
 }: CheckoutClientProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [email, setEmail] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [email, setEmail] = useState(userEmail);
+  const isAdmin = userRole === "admin";
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -49,27 +53,6 @@ Special/Dietary Requirements: `,
     arrivalDay: "",
     paymentType: "full", // full | deposit
   });
-
-  useEffect(() => {
-    // get user email
-    const fetchUser = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.auth.getUser();
-      if (data.user?.email) {
-        setEmail(data.user.email);
-        try {
-          const res = await fetch("/api/user/profile");
-          if (res.ok) {
-            const profileData = await res.json();
-            if (profileData.profile?.role === "admin") {
-              setIsAdmin(true);
-            }
-          }
-        } catch {}
-      }
-    };
-    fetchUser();
-  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<

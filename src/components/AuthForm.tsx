@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import styles from "./AuthForm.module.css";
-import { createClient } from "@/lib/supabase/client";
+// Supabase import removed
 
 type AuthStep = "email" | "otp";
 
@@ -53,16 +53,16 @@ export default function AuthForm({ callbackUrl }: AuthFormProps) {
     setError("");
 
     try {
-      const supabase = createClient();
-
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        email,
-        token: otpCode,
-        type: "email",
+      const res = await fetch("/api/auth/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, token: otpCode }),
       });
 
-      if (verifyError) {
-        setError(verifyError.message);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Invalid or expired verification code");
         return;
       }
 

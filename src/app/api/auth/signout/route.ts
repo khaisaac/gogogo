@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { clearSessionCookie } from '@/lib/auth'
 
 export async function POST() {
   try {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.signOut()
+    await clearSessionCookie()
+const error = null
 
     if (error) {
       return NextResponse.json(

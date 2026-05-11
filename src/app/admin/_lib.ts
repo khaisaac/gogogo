@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import type { User } from "@supabase/supabase-js";
 
@@ -8,10 +8,7 @@ type AdminContext = {
 };
 
 export async function requireAdminContext(): Promise<AdminContext> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUser();
 
   if (!user) {
     redirect("/admin-login");

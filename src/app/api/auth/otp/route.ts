@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createOtp } from '@/lib/auth'
+import { Resend } from 'resend'
 
 export async function POST(request: Request) {
   try {
@@ -12,19 +13,26 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = await createClient()
+    const code = await createOtp(email)
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        shouldCreateUser: true,
-        data: {
-          // New users auto-created as 'client' via DB trigger
-        },
-      },
+    const resend = new Resend(process.env.RESEND_API_KEY)
+    const { error: resendError } = await resend.emails.send({
+      from: 'Trekking Mount Rinjani <noreply@trekkingmountrinjani.com>',
+      to: email,
+      subject: 'Your Login Code - Trekking Mount Rinjani',
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Your Verification Code</h2>
+          <p>Please use the following 6-digit code to sign in:</p>
+          <div style="background: #f4f4f4; padding: 12px 24px; font-size: 24px; font-weight: bold; letter-spacing: 4px; text-align: center; border-radius: 8px;">
+            ${code}
+          </div>
+          <p style="color: #666; font-size: 14px; margin-top: 24px;">This code will expire in 10 minutes.</p>
+        </div>
+      `,
     })
 
-    if (error) {
+    if (resendError) {
       return NextResponse.json(
         { error: error.message },
         { status: 400 }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { verifyOtp, findOrCreateUser, signInUser } from '@/lib/auth'
 
 export async function POST(request: Request) {
   try {
@@ -12,27 +12,30 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = await createClient()
+    const isValid = await verifyOtp(email, token)
 
-    const { data, error } = await supabase.auth.verifyOtp({
-      email,
-      token,
-      type: 'email',
-    })
-
-    if (error) {
+    if (!isValid) {
       return NextResponse.json(
-        { error: error.message },
+        { error: 'Invalid or expired verification code' },
         { status: 400 }
       )
     }
 
+    const user = await findOrCreateUser(email)
+    const sessionToken = await signInUser(user)
+
     return NextResponse.json({
       message: 'Verification successful',
-      user: data.user,
-      session: data.session,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        full_name: user.full_name
+      },
+      session: sessionToken,
     })
-  } catch {
+  } catch (err: any) {
+    console.error("Verification error:", err);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

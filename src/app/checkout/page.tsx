@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -18,8 +18,7 @@ export default async function CheckoutPage({
 }: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getUser();
 
   const unresolvedSearchParams = await searchParams;
   const package_id = unresolvedSearchParams.package_id;
@@ -63,7 +62,7 @@ export default async function CheckoutPage({
     <><Navbar /><main className={styles.page}><div className="container">
       <h1 className={styles.title}>Secure Checkout</h1>
       <p className={styles.subtitle}>Please complete your booking details below.</p>
-      <CheckoutClient packageId={pkgData.id} packageTitle={pkgData.title} date={date || ""} pax={pax} priceType={price_type} priceMode={price_mode} totalDays={total_days} totalPrice={summaryPrice} />
+      <CheckoutClient packageId={pkgData.id} packageTitle={pkgData.title} date={date || ""} pax={pax} priceType={price_type} priceMode={price_mode} totalDays={total_days} totalPrice={summaryPrice} userEmail={user.email} userRole={user.role} />
     </div></main><Footer /></>
   );
 }

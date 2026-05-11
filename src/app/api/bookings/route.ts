@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { getUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Resend } from "resend";
 import { getPerPaxPrice, getTotalPackagePrice, type PriceType, type TotalDayOption } from "@/lib/pricing";
