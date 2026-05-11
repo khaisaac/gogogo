@@ -24,8 +24,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser();
+    let validUserId = null;
+    if (user?.id) {
+      const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { id: true } });
+      if (dbUser) {
+        validUserId = dbUser.id;
+      }
+    }
 
     let package_title = null;
     let total_price = null;
@@ -67,7 +73,7 @@ export async function POST(request: Request) {
 
     const booking = await prisma.booking.create({
       data: {
-        user_id: user?.id || null,
+        user_id: validUserId,
         package_id: package_id || null,
         full_name, email, whatsapp,
         trekking_date: new Date(trekking_date),
@@ -119,8 +125,7 @@ export async function POST(request: Request) {
 
 export async function GET() {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser();
     if (!user) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }

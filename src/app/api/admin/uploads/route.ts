@@ -5,8 +5,7 @@ import { uploadImage } from "@/lib/storage";
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUser();
     if (!user) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }

@@ -1,10 +1,9 @@
 import { redirect } from "next/navigation";
-import { getUser } from "@/lib/auth";
+import { getUser, type SessionUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import type { User } from "@supabase/supabase-js";
 
 type AdminContext = {
-  user: User;
+  user: SessionUser;
 };
 
 export async function requireAdminContext(): Promise<AdminContext> {
@@ -28,7 +27,7 @@ export async function requireAdminContext(): Promise<AdminContext> {
   return { user };
 }
 
-export async function requireAdmin(): Promise<User> {
+export async function requireAdmin(): Promise<SessionUser> {
   const { user } = await requireAdminContext();
   return user;
 }

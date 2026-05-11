@@ -327,7 +327,7 @@ Special/Dietary Requirements: `,
             {loading
               ? "Processing..."
               : formData.paymentType === "pay_later"
-                ? "Complete Booking (Pay on Arrival)"
+                ? "Complete Booking"
                 : `Proceed to Payment ($${amountToPay} USD)`}
           </button>
         </form>

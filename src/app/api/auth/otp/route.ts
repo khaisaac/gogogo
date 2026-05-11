@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     if (resendError) {
       return NextResponse.json(
-        { error: error.message },
+        { error: resendError.message },
         { status: 400 }
       )
     }
