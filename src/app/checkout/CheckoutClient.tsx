@@ -113,7 +113,7 @@ Special/Dietary Requirements: `,
       const bookingData = await bookingRes.json();
 
       if (!bookingRes.ok) {
-        throw new Error(bookingData.error || "Failed to create booking");
+        throw new Error(bookingData.details || bookingData.error || "Failed to create booking");
       }
 
       const bookingId = bookingData.booking.id;

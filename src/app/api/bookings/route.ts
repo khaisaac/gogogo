@@ -56,6 +56,9 @@ export async function POST(request: Request) {
       if (payment_type === "deposit") {
         deposit_amount = Math.round(total_price * 0.3);
         balance_amount = total_price - deposit_amount;
+      } else if (payment_type === "pay_later") {
+        deposit_amount = 0;
+        balance_amount = total_price;
       } else {
         deposit_amount = total_price;
         balance_amount = 0;
@@ -108,8 +111,9 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ message: "Booking created successfully", booking });
-  } catch {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Booking Error:", error);
+    return NextResponse.json({ error: "Internal server error", details: error.message || String(error) }, { status: 500 });
   }
 }
 
