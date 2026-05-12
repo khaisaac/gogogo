@@ -125,7 +125,14 @@ export default function SuccessClient({
     booking.payment_status === "deposit_paid" ||
     status === "success";
   const isDeposit = booking.payment_type === "deposit";
-  const amountPaid = booking.deposit_amount || booking.total_price;
+  const isPayLater = booking.payment_type === "pay_later";
+
+  let amountPaid = booking.total_price;
+  if (isDeposit) {
+    amountPaid = booking.deposit_amount;
+  } else if (isPayLater) {
+    amountPaid = 0;
+  }
 
   return (
     <div className={styles.card}>
@@ -158,7 +165,13 @@ export default function SuccessClient({
         </div>
         <div className={styles.detailItem}>
           <span className={styles.detailLabel}>Trekking Date</span>
-          <span className={styles.detailValue}>{booking.trekking_date}</span>
+          <span className={styles.detailValue}>
+            {new Date(booking.trekking_date).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </span>
         </div>
         <div className={styles.detailItem}>
           <span className={styles.detailLabel}>Participants</span>
@@ -169,13 +182,13 @@ export default function SuccessClient({
         </div>
         <div className={styles.detailItem}>
           <span className={styles.detailLabel}>
-            {isDeposit ? "Deposit Paid" : "Amount Paid"}
+            {isDeposit ? "Deposit Paid" : isPayLater ? "Amount Paid Now" : "Amount Paid"}
           </span>
           <span className={`${styles.detailValue} ${styles.priceValue}`}>
             ${amountPaid} USD
           </span>
         </div>
-        {isDeposit && (
+        {(isDeposit || isPayLater) && (
           <div className={styles.detailItem}>
             <span className={styles.detailLabel}>Balance Remaining</span>
             <span className={styles.detailValue}>
@@ -190,6 +203,17 @@ export default function SuccessClient({
           <strong>💡 Deposit Payment</strong>
           <p>
             You have paid a 30% deposit. The remaining balance of $
+            {booking.balance_amount} USD is due before your trekking date. Our
+            team will contact you with payment details.
+          </p>
+        </div>
+      )}
+
+      {isPayLater && (
+        <div className={styles.depositNotice}>
+          <strong>💡 Pay Later</strong>
+          <p>
+            You have chosen to pay later. The full amount of $
             {booking.balance_amount} USD is due before your trekking date. Our
             team will contact you with payment details.
           </p>
