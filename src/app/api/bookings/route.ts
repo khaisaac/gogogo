@@ -107,11 +107,110 @@ export async function POST(request: Request) {
       } catch (emailErr) { console.error("Email send error:", emailErr); }
 
       try {
+        const paymentTypeLabel =
+          payment_type === "full" ? "Pay in Full (100%)" :
+          payment_type === "deposit" ? "Pay Deposit (30%)" :
+          payment_type === "pay_later" ? "Pay Later (on arrival)" : payment_type;
+
+        const priceModeLabel =
+          price_mode === "total_package"
+            ? `Total Package (${total_days} days)`
+            : "Per Person";
+
+        const adminHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; color: #222; background: #f4f4f4; margin: 0; padding: 0; }
+    .wrapper { max-width: 640px; margin: 24px auto; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #1a5c2e, #2e8b57); padding: 28px 32px; }
+    .header h1 { margin: 0; color: #fff; font-size: 22px; }
+    .header p { margin: 4px 0 0; color: #b6e8c8; font-size: 14px; }
+    .body { padding: 28px 32px; }
+    .section-title { font-size: 13px; font-weight: 700; color: #1a5c2e; text-transform: uppercase; letter-spacing: 0.8px; margin: 24px 0 10px; border-bottom: 2px solid #e8f5ec; padding-bottom: 6px; }
+    table { width: 100%; border-collapse: collapse; }
+    td { padding: 9px 12px; font-size: 14px; border-bottom: 1px solid #f0f0f0; vertical-align: top; }
+    td:first-child { color: #666; width: 40%; font-weight: 600; }
+    td:last-child { color: #222; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .badge-full { background: #d4edda; color: #155724; }
+    .badge-deposit { background: #fff3cd; color: #856404; }
+    .badge-later { background: #f8d7da; color: #721c24; }
+    .pre-text { white-space: pre-wrap; background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 6px; padding: 12px; font-size: 13px; line-height: 1.6; font-family: monospace; }
+    .booking-id { background: #eef7f1; border: 1px solid #c3e6cb; border-radius: 6px; padding: 10px 14px; font-family: monospace; font-size: 13px; color: #155724; margin-top: 8px; }
+    .footer { background: #f9f9f9; padding: 16px 32px; font-size: 12px; color: #999; text-align: center; border-top: 1px solid #eee; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <h1>🏔️ New Booking Received!</h1>
+    <p>A guest has just completed a booking on Trekking Mount Rinjani.</p>
+  </div>
+  <div class="body">
+
+    <div class="section-title">👤 Guest Information</div>
+    <table>
+      <tr><td>Full Name</td><td>${full_name}</td></tr>
+      <tr><td>Email</td><td>${email}</td></tr>
+      <tr><td>WhatsApp</td><td>${whatsapp}</td></tr>
+    </table>
+
+    <div class="section-title">🎒 Booking Details</div>
+    <table>
+      <tr><td>Package</td><td><strong>${package_title || "Custom / No Package"}</strong></td></tr>
+      <tr><td>Trekking Date</td><td>${trekking_date}</td></tr>
+      <tr><td>Arrival / Pickup Date</td><td>${arrival_day || "—"}</td></tr>
+      <tr><td>Number of Trekkers</td><td>${trekkersCount} person(s)</td></tr>
+      <tr><td>Service Type</td><td style="text-transform:capitalize">${price_type || "—"}</td></tr>
+      <tr><td>Pricing Mode</td><td>${priceModeLabel}</td></tr>
+      <tr><td>Hotel Pickup Location</td><td>${hotel_pickup_location}</td></tr>
+    </table>
+
+    <div class="section-title">💳 Payment Information</div>
+    <table>
+      <tr>
+        <td>Payment Option</td>
+        <td>
+          <span class="badge ${payment_type === "full" ? "badge-full" : payment_type === "deposit" ? "badge-deposit" : "badge-later"}">
+            ${paymentTypeLabel}
+          </span>
+        </td>
+      </tr>
+      ${total_price ? `<tr><td>Total Price</td><td><strong>$${total_price} USD</strong></td></tr>` : ""}
+      ${deposit_amount != null ? `<tr><td>Amount Due Now</td><td><strong>$${deposit_amount} USD</strong></td></tr>` : ""}
+      ${balance_amount != null && balance_amount > 0 ? `<tr><td>Remaining Balance</td><td>$${balance_amount} USD</td></tr>` : ""}
+    </table>
+
+    ${special_requirements ? `
+    <div class="section-title">👥 Members Data & Special Requirements</div>
+    <div class="pre-text">${special_requirements.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+    ` : ""}
+
+    ${order_note ? `
+    <div class="section-title">📝 Order Note</div>
+    <div class="pre-text">${order_note.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
+    ` : ""}
+
+    <div class="section-title">🔖 Booking ID</div>
+    <div class="booking-id">${booking.id}</div>
+
+  </div>
+  <div class="footer">
+    This is an automated notification from Trekking Mount Rinjani booking system.<br>
+    Please log in to the admin dashboard to manage this booking.
+  </div>
+</div>
+</body>
+</html>`;
+
         await resend.emails.send({
           from: "Trekking Mount Rinjani <noreply@trekkingmountrinjani.com>",
-          to: process.env.ADMIN_EMAIL!,
-          subject: `🆕 New Booking — ${full_name}`,
-          html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;"><h2>New Booking Request</h2><p><strong>Name:</strong> ${full_name}</p><p><strong>Email:</strong> ${email}</p><p><strong>WhatsApp:</strong> ${whatsapp}</p><p><strong>Package:</strong> ${package_title || "Custom"}</p><p><strong>Date:</strong> ${trekking_date}</p><p><strong>Adults:</strong> ${trekkersCount}</p>${total_price ? `<p><strong>Total:</strong> $${total_price} USD</p>` : ""}<p><strong>Booking ID:</strong> ${booking.id}</p></div>`,
+          to: "rinjanitrekkingmount@gmail.com",
+          subject: `🆕 New Booking — ${full_name} | ${package_title || "Custom"} | ${payment_type === "pay_later" ? "Pay Later" : `$${total_price} USD`}`,
+          html: adminHtml,
         });
       } catch (emailErr) { console.error("Admin email error:", emailErr); }
     }
