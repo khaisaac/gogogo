@@ -208,7 +208,7 @@ export async function POST(request: Request) {
 
         await resend.emails.send({
           from: "Trekking Mount Rinjani <noreply@trekkingmountrinjani.com>",
-          to: "rinjanitrekkingmount@gmail.com",
+          to: "trekkingmrinjani@gmail.com",
           subject: `🆕 New Booking — ${full_name} | ${package_title || "Custom"} | ${payment_type === "pay_later" ? "Pay Later" : `$${total_price} USD`}`,
           html: adminHtml,
         });
