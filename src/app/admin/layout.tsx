@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { clearSessionCookie } from "@/lib/auth";
 import { requireAdmin } from "./_lib";
 import AdminSidebarNav from "./AdminSidebarNav";
 import styles from "./admin.module.css";
@@ -10,8 +10,7 @@ export const dynamic = "force-dynamic";
 async function logout() {
   "use server";
 
-  const supabase = await createClient();
-  await supabase.auth.signOut();
+  await clearSessionCookie();
   redirect("/admin-login");
 }
 

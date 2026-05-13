@@ -71,8 +71,8 @@ function AdminLoginContent() {
       await new Promise((resolve) => setTimeout(resolve, 500));
       router.push("/admin/packages");
       router.refresh();
-    } catch {
-      setError("Terjadi kesalahan saat login");
+    } catch (err: any) {
+      setError(`Network/Action error: ${err.message || "Failed to contact server"}`);
     } finally {
       setLoading(false);
     }

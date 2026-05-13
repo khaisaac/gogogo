@@ -50,8 +50,8 @@ export async function adminLogin(email: string, password: string) {
     });
 
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Admin login error:", error);
-    return { error: "Terjadi kesalahan saat login" };
+    return { error: `Terjadi kesalahan: ${error.message || String(error)}` };
   }
 }
