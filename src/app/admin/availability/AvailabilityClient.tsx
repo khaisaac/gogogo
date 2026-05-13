@@ -302,7 +302,8 @@ export default function AvailabilityClient({ packages }: { packages: Package[] }
               </thead>
               <tbody>
                 {upcomingDates.map((d) => {
-                  const dateObj = new Date(d.date + "T00:00:00");
+                  const dateStr = d.date.split("T")[0];
+                  const dateObj = new Date(dateStr + "T00:00:00");
                   const dayName = dateObj.toLocaleDateString("en-US", { weekday: "short" });
                   const available = d.max_pax - d.booked_pax;
                   const isEditing = editingId === d.id;
@@ -310,7 +311,7 @@ export default function AvailabilityClient({ packages }: { packages: Package[] }
                   return (
                     <tr key={d.id} className={!d.is_active ? styles.inactiveRow : ""}>
                       <td className={styles.dateCell}>
-                        {new Date(d.date + "T00:00:00").toLocaleDateString("en-GB", {
+                        {dateObj.toLocaleDateString("en-GB", {
                           day: "2-digit",
                           month: "short",
                           year: "numeric",
@@ -402,9 +403,11 @@ export default function AvailabilityClient({ packages }: { packages: Package[] }
                 </tr>
               </thead>
               <tbody>
-                {pastDates.map((d) => (
+                {pastDates.map((d) => {
+                  const pDateStr = d.date.split("T")[0];
+                  return (
                   <tr key={d.id} className={styles.pastRow}>
-                    <td>{new Date(d.date + "T00:00:00").toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</td>
+                    <td>{new Date(pDateStr + "T00:00:00").toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</td>
                     <td>{d.max_pax}</td>
                     <td>{d.booked_pax}</td>
                     <td>{d.notes || "—"}</td>
@@ -412,7 +415,8 @@ export default function AvailabilityClient({ packages }: { packages: Package[] }
                       <button className={adminStyles.dangerBtn} onClick={() => handleDelete(d.id)}>Delete</button>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
