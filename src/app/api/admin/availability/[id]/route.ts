@@ -16,8 +16,9 @@ async function requireAdmin() {
 // PATCH /api/admin/availability/[id]  — Update a date
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const admin = await requireAdmin();
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -26,7 +27,7 @@ export async function PATCH(
     const { max_pax, notes, is_active } = body;
 
     const updated = await prisma.packageDate.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(max_pax !== undefined && { max_pax }),
         ...(notes !== undefined && { notes }),
@@ -45,13 +46,14 @@ export async function PATCH(
 // DELETE /api/admin/availability/[id]
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const admin = await requireAdmin();
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    await prisma.packageDate.delete({ where: { id: params.id } });
+    await prisma.packageDate.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE /api/admin/availability/[id] error:", error);
