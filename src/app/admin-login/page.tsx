@@ -2,8 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { verifyAdminRole } from "./actions";
+import { adminLogin, verifyAdminRole } from "./actions";
 import styles from "./page.module.css";
 
 function AdminLoginContent() {
@@ -19,44 +18,37 @@ function AdminLoginContent() {
   const redirectedEmail = searchParams.get("email");
 
   useEffect(() => {
-    const supabase = createClient();
-
-    const loadSession = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        setActiveEmail(null);
-        setActiveRole(null);
-        return;
+    // Basic API call to check if we are already logged in
+    const checkSession = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            setActiveEmail(data.user.email);
+            setActiveRole(data.user.role);
+          }
+        }
+      } catch (err) {
+        // ignore
       }
-
-      setActiveEmail(user.email || null);
-
-      // Use server action to fetch role (bypasses RLS)
-      const profile = await verifyAdminRole(user.id);
-      setActiveRole(profile?.role || null);
     };
-
-    loadSession();
+    checkSession();
   }, []);
 
   useEffect(() => {
     if (message !== "not_admin") {
       return;
     }
-
-    const supabase = createClient();
-    supabase.auth.signOut().then(() => {
+    // Sign out API call
+    fetch("/api/auth/signout", { method: "POST" }).then(() => {
       setActiveEmail(null);
       setActiveRole(null);
     });
   }, [message]);
 
   const forceSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await fetch("/api/auth/signout", { method: "POST" });
     setActiveEmail(null);
     setActiveRole(null);
     setError("");
@@ -68,36 +60,15 @@ function AdminLoginContent() {
     setError("");
 
     try {
-      const supabase = createClient();
-      const { data: signInData, error: signInError } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+      const result = await adminLogin(email, password);
 
-      if (signInError) {
-        setError(signInError.message || "Login gagal");
+      if (result?.error) {
+        setError(result.error);
         return;
       }
 
-      // Use server action to verify role (bypasses RLS)
-      const profile = await verifyAdminRole(signInData.user.id);
-
-      console.log("Login Debug:", {
-        userId: signInData.user.id,
-        email: signInData.user.email,
-        profile: profile,
-      });
-
-      if (profile?.role !== "admin") {
-        await supabase.auth.signOut();
-        setError("Akun ini bukan admin.");
-        return;
-      }
-
-      // Wait a moment for session to persist before redirecting
+      // Success
       await new Promise((resolve) => setTimeout(resolve, 500));
-
       router.push("/admin/packages");
       router.refresh();
     } catch {
