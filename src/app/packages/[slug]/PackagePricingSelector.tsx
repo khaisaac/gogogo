@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import {
   GROUP_TIER_OPTIONS,
   PAX_OPTIONS,
@@ -37,7 +37,6 @@ export default function PackagePricingSelector({
   );
   const [totalDays, setTotalDays] = useState<TotalDayOption>(2);
   const [selectedDate, setSelectedDate] = useState<string>("");
-  const dateInputRef = useRef<HTMLInputElement>(null);
 
   // Get today's date in YYYY-MM-DD format based on local timezone
   const getTodayDateString = () => {
@@ -49,6 +48,27 @@ export default function PackagePricingSelector({
   };
 
   const minDate = getTodayDateString();
+
+  const [availableDates, setAvailableDates] = useState<{date: string, available_pax: number, is_available: boolean, id: string}[]>([]);
+  const [loadingDates, setLoadingDates] = useState(true);
+
+  useEffect(() => {
+    async function fetchDates() {
+      setLoadingDates(true);
+      try {
+        const res = await fetch(`/api/availability?package_id=${packageId}`);
+        const data = await res.json();
+        if (data.dates) {
+          setAvailableDates(data.dates);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingDates(false);
+      }
+    }
+    fetchDates();
+  }, [packageId]);
 
   const availableServiceTypes = useMemo(() => {
     return PRICE_TYPES.filter((typeDef) => {
@@ -143,6 +163,8 @@ export default function PackagePricingSelector({
     setPax((current) => Math.max(1, current - 1) as PaxNumber);
   const incrementAdult = () =>
     setPax((current) => Math.min(10, current + 1) as PaxNumber);
+
+  const filteredDates = availableDates.filter(d => d.is_available && d.available_pax >= resolvedPax);
 
   return (
     <>
@@ -265,40 +287,31 @@ export default function PackagePricingSelector({
         </div>
       </div>
 
-      <div 
-        className={styles.selector}
-        onClick={() => {
-          try {
-            if (dateInputRef.current && 'showPicker' in HTMLInputElement.prototype) {
-              dateInputRef.current.showPicker();
-            }
-          } catch (e) {
-            // ignore
-          }
-        }}
-      >
-        <span className={styles.dateTrigger} aria-hidden="true">
-          {selectedDate || "Select date"}
-        </span>
-        <input
-          ref={dateInputRef}
-          id="trek-start-date"
-          type="date"
-          className={styles.datePickerInput}
-          value={selectedDate}
-          onChange={(event) => setSelectedDate(event.target.value)}
-          onClick={(e) => {
-            try {
-              if ('showPicker' in HTMLInputElement.prototype) {
-                e.currentTarget.showPicker();
-              }
-            } catch (err) {
-              // ignore
-            }
-          }}
-          min={minDate}
-          aria-label="Select trek start date"
-        />
+      <div className={styles.selector}>
+        {loadingDates ? (
+          <span className={styles.dateTrigger}>Loading dates...</span>
+        ) : filteredDates.length > 0 ? (
+          <select
+            className={styles.bookingSelect}
+            value={selectedDate}
+            onChange={(event) => setSelectedDate(event.target.value)}
+            aria-label="Select trek start date"
+          >
+            <option value="" disabled>Select available date</option>
+            {filteredDates.map((d) => (
+              <option key={d.id} value={d.date}>
+                {new Date(d.date + "T00:00:00").toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })} ({d.available_pax} slots left)
+              </option>
+            ))}
+          </select>
+        ) : (
+          <select
+            className={styles.bookingSelect}
+            disabled
+          >
+            <option>No dates available</option>
+          </select>
+        )}
       </div>
       
       <a 
@@ -308,7 +321,6 @@ export default function PackagePricingSelector({
           if (!selectedDate) {
             e.preventDefault();
             alert("Please select a trekking date first.");
-            dateInputRef.current?.focus();
           }
         }}
       >

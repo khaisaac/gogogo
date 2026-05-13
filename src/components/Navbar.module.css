@@ -272,7 +272,7 @@
     flex-direction: column;
     justify-content: center;
     gap: 4px;
-    background: var(--color-dark);
+    background: #1a3d2b;
     transform: translateX(100%);
     transition: transform var(--transition-normal);
   }
@@ -290,11 +290,13 @@
   .dropdownMenu {
     position: static;
     transform: none;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
     box-shadow: none;
     min-width: unset;
     width: 100%;
     max-width: 300px;
+    border-left: 3px solid var(--color-primary);
+    border-radius: 0 4px 4px 0;
   }
 
   .dropdownOpen {

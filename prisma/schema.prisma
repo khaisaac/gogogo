@@ -93,9 +93,31 @@ model Package {
   updated_at  DateTime @updatedAt
 
   // Relations
-  bookings    Booking[]
+  bookings      Booking[]
+  available_dates PackageDate[]
 
   @@map("packages")
+}
+
+// 3b. Package Available Dates
+model PackageDate {
+  id          String   @id @default(uuid())
+  package_id  String
+  date        DateTime @db.Date
+  max_pax     Int      @default(20)
+  booked_pax  Int      @default(0)
+  notes       String?  @db.Text
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  // Relations
+  package     Package  @relation(fields: [package_id], references: [id], onDelete: Cascade)
+
+  @@unique([package_id, date])
+  @@index([package_id])
+  @@index([date])
+  @@map("package_dates")
 }
 
 // 4. Bookings table

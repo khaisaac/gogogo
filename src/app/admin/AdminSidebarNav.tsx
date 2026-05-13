@@ -8,6 +8,7 @@ function isActive(pathname: string, href: string) {
   if (href === "/admin") return pathname === "/admin";
   if (href === "/admin/blog") return pathname === "/admin/blog";
   if (href === "/admin/packages") return pathname === "/admin/packages";
+  if (href === "/admin/availability") return pathname === "/admin/availability";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -17,6 +18,7 @@ export default function AdminSidebarNav() {
   const links = [
     { href: "/admin", label: "Dashboard" },
     { href: "/admin/bookings", label: "Bookings" },
+    { href: "/admin/availability", label: "📅 Availability" },
     { href: "/admin/blog", label: "Posts" },
     { href: "/admin/blog/categories", label: "Categories" },
     { href: "/admin/blog/new", label: "Add New Post" },

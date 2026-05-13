@@ -12,7 +12,7 @@ export default function Navbar() {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [packagesOpen, setPackagesOpen] = useState(false);
+  const [packagesOpen, setPackagesOpen] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   
   // Auth state
