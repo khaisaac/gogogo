@@ -17,6 +17,11 @@ export default function ERinjaniSection() {
             <p className={styles.desc}>
               Planning a self-guided hike? Book your official Mt. Rinjani National Park entrance tickets directly through our e-Rinjani portal. Fast, secure, and instant confirmation.
             </p>
+            <img 
+              src="https://lh3.googleusercontent.com/d/1eEbPQwKIIIq6THCCFQ56XUGPqJljgD1u" 
+              alt="e-Rinjani Hiking" 
+              className={styles.promoImage}
+            />
           </div>
 
           <div className={styles.features}>
