@@ -4,7 +4,7 @@ import { requireAdmin } from "@/app/admin/_lib";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: any
 ) {
   try {
     await requireAdmin();
@@ -23,7 +23,7 @@ export async function DELETE(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: any
 ) {
   try {
     await requireAdmin();
