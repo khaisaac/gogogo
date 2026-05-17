@@ -33,6 +33,7 @@
 
 .title {
   flex: 1;
+  color: white;
   text-align: center;
   font-size: 1.5rem;
   font-weight: 700;
