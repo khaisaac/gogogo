@@ -128,6 +128,18 @@ export default function TicketBookingClient({
   const [insuranceType, setInsuranceType] = useState<"regular" | "premium">("regular");
   const [citizenType, setCitizenType] = useState<"foreign" | "local">("foreign");
 
+  const [mounted, setMounted] = useState(false);
+  const [todayStr, setTodayStr] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    setTodayStr(`${yyyy}-${mm}-${dd}`);
+  }, []);
+
   // Load selections from query params if coming back from login
   useEffect(() => {
     const entrance = searchParams?.get("entrance");
@@ -270,6 +282,48 @@ export default function TicketBookingClient({
       setCheckOut(minCheckoutStr);
     }
   }, [checkIn, entranceGate, exitGate]);
+
+  const handleCheckInChange = (val: string) => {
+    if (!val) {
+      setCheckIn("");
+      return;
+    }
+    const selected = new Date(val);
+    const today = new Date(todayStr);
+    
+    selected.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+    
+    if (selected < today) {
+      alert("Past dates are not allowed. Please choose today or a future date.");
+      setCheckIn(todayStr);
+      return;
+    }
+    setCheckIn(val);
+  };
+
+  const handleCheckOutChange = (val: string) => {
+    if (!val) {
+      setCheckOut("");
+      return;
+    }
+    if (!checkIn) {
+      alert("Please select a check-in date first.");
+      setCheckOut("");
+      return;
+    }
+    
+    const { minDays, maxDays } = getTrekDurationLimits(entranceGate?.name || "Sembalun", exitGate?.name || "Sembalun");
+    const minCheckoutStr = getDateWithOffset(checkIn, minDays - 1);
+    const maxCheckoutStr = getDateWithOffset(checkIn, maxDays - 1);
+    
+    if (val < minCheckoutStr || val > maxCheckoutStr) {
+      alert(`For this route, the duration must be between ${minDays} and ${maxDays} days. Adjusting check-out date automatically.`);
+      setCheckOut(minCheckoutStr);
+      return;
+    }
+    setCheckOut(val);
+  };
 
   const handleOpenGateModal = (type: "entrance" | "exit") => {
     setSelectingType(type);
@@ -519,8 +573,8 @@ export default function TicketBookingClient({
                       type="date" 
                       className={styles.dateInput}
                       value={checkIn}
-                      onChange={(e) => setCheckIn(e.target.value)}
-                      min={new Date().toISOString().split("T")[0]}
+                      onChange={(e) => handleCheckInChange(e.target.value)}
+                      min={mounted ? todayStr : ""}
                     />
                   </label>
                   <label className={styles.dateField}>
@@ -529,8 +583,8 @@ export default function TicketBookingClient({
                       type="date" 
                       className={styles.dateInput}
                       value={checkOut}
-                      onChange={(e) => setCheckOut(e.target.value)}
-                      min={checkIn ? getDateWithOffset(checkIn, (entranceGate && exitGate ? getTrekDurationLimits(entranceGate.name, exitGate.name).minDays : 2) - 1) : new Date().toISOString().split("T")[0]}
+                      onChange={(e) => handleCheckOutChange(e.target.value)}
+                      min={checkIn ? getDateWithOffset(checkIn, (entranceGate && exitGate ? getTrekDurationLimits(entranceGate.name, exitGate.name).minDays : 2) - 1) : (mounted ? todayStr : "")}
                       max={checkIn ? getDateWithOffset(checkIn, (entranceGate && exitGate ? getTrekDurationLimits(entranceGate.name, exitGate.name).maxDays : 4) - 1) : ""}
                       disabled={!checkIn}
                     />
