@@ -130,8 +130,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const callbackUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/doku/webhook`;
-    const redirectUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/booking-ticket/success?booking_id=${booking.id}`;
+    const origin = new URL(req.url).origin;
+    const callbackUrl = `${origin}/api/doku/webhook`;
+    const redirectUrl = `${origin}/booking-ticket/success?booking_id=${booking.id}`;
 
     const dokuResponse = await createDokuIdrPayment({
       invoiceNumber,
