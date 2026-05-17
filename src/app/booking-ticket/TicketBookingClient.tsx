@@ -55,6 +55,48 @@ function getDateWithOffset(baseDateStr: string, offsetDays: number): string {
   return date.toISOString().split("T")[0];
 }
 
+function calculateBasePrice(
+  citizenType: "foreign" | "local",
+  entranceGateName: string,
+  checkInDateStr: string,
+  checkOutDateStr: string
+): number {
+  if (!checkInDateStr || !checkOutDateStr) return 0;
+
+  const isClass1 = (name: string) => {
+    const n = name.toLowerCase();
+    return n.includes("sembalun") || n.includes("senaru") || n.includes("torean");
+  };
+
+  const start = new Date(checkInDateStr);
+  const end = new Date(checkOutDateStr);
+
+  let totalBasePrice = 0;
+  const current = new Date(start);
+  while (current <= end) {
+    const dayOfWeek = current.getDay(); // 0: Sunday, 6: Saturday
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+    let pricePerDay = 0;
+    if (citizenType === "foreign") {
+      pricePerDay = isClass1(entranceGateName) ? 250000 : 150000;
+    } else {
+      // Local (WNI)
+      if (isClass1(entranceGateName)) {
+        pricePerDay = isWeekend ? 75000 : 50000;
+      } else {
+        pricePerDay = isWeekend ? 15000 : 10000;
+      }
+    }
+    totalBasePrice += pricePerDay;
+
+    // Move to next day
+    current.setDate(current.getDate() + 1);
+  }
+
+  return totalBasePrice;
+}
+
 export default function TicketBookingClient({ 
   userEmail, 
   userFullName = "", 
@@ -71,6 +113,7 @@ export default function TicketBookingClient({
   const [checkOut, setCheckOut] = useState("");
   const [pax, setPax] = useState(1);
   const [insuranceType, setInsuranceType] = useState<"regular" | "premium">("regular");
+  const [citizenType, setCitizenType] = useState<"foreign" | "local">("foreign");
   
   const [isGateModalOpen, setIsGateModalOpen] = useState(false);
   const [selectingType, setSelectingType] = useState<"entrance" | "exit">("entrance");
@@ -184,7 +227,7 @@ Special/Dietary Requirements: `,
         check_out: checkOut,
         number_of_pax: pax,
         insurance_type: insuranceType,
-        member_data: formData.memberData,
+        member_data: `Citizen Type: ${citizenType === "foreign" ? "Foreigner (WNA)" : "Local (WNI)"}\n\n${formData.memberData}`,
       };
 
       const res = await fetch("/api/tickets/booking", {
@@ -212,13 +255,17 @@ Special/Dietary Requirements: `,
   };
 
   const insurancePrice = insuranceType === "regular" ? 10000 : 280000;
-  // Assume a base price if we don't have it. Let's say 150,000 IDR per day per person.
-  // Actually, let's just use the insurance for now as requested, but I'll add a base price field.
-  const basePricePerPersonPerDay = 150000; 
   const durationInDays = checkIn && checkOut ? 
     Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)) + 1 : 0;
   
-  const totalPrice = (basePricePerPersonPerDay * (durationInDays || 1) * pax) + (insurancePrice * pax);
+  const totalBasePrice = calculateBasePrice(
+    citizenType,
+    entranceGate?.name || "Sembalun",
+    checkIn,
+    checkOut
+  ) * pax;
+  
+  const totalPrice = totalBasePrice + (insurancePrice * pax);
 
   const parseAboutLine = (line: string) => {
     const idx = line.indexOf(":");
@@ -394,6 +441,64 @@ Special/Dietary Requirements: `,
                 </div>
 
                 <div style={{ marginTop: '24px' }}>
+                  <h3 className={styles.sectionTitle} style={{ marginBottom: '12px' }}>Nationality / Kewarganegaraan</h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setCitizenType("foreign")}
+                      style={{
+                        padding: '12px',
+                        borderRadius: '8px',
+                        border: citizenType === "foreign" ? '2px solid #1a4d43' : '1px solid #ddd',
+                        background: citizenType === "foreign" ? '#f0fdf4' : '#fff',
+                        color: citizenType === "foreign" ? '#1a4d43' : '#475569',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      🌍 Foreigner (WNA)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCitizenType("local")}
+                      style={{
+                        padding: '12px',
+                        borderRadius: '8px',
+                        border: citizenType === "local" ? '2px solid #1a4d43' : '1px solid #ddd',
+                        background: citizenType === "local" ? '#f0fdf4' : '#fff',
+                        color: citizenType === "local" ? '#1a4d43' : '#475569',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      🇮🇩 Indonesian (WNI)
+                    </button>
+                  </div>
+                  
+                  <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#64748b', background: '#f8fafc', padding: '10px', borderRadius: '6px', lineHeight: '1.4' }}>
+                    {citizenType === "foreign" ? (
+                      <div>
+                        <strong>Foreign National Fee:</strong> Class 1 gates (Sembalun, Senaru, Torean) are <strong>Rp 250,000 / day / person</strong>. Other gates are <strong>Rp 150,000 / day / person</strong>.
+                      </div>
+                    ) : (
+                      <div>
+                        <strong>Warga Negara Indonesia Fee:</strong> Class 1 gates (Sembalun, Senaru, Torean) are <strong>Rp 50,000 / day / person</strong> on normal weekdays and <strong>Rp 75,000 / day / person</strong> on weekend/holidays.
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '24px' }}>
                   <h3 className={styles.sectionTitle} style={{ marginBottom: '12px' }}>Insurance Option</h3>
                   <div 
                     className={`${styles.insuranceOption} ${insuranceType === "regular" ? styles.insuranceOptionSelected : ""}`}
@@ -422,7 +527,7 @@ Special/Dietary Requirements: `,
 
                 <button className={styles.submitBtn} onClick={handleNext} style={{ marginTop: '20px' }}>
                   <Search size={20} />
-                  Check Quota
+                  Book Now
                 </button>
               </div>
             </>
@@ -463,7 +568,7 @@ Special/Dietary Requirements: `,
               <div style={{ margin: '24px 0', padding: '16px', background: '#f9f9f9', borderRadius: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <span>Entrance Ticket ({pax} pax)</span>
-                  <span>Rp {(basePricePerPersonPerDay * (durationInDays || 1) * pax).toLocaleString()}</span>
+                  <span>Rp {totalBasePrice.toLocaleString()}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                   <span>{insuranceType === "regular" ? "Regular" : "Premium"} Insurance</span>

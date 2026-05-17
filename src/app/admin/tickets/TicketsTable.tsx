@@ -22,6 +22,48 @@ type Ticket = {
   member_data?: string;
 };
 
+function calculateBasePrice(
+  citizenType: string,
+  entranceGateName: string,
+  checkInDateStr: string,
+  checkOutDateStr: string
+): number {
+  if (!checkInDateStr || !checkOutDateStr) return 0;
+
+  const isClass1 = (name: string) => {
+    const n = name.toLowerCase();
+    return n.includes("sembalun") || n.includes("senaru") || n.includes("torean");
+  };
+
+  const start = new Date(checkInDateStr);
+  const end = new Date(checkOutDateStr);
+
+  let totalBasePrice = 0;
+  const current = new Date(start);
+  while (current <= end) {
+    const dayOfWeek = current.getDay(); // 0: Sunday, 6: Saturday
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+    let pricePerDay = 0;
+    if (citizenType === "foreign") {
+      pricePerDay = isClass1(entranceGateName) ? 250000 : 150000;
+    } else {
+      // Local (WNI)
+      if (isClass1(entranceGateName)) {
+        pricePerDay = isWeekend ? 75000 : 50000;
+      } else {
+        pricePerDay = isWeekend ? 15000 : 10000;
+      }
+    }
+    totalBasePrice += pricePerDay;
+
+    // Move to next day
+    current.setDate(current.getDate() + 1);
+  }
+
+  return totalBasePrice;
+}
+
 export default function TicketsTable({ tickets: initialTickets }: { tickets: any[] }) {
   const [tickets, setTickets] = useState(initialTickets);
   const [selectedTicket, setSelectedTicket] = useState<any | null>(null);
@@ -38,6 +80,7 @@ export default function TicketsTable({ tickets: initialTickets }: { tickets: any
     insurance_type: "",
     payment_status: "",
     member_data: "",
+    citizen_type: "foreign",
   });
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -113,6 +156,7 @@ export default function TicketsTable({ tickets: initialTickets }: { tickets: any
 
   const handleOpenDetails = (ticket: any) => {
     setSelectedTicket(ticket);
+    const isLocal = ticket.member_data?.toLowerCase().includes("local") || ticket.member_data?.toLowerCase().includes("wni");
     setEditForm({
       full_name: ticket.full_name,
       email: ticket.email,
@@ -125,6 +169,7 @@ export default function TicketsTable({ tickets: initialTickets }: { tickets: any
       insurance_type: ticket.insurance_type,
       payment_status: ticket.payment_status,
       member_data: ticket.member_data || "",
+      citizen_type: isLocal ? "local" : "foreign",
     });
   };
 
@@ -140,10 +185,16 @@ export default function TicketsTable({ tickets: initialTickets }: { tickets: any
     try {
       const checkInDate = new Date(editForm.check_in);
       const checkOutDate = new Date(editForm.check_out);
-      const durationInDays = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       const insurancePrice = editForm.insurance_type === "regular" ? 10000 : 280000;
-      const basePricePerPersonPerDay = 150000;
-      const totalPrice = (basePricePerPersonPerDay * durationInDays * editForm.number_of_pax) + (insurancePrice * editForm.number_of_pax);
+      
+      const totalBasePrice = calculateBasePrice(
+        editForm.citizen_type,
+        editForm.entrance_gate,
+        editForm.check_in,
+        editForm.check_out
+      ) * editForm.number_of_pax;
+      
+      const totalPrice = totalBasePrice + (insurancePrice * editForm.number_of_pax);
 
       const payload = {
         full_name: editForm.full_name,
@@ -362,6 +413,18 @@ export default function TicketsTable({ tickets: initialTickets }: { tickets: any
                       style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', width: '100%' }}
                       required
                     />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Citizen Type</label>
+                    <select 
+                      value={editForm.citizen_type}
+                      onChange={(e) => setEditForm({ ...editForm, citizen_type: e.target.value })}
+                      style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', background: 'white', width: '100%' }}
+                    >
+                      <option value="foreign">Foreigner (WNA)</option>
+                      <option value="local">Indonesian (WNI)</option>
+                    </select>
                   </div>
                 </div>
 
