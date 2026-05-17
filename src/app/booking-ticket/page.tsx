@@ -20,7 +20,7 @@ export default async function BookingTicketPage() {
     <TicketBookingClient 
       userEmail={user.email} 
       userFullName={user.full_name || ""} 
-      userWhatsapp={user.whatsapp || ""} 
+      userWhatsapp={(user as any).whatsapp || ""} 
     />
   );
 }
