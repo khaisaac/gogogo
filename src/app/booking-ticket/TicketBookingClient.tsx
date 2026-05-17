@@ -513,7 +513,7 @@ export default function TicketBookingClient({
                 </div>
 
                 <div className={styles.dateGrid}>
-                  <div className={styles.dateField}>
+                  <label className={styles.dateField}>
                     <span className={styles.dateLabel}>Check in</span>
                     <input 
                       type="date" 
@@ -522,8 +522,8 @@ export default function TicketBookingClient({
                       onChange={(e) => setCheckIn(e.target.value)}
                       min={new Date().toISOString().split("T")[0]}
                     />
-                  </div>
-                  <div className={styles.dateField}>
+                  </label>
+                  <label className={styles.dateField}>
                     <span className={styles.dateLabel}>Check out</span>
                     <input 
                       type="date" 
@@ -534,7 +534,7 @@ export default function TicketBookingClient({
                       max={checkIn ? getDateWithOffset(checkIn, (entranceGate && exitGate ? getTrekDurationLimits(entranceGate.name, exitGate.name).maxDays : 4) - 1) : ""}
                       disabled={!checkIn}
                     />
-                  </div>
+                  </label>
                 </div>
 
                 <div className={styles.formGroup}>
