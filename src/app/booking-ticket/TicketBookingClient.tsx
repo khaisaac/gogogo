@@ -94,10 +94,31 @@ Special/Dietary Requirements: `,
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  // Set gates on mount
+  const [pageSettings, setPageSettings] = useState<any>({
+    title: "e-Rinjani Entrance Tickets",
+    description: "Secure your limited official Mt. Rinjani National Park entrance tickets first! Ensure flexible dates and instant confirmation before commencing your trek.",
+    about_items: "Instant Booking: Avoid queues and secure your entry pass ahead of your climb.\nMedical Insurance Included: Covers basic search, rescue, and health care within the national park.\nOfficial Registration: Issued and verified directly through the Rinjani National Park registry.\nFlexible Routes: Valid for Sembalun, Senaru, and Torean trekking trails.",
+    included_items: "Official Mt. Rinjani National Park Entrance Pass\nCustomized Entrance and Exit Gate route registry\nTrekking Health & Search and Rescue (SAR) Insurance\n24/7 client support for e-Rinjani processing",
+    image: "/sembalun.jpg",
+  });
+
+  // Set gates on mount and fetch page settings
   useEffect(() => {
     setGates(TICKET_GATES);
     setLoadingGates(false);
+
+    async function fetchSettings() {
+      try {
+        const res = await fetch("/api/tickets/settings");
+        if (res.ok) {
+          const data = await res.json();
+          setPageSettings(data);
+        }
+      } catch (err) {
+        console.error("Failed to load page settings", err);
+      }
+    }
+    fetchSettings();
   }, []);
 
   // Dynamically manage and clamp checkout date based on trek route limits
@@ -199,6 +220,27 @@ Special/Dietary Requirements: `,
   
   const totalPrice = (basePricePerPersonPerDay * (durationInDays || 1) * pax) + (insurancePrice * pax);
 
+  const parseAboutLine = (line: string) => {
+    const idx = line.indexOf(":");
+    if (idx !== -1) {
+      return (
+        <>
+          <strong>{line.substring(0, idx + 1)}</strong>
+          {line.substring(idx + 1)}
+        </>
+      );
+    }
+    return line;
+  };
+
+  const aboutLines = pageSettings.about_items 
+    ? pageSettings.about_items.split("\n").map((l: string) => l.trim()).filter(Boolean) 
+    : [];
+  
+  const includedLines = pageSettings.included_items 
+    ? pageSettings.included_items.split("\n").map((l: string) => l.trim()).filter(Boolean) 
+    : [];
+
   if (loadingGates) {
     return <div className={styles.container}>Loading...</div>;
   }
@@ -216,34 +258,36 @@ Special/Dietary Requirements: `,
         <div className={styles.leftColumn}>
           <div className={styles.galleryWrapper}>
             <img 
-              src="/sembalun.jpg" 
-              alt="Mount Rinjani Trekking" 
+              src={pageSettings.image || "/sembalun.jpg"} 
+              alt={pageSettings.title || "Mount Rinjani Trekking"} 
               className={styles.galleryImageMain}
             />
           </div>
           <div className={styles.detailCard}>
-            <h2 className={styles.detailTitle}>e-Rinjani Entrance Tickets</h2>
+            <h2 className={styles.detailTitle}>{pageSettings.title}</h2>
             <p className={styles.detailDesc}>
-              Secure your limited official Mt. Rinjani National Park entrance tickets first! Ensure flexible dates and instant confirmation before commencing your trek.
+              {pageSettings.description}
             </p>
-            <div className={styles.activityInfo}>
-              <h3 className={styles.infoSectionTitle}>About This Ticket</h3>
-              <ul className={styles.infoList}>
-                <li><strong>Instant Booking:</strong> Avoid queues and secure your entry pass ahead of your climb.</li>
-                <li><strong>Medical Insurance Included:</strong> Covers basic search, rescue, and health care within the national park.</li>
-                <li><strong>Official Registration:</strong> Issued and verified directly through the Rinjani National Park registry.</li>
-                <li><strong>Flexible Routes:</strong> Valid for Sembalun, Senaru, and Torean trekking trails.</li>
-              </ul>
-            </div>
-            <div className={styles.includedSection}>
-              <h3 className={styles.infoSectionTitle}>What's Included</h3>
-              <ul className={styles.includedList}>
-                <li>Official Mt. Rinjani National Park Entrance Pass</li>
-                <li>Customized Entrance and Exit Gate route registry</li>
-                <li>Trekking Health & Search and Rescue (SAR) Insurance</li>
-                <li>24/7 client support for e-Rinjani processing</li>
-              </ul>
-            </div>
+            {aboutLines.length > 0 && (
+              <div className={styles.activityInfo}>
+                <h3 className={styles.infoSectionTitle}>About This Ticket</h3>
+                <ul className={styles.infoList}>
+                  {aboutLines.map((line: string, idx: number) => (
+                    <li key={idx}>{parseAboutLine(line)}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {includedLines.length > 0 && (
+              <div className={styles.includedSection}>
+                <h3 className={styles.infoSectionTitle}>What's Included</h3>
+                <ul className={styles.includedList}>
+                  {includedLines.map((line: string, idx: number) => (
+                    <li key={idx}>{line}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
 

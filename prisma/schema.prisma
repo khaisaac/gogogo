@@ -352,3 +352,15 @@ model TicketBooking {
   @@index([payment_status])
   @@map("ticket_bookings")
 }
+
+model TicketSetting {
+  id              String   @id @default("default")
+  title           String   @db.Text
+  description     String   @db.Text
+  about_items     String   @db.LongText // Separated by newlines
+  included_items  String   @db.LongText // Separated by newlines
+  image           String?  @db.Text
+  updated_at      DateTime @updatedAt
+
+  @@map("ticket_settings")
+}

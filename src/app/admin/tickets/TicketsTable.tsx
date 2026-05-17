@@ -40,6 +40,61 @@ export default function TicketsTable({ tickets: initialTickets }: { tickets: any
     member_data: "",
   });
 
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
+  const [settingsForm, setSettingsForm] = useState({
+    title: "",
+    description: "",
+    about_items: "",
+    included_items: "",
+    image: "",
+  });
+
+  const handleOpenSettings = async () => {
+    setIsSettingsOpen(true);
+    try {
+      const res = await fetch("/api/tickets/settings");
+      if (res.ok) {
+        const data = await res.json();
+        setSettingsForm({
+          title: data.title || "",
+          description: data.description || "",
+          about_items: data.about_items || "",
+          included_items: data.included_items || "",
+          image: data.image || "",
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to fetch current settings.");
+    }
+  };
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingSettings(true);
+    try {
+      const res = await fetch("/api/tickets/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settingsForm),
+      });
+
+      if (res.ok) {
+        alert("Page details saved successfully! The ticket booking page is now updated.");
+        setIsSettingsOpen(false);
+      } else {
+        const errData = await res.json();
+        alert(`Failed to save: ${errData.error || "Unknown error"}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error saving settings.");
+    } finally {
+      setIsSavingSettings(false);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this booking?")) return;
 
@@ -130,6 +185,29 @@ export default function TicketsTable({ tickets: initialTickets }: { tickets: any
 
   return (
     <div className={styles.tableWrapper}>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "16px" }}>
+        <button
+          onClick={handleOpenSettings}
+          className={styles.expandBtn}
+          style={{ 
+            background: "#1a4d43", 
+            color: "white", 
+            border: "none", 
+            borderRadius: "8px", 
+            padding: "10px 18px", 
+            fontWeight: 700, 
+            fontSize: "0.85rem", 
+            display: "flex", 
+            alignItems: "center", 
+            gap: "6px",
+            cursor: "pointer",
+            boxShadow: "0 4px 10px rgba(26, 77, 67, 0.15)"
+          }}
+        >
+          ⚙️ Edit Page Content
+        </button>
+      </div>
+
       <table className={styles.table}>
         <thead>
           <tr>
@@ -364,6 +442,89 @@ export default function TicketsTable({ tickets: initialTickets }: { tickets: any
                   style={{ background: '#1a4d43', color: 'white', border: 'none', cursor: 'pointer' }}
                 >
                   {isSaving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isSettingsOpen && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent} style={{ maxWidth: '650px', width: '100%' }}>
+            <div className={styles.modalHeader}>
+              <h3>Edit Ticket Page Details</h3>
+              <button className={styles.closeBtn} onClick={() => setIsSettingsOpen(false)}>&times;</button>
+            </div>
+            
+            <form onSubmit={handleSaveSettings}>
+              <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Page Title</label>
+                  <input 
+                    type="text" 
+                    value={settingsForm.title} 
+                    onChange={(e) => setSettingsForm({ ...settingsForm, title: e.target.value })} 
+                    style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', width: '100%' }}
+                    required
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Page Description</label>
+                  <textarea 
+                    value={settingsForm.description} 
+                    onChange={(e) => setSettingsForm({ ...settingsForm, description: e.target.value })} 
+                    style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', minHeight: '80px', resize: 'vertical', width: '100%', fontFamily: 'inherit' }}
+                    required
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>About This Ticket Items</label>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '-4px' }}>Enter one item per line. Add colon (:) for bold labels, e.g. <code>Instant Booking: Avoid queues...</code></span>
+                  <textarea 
+                    value={settingsForm.about_items} 
+                    onChange={(e) => setSettingsForm({ ...settingsForm, about_items: e.target.value })} 
+                    style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', minHeight: '120px', resize: 'vertical', width: '100%', fontFamily: 'inherit', fontSize: '0.85rem' }}
+                    required
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>What's Included Items</label>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '-4px' }}>Enter one item per line.</span>
+                  <textarea 
+                    value={settingsForm.included_items} 
+                    onChange={(e) => setSettingsForm({ ...settingsForm, included_items: e.target.value })} 
+                    style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', minHeight: '120px', resize: 'vertical', width: '100%', fontFamily: 'inherit', fontSize: '0.85rem' }}
+                    required
+                  />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Cover Image Path / URL</label>
+                  <input 
+                    type="text" 
+                    value={settingsForm.image} 
+                    onChange={(e) => setSettingsForm({ ...settingsForm, image: e.target.value })} 
+                    style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', width: '100%' }}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className={styles.modalFooter}>
+                <button type="button" className={styles.closeModalBtn} onClick={() => setIsSettingsOpen(false)}>
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isSavingSettings} 
+                  className={styles.approveBtn}
+                  style={{ background: '#1a4d43', color: 'white', border: 'none', cursor: 'pointer' }}
+                >
+                  {isSavingSettings ? "Saving..." : "Save Settings"}
                 </button>
               </div>
             </form>
