@@ -27,6 +27,34 @@ type TicketBookingClientProps = {
   userWhatsapp?: string;
 };
 
+const TICKET_GATES: Gate[] = [
+  { id: "sembalun", name: "Sembalun", image: "/sembalun.jpg" },
+  { id: "torean", name: "Torean - Senange", image: "/n.jpg" },
+  { id: "senaru", name: "Senaru", image: "/senaru.jpg" },
+];
+
+function getTrekDurationLimits(entrance: string, exit: string): { minDays: number; maxDays: number } {
+  const ent = entrance.toLowerCase();
+  const ex = exit.toLowerCase();
+  
+  const isSembalun = (name: string) => name.includes("sembalun");
+  const isTorean = (name: string) => name.includes("torean");
+  const isSenaru = (name: string) => name.includes("senaru");
+
+  if (isSembalun(ent) && isSembalun(ex)) return { minDays: 2, maxDays: 4 };
+  if (isSenaru(ent) && isSenaru(ex)) return { minDays: 2, maxDays: 4 };
+  if (isTorean(ent) && isTorean(ex)) return { minDays: 2, maxDays: 4 };
+
+  return { minDays: 3, maxDays: 4 };
+}
+
+function getDateWithOffset(baseDateStr: string, offsetDays: number): string {
+  if (!baseDateStr) return "";
+  const date = new Date(baseDateStr);
+  date.setDate(date.getDate() + offsetDays);
+  return date.toISOString().split("T")[0];
+}
+
 export default function TicketBookingClient({ 
   userEmail, 
   userFullName = "", 
@@ -37,8 +65,8 @@ export default function TicketBookingClient({
   const [gates, setGates] = useState<Gate[]>([]);
   const [loadingGates, setLoadingGates] = useState(true);
   
-  const [entranceGate, setEntranceGate] = useState<Gate | null>(null);
-  const [exitGate, setExitGate] = useState<Gate | null>(null);
+  const [entranceGate, setEntranceGate] = useState<Gate | null>(TICKET_GATES[0]);
+  const [exitGate, setExitGate] = useState<Gate | null>(TICKET_GATES[2]);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [pax, setPax] = useState(1);
@@ -66,25 +94,28 @@ Special/Dietary Requirements: `,
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  // Set gates on mount
   useEffect(() => {
-    async function fetchGates() {
-      try {
-        const res = await fetch("/api/tickets/gates");
-        const data = await res.json();
-        if (data.gates) {
-          setGates(data.gates);
-          // Set defaults
-          setEntranceGate(data.gates.find((g: Gate) => g.name === "Aik Berik") || data.gates[0]);
-          setExitGate(data.gates.find((g: Gate) => g.name === "Tete Batu") || data.gates[1]);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingGates(false);
-      }
-    }
-    fetchGates();
+    setGates(TICKET_GATES);
+    setLoadingGates(false);
   }, []);
+
+  // Dynamically manage and clamp checkout date based on trek route limits
+  useEffect(() => {
+    if (!checkIn || !entranceGate || !exitGate) return;
+    
+    const { minDays, maxDays } = getTrekDurationLimits(entranceGate.name, exitGate.name);
+    const minCheckoutStr = getDateWithOffset(checkIn, minDays - 1);
+    const maxCheckoutStr = getDateWithOffset(checkIn, maxDays - 1);
+    
+    if (checkOut) {
+      if (checkOut < minCheckoutStr || checkOut > maxCheckoutStr) {
+        setCheckOut(minCheckoutStr);
+      }
+    } else {
+      setCheckOut(minCheckoutStr);
+    }
+  }, [checkIn, entranceGate, exitGate]);
 
   const handleOpenGateModal = (type: "entrance" | "exit") => {
     setSelectingType(type);
@@ -255,7 +286,9 @@ Special/Dietary Requirements: `,
                     className={styles.dateInput}
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
-                    min={checkIn || new Date().toISOString().split("T")[0]}
+                    min={checkIn ? getDateWithOffset(checkIn, (entranceGate && exitGate ? getTrekDurationLimits(entranceGate.name, exitGate.name).minDays : 2) - 1) : new Date().toISOString().split("T")[0]}
+                    max={checkIn ? getDateWithOffset(checkIn, (entranceGate && exitGate ? getTrekDurationLimits(entranceGate.name, exitGate.name).maxDays : 4) - 1) : ""}
+                    disabled={!checkIn}
                   />
                 </div>
               </div>
