@@ -79,7 +79,9 @@ export function generateRequestId(): string {
  * Get current ISO timestamp for DOKU
  */
 export function getTimestamp(): string {
-  return new Date().toISOString()
+  // DOKU strictly requires the ISO 8601 timestamp without milliseconds (e.g. YYYY-MM-DDTHH:mm:ssZ).
+  // Including milliseconds triggers a "500 INTERNAL SERVER ERROR" on Doku's server.
+  return new Date().toISOString().slice(0, 19) + 'Z'
 }
 
 /**
