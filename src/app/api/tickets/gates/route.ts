@@ -3,23 +3,31 @@ import { prisma } from "@/lib/db";
 
 export async function GET() {
   try {
+    const correctGates = [
+      { name: "Sembalun", image: "/sembalun.jpg" },
+      { name: "Torean - Senange", image: "/n.jpg" },
+      { name: "Senaru", image: "/senaru.jpg" },
+    ];
+
+    for (const g of correctGates) {
+      const existing = await prisma.ticketGate.findUnique({
+        where: { name: g.name }
+      });
+      if (!existing) {
+        await prisma.ticketGate.create({
+          data: {
+            name: g.name,
+            image: g.image,
+            is_active: true
+          }
+        });
+      }
+    }
+
     const gates = await prisma.ticketGate.findMany({
       where: { is_active: true },
       orderBy: { name: "asc" },
     });
-
-    // Fallback if no gates in DB yet
-    if (gates.length === 0) {
-      const defaultGates = [
-        { id: "1", name: "Aik Berik", image: "/gates/aik-berik.jpg" },
-        { id: "2", name: "Tete Batu", image: "/gates/tete-batu.jpg" },
-        { id: "3", name: "Sembalun", image: "/gates/sembalun.jpg" },
-        { id: "4", name: "Senaru", image: "/gates/senaru.jpg" },
-        { id: "5", name: "Timbanuh", image: "/gates/timbanuh.jpg" },
-        { id: "6", name: "Torengan", image: "/gates/torengan.jpg" },
-      ];
-      return NextResponse.json({ gates: defaultGates });
-    }
 
     return NextResponse.json({ gates });
   } catch (error) {

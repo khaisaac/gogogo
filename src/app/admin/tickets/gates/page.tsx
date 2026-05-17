@@ -12,6 +12,27 @@ export const metadata = {
 export default async function AdminGatesPage() {
   await requireAdmin();
 
+  const correctGates = [
+    { name: "Sembalun", image: "/sembalun.jpg" },
+    { name: "Torean - Senange", image: "/n.jpg" },
+    { name: "Senaru", image: "/senaru.jpg" },
+  ];
+
+  for (const g of correctGates) {
+    const existing = await prisma.ticketGate.findUnique({
+      where: { name: g.name }
+    });
+    if (!existing) {
+      await prisma.ticketGate.create({
+        data: {
+          name: g.name,
+          image: g.image,
+          is_active: true
+        }
+      });
+    }
+  }
+
   const gates = await prisma.ticketGate.findMany({
     orderBy: { name: "asc" },
   });
