@@ -51,10 +51,13 @@ export default async function BlogPage({
                 <div className={styles.grid}>
                 {posts.map((post) => {
                   const categoryName = post.category?.name || "Uncategorized";
+                  const imageUrl = post.featured_image && post.featured_image.includes("supabase.co") 
+                    ? "/n.jpg" 
+                    : (post.featured_image || "/hero-banner.png");
                   return (
                     <Link key={post.id} href={`/blog/${post.slug}`} className={styles.card}>
                       <div className={styles.imageWrapper}>
-                        <img src={post.featured_image || "/hero-banner.png"} alt={post.title} className={styles.image} />
+                        <img src={imageUrl} alt={post.title} className={styles.image} />
                         <span className={styles.categoryBadge}>{categoryName}</span>
                       </div>
                       <div className={styles.cardContent}>

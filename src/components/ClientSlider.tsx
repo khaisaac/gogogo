@@ -103,18 +103,22 @@ export default function ClientSlider({ items }: ClientSliderProps) {
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {items.map((a) => (
-          <Link key={a.id} href={`/blog/${a.slug}`} className={styles.card}>
-            <div className={styles.imageWrapper}>
-              <Image
-                src={a.featured_image || "/hero-banner.png"}
-                alt={a.title}
-                fill
-                sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 25vw"
-                className={styles.image}
-                loading="lazy"
-              />
-            </div>
+        {items.map((a) => {
+          const imageUrl = a.featured_image && a.featured_image.includes("supabase.co")
+            ? "/n.jpg"
+            : (a.featured_image || "/hero-banner.png");
+          return (
+            <Link key={a.id} href={`/blog/${a.slug}`} className={styles.card}>
+              <div className={styles.imageWrapper}>
+                <Image
+                  src={imageUrl}
+                  alt={a.title}
+                  fill
+                  sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 25vw"
+                  className={styles.image}
+                  loading="lazy"
+                />
+              </div>
             <div className={styles.content}>
               <span className={styles.date}>
                 {new Date(a.published_at || new Date()).toLocaleDateString(
@@ -127,10 +131,10 @@ export default function ClientSlider({ items }: ClientSliderProps) {
               </span>
               <h3 className={styles.title}>{a.title}</h3>
               <p className={styles.excerpt}>{a.excerpt}</p>
-              <span className={styles.readMore}>Read More →</span>
+              <span className={styles.readMore}>Read More &rarr;</span>
             </div>
           </Link>
-        ))}
+        ); })}
       </div>
 
       {/* Mobile Navigation Arrows */}

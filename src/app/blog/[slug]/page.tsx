@@ -61,7 +61,7 @@ export default async function BlogPostPage({
             </div>
             {post.featured_image && (
               <div className={styles.coverImageWrapper} style={{ textAlign: post.cover_image_alignment === "left" ? "left" : post.cover_image_alignment === "right" ? "right" : "center" }}>
-                <img src={post.featured_image} alt={post.title} className={styles.coverImage} style={{ marginLeft: post.cover_image_alignment === "right" ? "auto" : post.cover_image_alignment === "center" ? "auto" : "0", marginRight: post.cover_image_alignment === "left" ? "auto" : post.cover_image_alignment === "center" ? "auto" : "0" }} />
+                <img src={post.featured_image.includes("supabase.co") ? "/n.jpg" : post.featured_image} alt={post.title} className={styles.coverImage} style={{ marginLeft: post.cover_image_alignment === "right" ? "auto" : post.cover_image_alignment === "center" ? "auto" : "0", marginRight: post.cover_image_alignment === "left" ? "auto" : post.cover_image_alignment === "center" ? "auto" : "0" }} />
               </div>
             )}
             <div className={`${styles.postBody} wysiwyg-content`} dangerouslySetInnerHTML={{ __html: post.content || "" }} />
@@ -69,16 +69,21 @@ export default async function BlogPostPage({
           <aside className={styles.sidebar}>
             <div className={styles.sidebarHeader}><h2>New Article</h2></div>
             <div className={styles.articleList}>
-              {recentPosts?.map((rp) => (
-                <div key={rp.id} className={styles.articleCard}>
-                  <img src={rp.featured_image || "/hero-banner.png"} alt={rp.title} className={styles.articleImage} />
-                  <div className={styles.articleInfo}>
-                    <Link href={`/blog/${rp.slug}`} className={styles.articleTitle}>{rp.title}</Link>
-                    <div className={styles.articleDate}>{new Date(rp.published_at || new Date()).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</div>
-                    <Link href={`/blog/${rp.slug}`} className={styles.readMore}>Read More »</Link>
+              {recentPosts?.map((rp) => {
+                const rpImageUrl = rp.featured_image && rp.featured_image.includes("supabase.co")
+                  ? "/n.jpg"
+                  : (rp.featured_image || "/hero-banner.png");
+                return (
+                  <div key={rp.id} className={styles.articleCard}>
+                    <img src={rpImageUrl} alt={rp.title} className={styles.articleImage} />
+                    <div className={styles.articleInfo}>
+                      <Link href={`/blog/${rp.slug}`} className={styles.articleTitle}>{rp.title}</Link>
+                      <div className={styles.articleDate}>{new Date(rp.published_at || new Date()).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</div>
+                      <Link href={`/blog/${rp.slug}`} className={styles.readMore}>Read More »</Link>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             {totalPages > 1 && (
               <div className={styles.pagination}>
