@@ -55,7 +55,7 @@ export async function POST(request: Request) {
         select: { booking_id: true },
       });
 
-      if (payment) {
+      if (payment && payment.booking_id) {
         const booking = await prisma.booking.findUnique({
           where: { id: payment.booking_id },
           select: { payment_type: true, payment_status: true },
