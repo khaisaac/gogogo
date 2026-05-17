@@ -8,6 +8,7 @@ export default function GatesTable({ initialGates }: { initialGates: any[] }) {
   const [gates, setGates] = useState(initialGates);
   const [isAdding, setIsAdding] = useState(false);
   const [newGate, setNewGate] = useState({ name: "", image: "", is_active: true });
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleAdd = async () => {
     if (!newGate.name) return;
@@ -25,6 +26,33 @@ export default function GatesTable({ initialGates }: { initialGates: any[] }) {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "packages");
+
+      const response = await fetch("/api/admin/uploads", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data.url) throw new Error(data.error || "Failed to upload image");
+
+      setNewGate(prev => ({ ...prev, image: data.url }));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -81,13 +109,20 @@ export default function GatesTable({ initialGates }: { initialGates: any[] }) {
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.875rem' }}>Image URL</label>
+              <label style={{ display: 'block', marginBottom: '4px', fontSize: '0.875rem' }}>Gate Image</label>
               <input 
-                type="text" 
-                value={newGate.image} 
-                onChange={(e) => setNewGate({...newGate, image: e.target.value})}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
+                type="file" 
+                accept="image/*"
+                disabled={isUploading}
+                onChange={handleImageUpload}
+                style={{ width: '100%', padding: '7px', borderRadius: '8px', border: '1px solid #ccc' }}
               />
+              {isUploading && <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '4px' }}>Uploading...</p>}
+              {newGate.image && !isUploading && (
+                <div style={{ marginTop: '8px' }}>
+                  <img src={newGate.image} alt="Preview" style={{ width: '100px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} />
+                </div>
+              )}
             </div>
           </div>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
