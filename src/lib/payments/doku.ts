@@ -202,4 +202,81 @@ export function verifyDokuNotification({
   return expectedSignature === receivedSignature
 }
 
+/**
+ * Create a DOKU Checkout payment page with IDR amount directly.
+ */
+export async function createDokuIdrPayment({
+  invoiceNumber,
+  amountIdr,
+  customerName,
+  customerEmail,
+  callbackUrl,
+  redirectUrl,
+}: {
+  invoiceNumber: string
+  amountIdr: number
+  customerName: string
+  customerEmail: string
+  callbackUrl: string
+  redirectUrl: string
+}) {
+  const requestTarget = '/checkout/v1/payment'
+  const requestId = generateRequestId()
+  const requestTimestamp = getTimestamp()
+
+  const requestBody = {
+    order: {
+      amount: amountIdr,
+      invoice_number: invoiceNumber,
+      currency: 'IDR',
+      callback_url: callbackUrl,
+      auto_redirect: true,
+    },
+    payment: {
+      payment_due_date: 60,
+    },
+    customer: {
+      name: customerName,
+      email: customerEmail,
+    },
+    override_configuration: {
+      finish_payment_return_url: redirectUrl,
+    },
+  }
+
+  const { clientId, secretKey, baseUrl } = getDokuConfig()
+  const bodyString = JSON.stringify(requestBody)
+
+  const signature = generateSignature({
+    clientId,
+    secretKey,
+    requestId,
+    requestTimestamp,
+    requestTarget,
+    body: bodyString,
+  })
+
+  const response = await fetch(`${baseUrl}${requestTarget}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Client-Id': clientId,
+      'Request-Id': requestId,
+      'Request-Timestamp': requestTimestamp,
+      Signature: signature,
+    },
+    body: bodyString,
+  })
+
+  const responseText = await response.text()
+  let data: any
+  try {
+    data = JSON.parse(responseText)
+  } catch {
+    data = { error: responseText }
+  }
+
+  return data
+}
+
 export { getDokuConfig }

@@ -18,6 +18,8 @@ export default function AdminSidebarNav() {
   const links = [
     { href: "/admin", label: "Dashboard" },
     { href: "/admin/bookings", label: "Bookings" },
+    { href: "/admin/tickets", label: "🎟️ Ticket Bookings" },
+    { href: "/admin/tickets/gates", label: "⛩️ Ticket Gates" },
     { href: "/admin/availability", label: "📅 Availability" },
     { href: "/admin/blog", label: "Posts" },
     { href: "/admin/blog/categories", label: "Categories" },

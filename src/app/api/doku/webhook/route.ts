@@ -51,6 +51,19 @@ export async function POST(req: Request) {
 
     await prisma.payment.updateMany({ where: { invoice: invoiceNumber }, data: { status: finalStatusToSave } });
 
+    // Also update TicketBooking if this invoice belongs to one
+    if (newStatus === "success") {
+      await prisma.ticketBooking.updateMany({
+        where: { doku_invoice: invoiceNumber },
+        data: { payment_status: "paid" },
+      });
+    } else if (newStatus === "failed") {
+      await prisma.ticketBooking.updateMany({
+        where: { doku_invoice: invoiceNumber },
+        data: { payment_status: "failed" },
+      });
+    }
+
     if (finalStatusToSave === "paid_dp") {
       console.log(`DP paid for ${invoiceNumber}.`);
     }

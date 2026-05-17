@@ -25,6 +25,7 @@ model User {
 
   // Relations
   bookings      Booking[]
+  ticket_bookings TicketBooking[]
   posts         Post[]    @relation("PostAuthor")
   refunds_requested Refund[] @relation("RefundRequester")
   refunds_approved  Refund[] @relation("RefundApprover")
@@ -184,7 +185,8 @@ model Booking {
 // 5. Payments table (DOKU & PayPal)
 model Payment {
   id                       String    @id @default(uuid())
-  booking_id               String
+  booking_id               String?
+  ticket_booking_id        String?
   provider                 String    // 'doku' | 'paypal'
   provider_order_id        String?   // DOKU invoice number or PayPal order ID
   provider_transaction_id  String?   // Transaction ID from provider
@@ -206,9 +208,11 @@ model Payment {
   updated_at               DateTime  @updatedAt
 
   // Relations
-  booking                  Booking   @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  booking                  Booking?         @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  ticket_booking           TicketBooking?  @relation(fields: [ticket_booking_id], references: [id], onDelete: Cascade)
 
   @@index([booking_id])
+  @@index([ticket_booking_id])
   @@index([invoice])
   @@index([parent_invoice])
   @@map("payments")
@@ -303,4 +307,48 @@ model Refund {
   @@index([booking_id])
   @@index([status])
   @@map("refunds")
+}
+
+// 11. Ticket Gates (Mt. Rinjani Entrance/Exit Gates)
+model TicketGate {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  image      String?  @db.Text
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("ticket_gates")
+}
+
+// 12. Ticket Bookings
+model TicketBooking {
+  id                String   @id @default(uuid())
+  user_id           String?
+  full_name         String
+  email                 String
+  whatsapp              String
+  entrance_gate     String
+  exit_gate         String
+  check_in          DateTime  @db.Date
+  check_out         DateTime  @db.Date
+  number_of_pax     Int
+  insurance_type    String    // 'regular' | 'premium'
+  insurance_price   Int
+  base_price        Int       @default(0) // Price per person per day or fixed
+  total_price       Int       // Total in IDR
+  payment_status    String    @default("pending") // 'pending' | 'paid' | 'failed'
+  doku_invoice      String?   @unique
+  member_data       String?   @db.Text
+  
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  // Relations
+  user              User?     @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  payments          Payment[]
+
+  @@index([user_id])
+  @@index([payment_status])
+  @@map("ticket_bookings")
 }

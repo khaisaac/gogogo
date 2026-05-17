@@ -12,7 +12,7 @@ export default function Navbar() {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [packagesOpen, setPackagesOpen] = useState(true);
+  const [packagesOpen, setPackagesOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   
   // Auth state
@@ -107,6 +107,7 @@ export default function Navbar() {
 
           <Link href="/#about" className={styles.navLink} onClick={closeMenu}>About</Link>
           <Link href="/#pricing" className={styles.navLink} onClick={closeMenu}>Pricing</Link>
+          <Link href="/booking-ticket" className={styles.navLink} onClick={closeMenu}>🎟️ Tickets</Link>
           <Link href="/blog" className={styles.navLink} onClick={closeMenu}>Blog</Link>
           <Link href="/#contact" className={styles.navLink} onClick={closeMenu}>Contact</Link>
         </nav>
@@ -161,7 +162,10 @@ export default function Navbar() {
 
           <button
             className={styles.hamburger}
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={() => {
+              setMenuOpen(!menuOpen);
+              if (!menuOpen) setPackagesOpen(true);
+            }}
             aria-label="Toggle menu"
           >
             <span className={`${styles.bar} ${menuOpen ? styles.barOpen : ""}`} />
