@@ -97,6 +97,16 @@ function calculateBasePrice(
   return totalBasePrice;
 }
 
+interface TrekkerData {
+  fullName: string;
+  passportNumber: string;
+  nationality: string;
+  gender: string;
+  birthday: string;
+  height: string;
+  weight: string;
+}
+
 export default function TicketBookingClient({ 
   userEmail, 
   userFullName = "", 
@@ -114,6 +124,35 @@ export default function TicketBookingClient({
   const [pax, setPax] = useState(1);
   const [insuranceType, setInsuranceType] = useState<"regular" | "premium">("regular");
   const [citizenType, setCitizenType] = useState<"foreign" | "local">("foreign");
+
+  const [trekkers, setTrekkers] = useState<TrekkerData[]>([
+    { fullName: userFullName, passportNumber: "", nationality: "", gender: "Male", birthday: "", height: "", weight: "" }
+  ]);
+
+  // Dynamically update trekkers array size when pax changes
+  useEffect(() => {
+    setTrekkers((prev) => {
+      const copy = [...prev];
+      if (copy.length < pax) {
+        while (copy.length < pax) {
+          copy.push({ fullName: "", passportNumber: "", nationality: "", gender: "Male", birthday: "", height: "", weight: "" });
+        }
+      } else if (copy.length > pax) {
+        copy.splice(pax);
+      }
+      return copy;
+    });
+  }, [pax]);
+
+  const updateTrekker = (index: number, field: keyof TrekkerData, value: string) => {
+    setTrekkers((prev) => {
+      const copy = [...prev];
+      if (copy[index]) {
+        copy[index] = { ...copy[index], [field]: value };
+      }
+      return copy;
+    });
+  };
   
   const [isGateModalOpen, setIsGateModalOpen] = useState(false);
   const [selectingType, setSelectingType] = useState<"entrance" | "exit">("entrance");
@@ -121,18 +160,19 @@ export default function TicketBookingClient({
   const [formData, setFormData] = useState({
     fullName: userFullName,
     whatsapp: userWhatsapp,
-    memberData: `Member 1:
-1. Full Name: 
-2. Passport Number: 
-3. Nationality: 
-4. Gender: 
-5. Birthday: 
-6. Height (cm): 
-7. Weight (kg): 
-
-(Copy the format above for member 2, 3, etc.)
-Special/Dietary Requirements: `,
+    memberData: "",
   });
+
+  const handleLeadNameChange = (val: string) => {
+    setFormData(prev => ({ ...prev, fullName: val }));
+    setTrekkers(prev => {
+      const copy = [...prev];
+      if (copy[0]) {
+        copy[0].fullName = val;
+      }
+      return copy;
+    });
+  };
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -217,6 +257,17 @@ Special/Dietary Requirements: `,
     setError("");
 
     try {
+      const formattedMemberData = trekkers.map((t, idx) => {
+        return `Member ${idx + 1}:
+1. Full Name: ${t.fullName}
+2. Passport Number: ${t.passportNumber}
+3. Nationality: ${t.nationality}
+4. Gender: ${t.gender}
+5. Birthday: ${t.birthday}
+6. Height: ${t.height} cm
+7. Weight: ${t.weight} kg`;
+      }).join("\n\n");
+
       const payload = {
         full_name: formData.fullName,
         email: userEmail,
@@ -227,7 +278,7 @@ Special/Dietary Requirements: `,
         check_out: checkOut,
         number_of_pax: pax,
         insurance_type: insuranceType,
-        member_data: `Citizen Type: ${citizenType === "foreign" ? "Foreigner (WNA)" : "Local (WNI)"}\n\n${formData.memberData}`,
+        member_data: `Citizen Type: ${citizenType === "foreign" ? "Foreigner (WNA)" : "Local (WNI)"}\n\n${formattedMemberData}`,
       };
 
       const res = await fetch("/api/tickets/booking", {
@@ -541,7 +592,7 @@ Special/Dietary Requirements: `,
                   type="text" 
                   required 
                   value={formData.fullName}
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                  onChange={(e) => handleLeadNameChange(e.target.value)}
                 />
               </div>
 
@@ -556,13 +607,111 @@ Special/Dietary Requirements: `,
                 />
               </div>
 
-              <div className={styles.formGroup}>
-                <label>Guest Data (Passport, Nationality, etc.) *</label>
-                <textarea 
-                  required 
-                  value={formData.memberData}
-                  onChange={(e) => setFormData({...formData, memberData: e.target.value})}
-                />
+              <div style={{ marginTop: '24px', marginBottom: '24px' }}>
+                <h3 className={styles.sectionTitle} style={{ marginBottom: '16px', fontSize: '1.1rem' }}>Trekkers Information</h3>
+                
+                {trekkers.map((trekker, idx) => (
+                  <div key={idx} style={{ 
+                    padding: '20px', 
+                    background: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    borderRadius: '12px', 
+                    marginBottom: '20px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
+                  }}>
+                    <h4 style={{ 
+                      fontSize: '0.95rem', 
+                      fontWeight: 700, 
+                      color: '#1a4d43', 
+                      marginBottom: '16px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '8px',
+                      borderBottom: '1px solid #e2e8f0',
+                      paddingBottom: '8px'
+                    }}>
+                      👤 Trekker {idx + 1} {idx === 0 ? "(Lead Booker)" : ""}
+                    </h4>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                      <div className={styles.formGroup} style={{ gridColumn: 'span 2', marginBottom: '0' }}>
+                        <label>Full Name *</label>
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="Enter full name"
+                          value={trekker.fullName}
+                          onChange={(e) => updateTrekker(idx, "fullName", e.target.value)}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup} style={{ marginBottom: '0' }}>
+                        <label>Passport / NIK *</label>
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="Passport or ID Number"
+                          value={trekker.passportNumber}
+                          onChange={(e) => updateTrekker(idx, "passportNumber", e.target.value)}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup} style={{ marginBottom: '0' }}>
+                        <label>Nationality *</label>
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder={citizenType === "local" ? "Indonesia" : "e.g. Australia"}
+                          value={trekker.nationality}
+                          onChange={(e) => updateTrekker(idx, "nationality", e.target.value)}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup} style={{ marginBottom: '0' }}>
+                        <label>Gender *</label>
+                        <select 
+                          value={trekker.gender}
+                          onChange={(e) => updateTrekker(idx, "gender", e.target.value)}
+                        >
+                          <option value="Male">Male</option>
+                          <option value="Female">Female</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.formGroup} style={{ marginBottom: '0' }}>
+                        <label>Birthday *</label>
+                        <input 
+                          type="date" 
+                          required 
+                          value={trekker.birthday}
+                          onChange={(e) => updateTrekker(idx, "birthday", e.target.value)}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup} style={{ marginBottom: '0' }}>
+                        <label>Height (cm) *</label>
+                        <input 
+                          type="number" 
+                          required 
+                          placeholder="170"
+                          value={trekker.height}
+                          onChange={(e) => updateTrekker(idx, "height", e.target.value)}
+                        />
+                      </div>
+
+                      <div className={styles.formGroup} style={{ marginBottom: '0' }}>
+                        <label>Weight (kg) *</label>
+                        <input 
+                          type="number" 
+                          required 
+                          placeholder="60"
+                          value={trekker.weight}
+                          onChange={(e) => updateTrekker(idx, "weight", e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <div style={{ margin: '24px 0', padding: '16px', background: '#f9f9f9', borderRadius: '12px' }}>
