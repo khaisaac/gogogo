@@ -13,7 +13,7 @@ type Ticket = {
   exit_gate: string;
   check_in: Date;
   check_out: Date;
-  number_of_pax: Int;
+  number_of_pax: number;
   insurance_type: string;
   total_price: number;
   payment_status: string;
