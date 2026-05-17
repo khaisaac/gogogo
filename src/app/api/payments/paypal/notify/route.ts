@@ -36,11 +36,11 @@ export async function POST(request: Request) {
         });
 
         const payment = await prisma.payment.findFirst({ where: { provider_order_id: orderId }, select: { booking_id: true } });
-        if (payment) {
-          const booking = await prisma.booking.findUnique({ where: { id: payment.booking_id }, select: { payment_type: true, payment_status: true } });
+        if (payment && payment.booking_id) {
+          const booking = await prisma.booking.findUnique({ where: { id: payment.booking_id! }, select: { payment_type: true, payment_status: true } });
           let newPaymentStatus = "fully_paid";
           if (booking?.payment_type === "deposit" && booking?.payment_status === "pending") { newPaymentStatus = "deposit_paid"; }
-          await prisma.booking.update({ where: { id: payment.booking_id }, data: { status: "confirmed", payment_status: newPaymentStatus } });
+          await prisma.booking.update({ where: { id: payment.booking_id! }, data: { status: "confirmed", payment_status: newPaymentStatus } });
         }
         break;
       }
