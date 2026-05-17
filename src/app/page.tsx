@@ -11,6 +11,8 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { getPublicPackages } from "@/lib/public-packages";
 
+import ERinjaniSection from "@/components/ERinjaniSection";
+
 export const revalidate = 60; // ISR: re-generate every 60 seconds
 
 export default async function Home() {
@@ -24,6 +26,7 @@ export default async function Home() {
         <About />
         <SembalunPackages packages={sembalun} />
         <SenaruPackages packages={senaru} />
+        <ERinjaniSection />
         <WhyChooseUs />
         <PriceTable packages={[...sembalun, ...senaru]} />
         <HowToBook />

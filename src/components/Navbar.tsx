@@ -107,7 +107,7 @@ export default function Navbar() {
 
           <Link href="/#about" className={styles.navLink} onClick={closeMenu}>About</Link>
           <Link href="/#pricing" className={styles.navLink} onClick={closeMenu}>Pricing</Link>
-          <Link href="/booking-ticket" className={styles.navLink} onClick={closeMenu}>🎟️ Tickets</Link>
+          <Link href="/booking-ticket" className={styles.navLink} onClick={closeMenu}>e-Rinjani</Link>
           <Link href="/blog" className={styles.navLink} onClick={closeMenu}>Blog</Link>
           <Link href="/#contact" className={styles.navLink} onClick={closeMenu}>Contact</Link>
         </nav>
