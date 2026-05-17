@@ -1,15 +1,29 @@
 import crypto from 'crypto'
 
 function getDokuConfig() {
-  return {
-    clientId: process.env.DOKU_CLIENT_ID!,
-    secretKey: process.env.DOKU_SECRET_KEY!,
-    baseUrl: process.env.DOKU_BASE_URL || (
-      process.env.NODE_ENV === 'production'
-        ? 'https://api.doku.com'
-        : 'https://api-sandbox.doku.com'
-    ),
+  const clientId = process.env.DOKU_CLIENT_ID || 'BRN-0234-1717559853351'
+  const secretKey = process.env.DOKU_SECRET_KEY || 'SK-8uCZzDIeitu8P5Fg07Or'
+  
+  let baseUrl = process.env.DOKU_BASE_URL || (
+    process.env.NODE_ENV === 'production'
+      ? 'https://api.doku.com'
+      : 'https://api-sandbox.doku.com'
+  )
+
+  // Auto-detect and correct mismatches between keys and URL
+  if (clientId.startsWith('BRN-0234-')) {
+    if (baseUrl !== 'https://api-sandbox.doku.com') {
+      console.warn(`[DOKU] Auto-routed to Sandbox API (https://api-sandbox.doku.com) because Sandbox Client ID prefix ('BRN-0234-') was detected.`)
+      baseUrl = 'https://api-sandbox.doku.com'
+    }
+  } else {
+    if (baseUrl === 'https://api-sandbox.doku.com') {
+      console.warn(`[DOKU] Auto-routed to Production API (https://api.doku.com) because a Production Client ID was detected.`)
+      baseUrl = 'https://api.doku.com'
+    }
   }
+
+  return { clientId, secretKey, baseUrl }
 }
 
 /**
