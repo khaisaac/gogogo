@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./BookingTicket.module.css";
 import { 
   ArrowLeft, 
@@ -22,9 +22,10 @@ type Gate = {
 };
 
 type TicketBookingClientProps = {
-  userEmail: string;
+  userEmail?: string;
   userFullName?: string;
   userWhatsapp?: string;
+  isLoggedIn?: boolean;
 };
 
 const TICKET_GATES: Gate[] = [
@@ -108,11 +109,13 @@ interface TrekkerData {
 }
 
 export default function TicketBookingClient({ 
-  userEmail, 
+  userEmail = "", 
   userFullName = "", 
-  userWhatsapp = "" 
+  userWhatsapp = "",
+  isLoggedIn = false
 }: TicketBookingClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState(1); // 1: Selection, 2: Personal Data
   const [gates, setGates] = useState<Gate[]>([]);
   const [loadingGates, setLoadingGates] = useState(true);
@@ -124,6 +127,53 @@ export default function TicketBookingClient({
   const [pax, setPax] = useState(1);
   const [insuranceType, setInsuranceType] = useState<"regular" | "premium">("regular");
   const [citizenType, setCitizenType] = useState<"foreign" | "local">("foreign");
+
+  // Load selections from query params if coming back from login
+  useEffect(() => {
+    const entrance = searchParams?.get("entrance");
+    const exit = searchParams?.get("exit");
+    const checkin = searchParams?.get("checkin");
+    const checkout = searchParams?.get("checkout");
+    const paxParam = searchParams?.get("pax");
+    const citizen = searchParams?.get("citizen");
+    const insurance = searchParams?.get("insurance");
+    const autoNext = searchParams?.get("step") === "2";
+
+    if (entrance) {
+      const found = TICKET_GATES.find(g => g.name.toLowerCase() === entrance.toLowerCase());
+      if (found) setEntranceGate(found);
+    }
+    if (exit) {
+      const found = TICKET_GATES.find(g => g.name.toLowerCase() === exit.toLowerCase());
+      if (found) setExitGate(found);
+    }
+    if (checkin) setCheckIn(checkin);
+    if (checkout) setCheckOut(checkout);
+    if (paxParam) setPax(parseInt(paxParam) || 1);
+    if (citizen === "local" || citizen === "foreign") setCitizenType(citizen);
+    if (insurance === "regular" || insurance === "premium") setInsuranceType(insurance);
+    
+    if (autoNext && isLoggedIn) {
+      setStep(2);
+    }
+  }, [searchParams, isLoggedIn]);
+
+  // Pre-fill Member 1 and form data once user logs in
+  useEffect(() => {
+    if (userFullName) {
+      setFormData(prev => ({ ...prev, fullName: userFullName }));
+      setTrekkers(prev => {
+        const copy = [...prev];
+        if (copy[0] && !copy[0].fullName) {
+          copy[0].fullName = userFullName;
+        }
+        return copy;
+      });
+    }
+    if (userWhatsapp) {
+      setFormData(prev => ({ ...prev, whatsapp: userWhatsapp }));
+    }
+  }, [userFullName, userWhatsapp]);
 
   const [trekkers, setTrekkers] = useState<TrekkerData[]>([
     { fullName: userFullName, passportNumber: "", nationality: "", gender: "Male", birthday: "", height: "", weight: "" }
@@ -240,6 +290,23 @@ export default function TicketBookingClient({
       alert("Please complete all selection fields.");
       return;
     }
+
+    if (!isLoggedIn) {
+      const params = new URLSearchParams({
+        entrance: entranceGate.name,
+        exit: exitGate.name,
+        checkin: checkIn,
+        checkout: checkOut,
+        pax: pax.toString(),
+        citizen: citizenType,
+        insurance: insuranceType,
+        step: "2"
+      });
+      const callbackUrl = `/booking-ticket?${params.toString()}`;
+      router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+      return;
+    }
+
     setStep(2);
   };
 
@@ -512,7 +579,7 @@ export default function TicketBookingClient({
                         gap: '6px'
                       }}
                     >
-                      🌍 Foreigner (WNA)
+                      Foreigner (WNA)
                     </button>
                     <button
                       type="button"
@@ -532,7 +599,7 @@ export default function TicketBookingClient({
                         gap: '6px'
                       }}
                     >
-                      🇮🇩 Indonesian (WNI)
+                       Indonesian (WNI)
                     </button>
                   </div>
                   
