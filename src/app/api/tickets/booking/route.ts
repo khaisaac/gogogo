@@ -3,6 +3,48 @@ import { prisma } from "@/lib/db";
 import { getUser } from "@/lib/auth";
 import { createDokuIdrPayment } from "@/lib/payments/doku";
 
+function calculateBasePrice(
+  citizenType: string,
+  entranceGateName: string,
+  checkInDateStr: string,
+  checkOutDateStr: string
+): number {
+  if (!checkInDateStr || !checkOutDateStr) return 0;
+
+  const isClass1 = (name: string) => {
+    const n = name.toLowerCase();
+    return n.includes("sembalun") || n.includes("senaru") || n.includes("torean");
+  };
+
+  const start = new Date(checkInDateStr);
+  const end = new Date(checkOutDateStr);
+
+  let totalBasePrice = 0;
+  const current = new Date(start);
+  while (current <= end) {
+    const dayOfWeek = current.getDay(); // 0: Sunday, 6: Saturday
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+    let pricePerDay = 0;
+    if (citizenType === "foreign") {
+      pricePerDay = isClass1(entranceGateName) ? 250000 : 150000;
+    } else {
+      // Local (WNI)
+      if (isClass1(entranceGateName)) {
+        pricePerDay = isWeekend ? 75000 : 50000;
+      } else {
+        pricePerDay = isWeekend ? 15000 : 10000;
+      }
+    }
+    totalBasePrice += pricePerDay;
+
+    // Move to next day
+    current.setDate(current.getDate() + 1);
+  }
+
+  return totalBasePrice;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const user = await getUser();
@@ -30,13 +72,20 @@ export async function POST(req: NextRequest) {
     }
 
     // Calculate price
-    const insurancePrice = insurance_type === "regular" ? 10000 : 280000;
-    const basePricePerPersonPerDay = 150000;
     const checkInDate = new Date(check_in);
     const checkOutDate = new Date(check_out);
-    const durationInDays = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    
-    const totalPrice = (basePricePerPersonPerDay * durationInDays * number_of_pax) + (insurancePrice * number_of_pax);
+    const isLocal = member_data?.toLowerCase().includes("local") || member_data?.toLowerCase().includes("wni");
+    const citizenType = isLocal ? "local" : "foreign";
+
+    const totalBasePrice = calculateBasePrice(
+      citizenType,
+      entrance_gate,
+      check_in,
+      check_out
+    );
+
+    const insurancePrice = insurance_type === "regular" ? 10000 : 280000;
+    const totalPrice = (totalBasePrice * number_of_pax) + (insurancePrice * number_of_pax);
 
     // Create booking in DB
     const booking = await prisma.ticketBooking.create({
@@ -52,7 +101,7 @@ export async function POST(req: NextRequest) {
         number_of_pax,
         insurance_type,
         insurance_price: insurancePrice,
-        base_price: basePricePerPersonPerDay,
+        base_price: totalBasePrice,
         total_price: totalPrice,
         member_data,
         payment_status: "pending",

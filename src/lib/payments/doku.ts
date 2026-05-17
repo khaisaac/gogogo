@@ -269,11 +269,26 @@ export async function createDokuIdrPayment({
   })
 
   const responseText = await response.text()
+  console.log(`DOKU IDR raw response [${response.status}]:`, responseText)
+
   let data: any
   try {
     data = JSON.parse(responseText)
   } catch {
+    console.error('DOKU IDR response is not valid JSON:', responseText)
     data = { error: responseText }
+  }
+
+  if (!response.ok) {
+    console.error(`DOKU IDR API error [${response.status}]:`, JSON.stringify(data, null, 2))
+    console.error('DOKU IDR request details:', {
+      url: `${baseUrl}${requestTarget}`,
+      clientId,
+      requestId,
+      requestTimestamp,
+      amountIdr,
+      invoiceNumber,
+    })
   }
 
   return data

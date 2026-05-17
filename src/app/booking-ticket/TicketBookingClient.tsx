@@ -411,7 +411,8 @@ export default function TicketBookingClient({
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to create booking");
+        const detailStr = data.details ? ` Details: ${JSON.stringify(data.details)}` : "";
+        throw new Error((data.error || "Failed to create booking") + detailStr);
       }
 
       // Redirect to DOKU payment
