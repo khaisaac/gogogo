@@ -6,6 +6,14 @@ import styles from "./blog.module.css";
 
 export const dynamic = "force-dynamic";
 
+const getValidImageUrl = (url: string | null | undefined) => {
+  if (!url) return "/hero-banner.png";
+  if (url.toLowerCase().includes("supabase")) return "/n.jpg";
+  if (url.startsWith("public/")) return url.replace("public/", "/");
+  if (!url.startsWith("http") && !url.startsWith("/")) return "/" + url;
+  return url;
+};
+
 export const metadata = {
   title: "Blog & Guides — Trekking Mount Rinjani",
   description: "Read our latest guides, tips, and stories to prepare for your Rinjani adventure.",
@@ -51,9 +59,7 @@ export default async function BlogPage({
                 <div className={styles.grid}>
                 {posts.map((post) => {
                   const categoryName = post.category?.name || "Uncategorized";
-                  const imageUrl = post.featured_image && post.featured_image.includes("supabase.co") 
-                    ? "/n.jpg" 
-                    : (post.featured_image || "/hero-banner.png");
+                  const imageUrl = getValidImageUrl(post.featured_image);
                   return (
                     <Link key={post.id} href={`/blog/${post.slug}`} className={styles.card}>
                       <div className={styles.imageWrapper}>

@@ -20,6 +20,14 @@ interface ClientSliderProps {
   items: Article[];
 }
 
+const getValidImageUrl = (url: string | null | undefined) => {
+  if (!url) return "/hero-banner.png";
+  if (url.toLowerCase().includes("supabase")) return "/n.jpg";
+  if (url.startsWith("public/")) return url.replace("public/", "/");
+  if (!url.startsWith("http") && !url.startsWith("/")) return "/" + url;
+  return url;
+};
+
 export default function ClientSlider({ items }: ClientSliderProps) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
@@ -103,9 +111,7 @@ export default function ClientSlider({ items }: ClientSliderProps) {
         onTouchEnd={handleTouchEnd}
       >
         {items.map((a) => {
-          const imageUrl = a.featured_image && a.featured_image.includes("supabase.co")
-            ? "/n.jpg"
-            : (a.featured_image || "/hero-banner.png");
+          const imageUrl = getValidImageUrl(a.featured_image);
           return (
             <Link key={a.id} href={`/blog/${a.slug}`} className={styles.card}>
               <div className={styles.imageWrapper}>

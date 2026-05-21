@@ -7,6 +7,14 @@ import styles from "./blog-post.module.css";
 
 export const dynamic = "force-dynamic";
 
+const getValidImageUrl = (url: string | null | undefined) => {
+  if (!url) return "/hero-banner.png";
+  if (url.toLowerCase().includes("supabase")) return "/n.jpg";
+  if (url.startsWith("public/")) return url.replace("public/", "/");
+  if (!url.startsWith("http") && !url.startsWith("/")) return "/" + url;
+  return url;
+};
+
 export default async function BlogPostPage({
   params, searchParams,
 }: {
@@ -61,7 +69,7 @@ export default async function BlogPostPage({
             </div>
             {post.featured_image && (
               <div className={styles.coverImageWrapper} style={{ textAlign: post.cover_image_alignment === "left" ? "left" : post.cover_image_alignment === "right" ? "right" : "center" }}>
-                <img src={post.featured_image.includes("supabase.co") ? "/n.jpg" : post.featured_image} alt={post.title} className={styles.coverImage} style={{ marginLeft: post.cover_image_alignment === "right" ? "auto" : post.cover_image_alignment === "center" ? "auto" : "0", marginRight: post.cover_image_alignment === "left" ? "auto" : post.cover_image_alignment === "center" ? "auto" : "0" }} />
+                <img src={getValidImageUrl(post.featured_image)} alt={post.title} className={styles.coverImage} style={{ marginLeft: post.cover_image_alignment === "right" ? "auto" : post.cover_image_alignment === "center" ? "auto" : "0", marginRight: post.cover_image_alignment === "left" ? "auto" : post.cover_image_alignment === "center" ? "auto" : "0" }} />
               </div>
             )}
             <div className={`${styles.postBody} wysiwyg-content`} dangerouslySetInnerHTML={{ __html: post.content || "" }} />
@@ -70,9 +78,7 @@ export default async function BlogPostPage({
             <div className={styles.sidebarHeader}><h2>New Article</h2></div>
             <div className={styles.articleList}>
               {recentPosts?.map((rp) => {
-                const rpImageUrl = rp.featured_image && rp.featured_image.includes("supabase.co")
-                  ? "/n.jpg"
-                  : (rp.featured_image || "/hero-banner.png");
+                const rpImageUrl = getValidImageUrl(rp.featured_image);
                 return (
                   <div key={rp.id} className={styles.articleCard}>
                     <img src={rpImageUrl} alt={rp.title} className={styles.articleImage} />
