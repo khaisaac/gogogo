@@ -314,6 +314,18 @@ export default function RootLayout({
             gtag('config', 'AW-11203920100');
           `}
         </Script>
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-762E0P589G"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-762E0P589G');
+          `}
+        </Script>
         {children}
       </body>
     </html>
