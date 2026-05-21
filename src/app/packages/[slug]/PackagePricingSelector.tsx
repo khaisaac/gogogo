@@ -1,6 +1,9 @@
 "use client";
 
 import { useMemo, useRef, useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from "date-fns";
 import {
   GROUP_TIER_OPTIONS,
   PAX_OPTIONS,
@@ -290,27 +293,42 @@ export default function PackagePricingSelector({
       <div className={styles.selector}>
         {loadingDates ? (
           <span className={styles.dateTrigger}>Loading dates...</span>
-        ) : filteredDates.length > 0 ? (
-          <select
-            className={styles.bookingSelect}
-            value={selectedDate}
-            onChange={(event) => setSelectedDate(event.target.value)}
-            aria-label="Select trek start date"
-          >
-            <option value="" disabled>Select available date</option>
-            {filteredDates.map((d) => (
-              <option key={d.id} value={d.date}>
-                {new Date(d.date + "T00:00:00").toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })} ({d.available_pax} slots left)
-              </option>
-            ))}
-          </select>
         ) : (
-          <select
+          <DatePicker
+            selected={selectedDate ? new Date(selectedDate + "T00:00:00") : null}
+            onChange={(date) => {
+              if (date) {
+                setSelectedDate(format(date, "yyyy-MM-dd"));
+              } else {
+                setSelectedDate("");
+              }
+            }}
+            includeDates={filteredDates.map((d) => new Date(d.date + "T00:00:00"))}
+            placeholderText={
+              filteredDates.length > 0
+                ? "Select available date"
+                : "No dates available"
+            }
             className={styles.bookingSelect}
-            disabled
-          >
-            <option>No dates available</option>
-          </select>
+            disabled={filteredDates.length === 0}
+            dateFormat="EEE, MMM d, yyyy"
+            renderDayContents={(day, date) => {
+              if (!date) return day;
+              const dateStr = format(date, "yyyy-MM-dd");
+              const availability = filteredDates.find((d) => d.date === dateStr);
+              return (
+                <div
+                  title={
+                    availability
+                      ? `${availability.available_pax} slots left`
+                      : "Not available"
+                  }
+                >
+                  {day}
+                </div>
+              );
+            }}
+          />
         )}
       </div>
       

@@ -4,23 +4,20 @@ function getDokuConfig() {
   const clientId = process.env.DOKU_CLIENT_ID || 'BRN-0234-1717559853351'
   const secretKey = process.env.DOKU_SECRET_KEY || 'SK-8uCZzDIeitu8P5Fg07Or'
   
-  let baseUrl = process.env.DOKU_BASE_URL || (
-    process.env.NODE_ENV === 'production'
-      ? 'https://api.doku.com'
-      : 'https://api-sandbox.doku.com'
-  )
+  // 1. If DOKU_BASE_URL is explicitly set in .env / environment, ALWAYS respect it
+  if (process.env.DOKU_BASE_URL) {
+    return { clientId, secretKey, baseUrl: process.env.DOKU_BASE_URL }
+  }
 
-  // Auto-detect and correct mismatches between keys and URL
-  if (clientId.startsWith('BRN-0234-')) {
-    if (baseUrl !== 'https://api-sandbox.doku.com') {
-      console.warn(`[DOKU] Auto-routed to Sandbox API (https://api-sandbox.doku.com) because Sandbox Client ID prefix ('BRN-0234-') was detected.`)
-      baseUrl = 'https://api-sandbox.doku.com'
-    }
-  } else {
-    if (baseUrl === 'https://api-sandbox.doku.com') {
-      console.warn(`[DOKU] Auto-routed to Production API (https://api.doku.com) because a Production Client ID was detected.`)
-      baseUrl = 'https://api.doku.com'
-    }
+  // 2. Otherwise, determine standard default base URL based on NODE_ENV
+  let baseUrl = process.env.NODE_ENV === 'production'
+    ? 'https://api.doku.com'
+    : 'https://api-sandbox.doku.com'
+
+  // 3. Fallback/Auto-detect for sandbox keys if base URL is not explicitly configured
+  // Doku Sandbox Client IDs start with 'BRN-' (like BRN-0234-, BRN-0277-, etc.)
+  if (clientId.startsWith('BRN-')) {
+    baseUrl = 'https://api-sandbox.doku.com'
   }
 
   return { clientId, secretKey, baseUrl }

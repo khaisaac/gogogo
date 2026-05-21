@@ -3,9 +3,7 @@ import crypto from "crypto";
 import axios from "axios";
 import { prisma } from "@/lib/db";
 
-const DOKU_CLIENT_ID = process.env.DOKU_CLIENT_ID || "";
-const DOKU_SECRET_KEY = process.env.DOKU_SECRET_KEY || "";
-const DOKU_BASE_URL = process.env.DOKU_BASE_URL || "https://api.doku.com";
+import { getDokuConfig } from "@/lib/payments/doku";
 
 function generateDokuSignature(clientId: string, requestId: string, requestTimestamp: string, requestTarget: string, digest: string, secretKey: string) {
   const componentSignature = `Client-Id:${clientId}\nRequest-Id:${requestId}\nRequest-Timestamp:${requestTimestamp}\nRequest-Target:${requestTarget}\nDigest:${digest}`;
@@ -16,6 +14,7 @@ function generateDokuSignature(clientId: string, requestId: string, requestTimes
 
 export async function POST(req: Request) {
   try {
+    const { clientId: DOKU_CLIENT_ID, secretKey: DOKU_SECRET_KEY, baseUrl: DOKU_BASE_URL } = getDokuConfig();
     const body = await req.json();
     const { invoice, reason } = body;
     if (!invoice) {
