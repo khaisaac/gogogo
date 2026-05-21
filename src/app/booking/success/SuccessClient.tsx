@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Script from "next/script";
 import styles from "./success.module.css";
 
 type SuccessClientProps = {
@@ -136,6 +137,11 @@ export default function SuccessClient({
 
   return (
     <div className={styles.card}>
+      <Script id="google-ads-conversion" strategy="afterInteractive">
+        {`
+          gtag('event', 'conversion', {'send_to': 'AW-11203920100/ti5GCJPG5bAcEOSBud4p'});
+        `}
+      </Script>
       <div className={styles.iconWrap}>
         <div className={styles.iconSuccess}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
