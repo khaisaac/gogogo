@@ -296,7 +296,7 @@ export default function PackagePricingSelector({
         ) : (
           <DatePicker
             selected={selectedDate ? new Date(selectedDate + "T00:00:00") : null}
-            onChange={(date) => {
+            onChange={(date: Date | null) => {
               if (date) {
                 setSelectedDate(format(date, "yyyy-MM-dd"));
               } else {
@@ -312,7 +312,7 @@ export default function PackagePricingSelector({
             className={styles.bookingSelect}
             disabled={filteredDates.length === 0}
             dateFormat="EEE, MMM d, yyyy"
-            renderDayContents={(day, date) => {
+            renderDayContents={(day: number, date: Date) => {
               if (!date) return day;
               const dateStr = format(date, "yyyy-MM-dd");
               const availability = filteredDates.find((d) => d.date === dateStr);
