@@ -99,14 +99,14 @@ export default function Navbar() {
                 <span className={styles.dropdownIcon}>🌿</span>
                 <div>
                   <strong>Senaru Route</strong>
-                  <small>The Green Route — Forests & Waterfalls</small>
+                  <small>The Green Route — Forests & Crater Rim View</small>
                 </div>
               </Link>
               <Link href="/#torean" className={styles.dropdownItem} onClick={closeMenu}>
                 <span className={styles.dropdownIcon}>🌊</span>
                 <div>
                   <strong>Torean Route</strong>
-                  <small>The Majestic Canyon — Rivers & Hot Springs</small>
+                  <small>The Majestic Canyon — Rivers, Waterfalls & Hot Springs</small>
                 </div>
               </Link>
             </div>
