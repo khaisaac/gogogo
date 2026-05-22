@@ -13,8 +13,9 @@ type PackageSliderProps = {
 export function SembalunPackages({ packages }: PackageSliderProps) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeftPos, setScrollLeftPos] = useState(0);
+  const dragStartRef = useRef({ x: 0, scrollLeft: 0 });
+  const isMouseDownRef = useRef(false);
+  const wasDraggingRef = useRef(false);
 
   const scrollLeft = () => {
     if (sliderRef.current) {
@@ -37,21 +38,47 @@ export function SembalunPackages({ packages }: PackageSliderProps) {
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    if (sliderRef.current) {
-      setStartX(e.pageX - sliderRef.current.offsetLeft);
-      setScrollLeftPos(sliderRef.current.scrollLeft);
+    if (!sliderRef.current) return;
+    isMouseDownRef.current = true;
+    wasDraggingRef.current = false;
+    dragStartRef.current = {
+      x: e.pageX,
+      scrollLeft: sliderRef.current.scrollLeft,
+    };
+  };
+
+  const handleMouseLeave = () => {
+    isMouseDownRef.current = false;
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    isMouseDownRef.current = false;
+    if (isDragging) {
+      setIsDragging(false);
     }
   };
 
-  const handleMouseLeave = () => setIsDragging(false);
-  const handleMouseUp = () => setIsDragging(false);
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !sliderRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    sliderRef.current.scrollLeft = scrollLeftPos - walk;
+    if (!isMouseDownRef.current || !sliderRef.current) return;
+    const x = e.pageX;
+    const walk = x - dragStartRef.current.x;
+    if (Math.abs(walk) > 5) {
+      if (!isDragging) {
+        setIsDragging(true);
+        wasDraggingRef.current = true;
+      }
+      e.preventDefault();
+      sliderRef.current.scrollLeft = dragStartRef.current.scrollLeft - walk * 1.5;
+    }
+  };
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    if (wasDraggingRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      wasDraggingRef.current = false;
+    }
   };
 
   return (
@@ -84,7 +111,7 @@ export function SembalunPackages({ packages }: PackageSliderProps) {
           >
             {packages.slice(0, 4).map((pkg) => (
               <div className={styles.sembalunSlideItem} key={pkg.id}>
-                <Link href={`/packages/${pkg.slug}`}>
+                <Link href={`/packages/${pkg.slug}`} onClick={handleLinkClick}>
                   <PackageCard
                     title={pkg.title}
                     duration={pkg.duration}
@@ -148,8 +175,9 @@ export function SembalunPackages({ packages }: PackageSliderProps) {
 export function SenaruPackages({ packages }: PackageSliderProps) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeftPos, setScrollLeftPos] = useState(0);
+  const dragStartRef = useRef({ x: 0, scrollLeft: 0 });
+  const isMouseDownRef = useRef(false);
+  const wasDraggingRef = useRef(false);
 
   const scrollLeft = () => {
     if (sliderRef.current) {
@@ -172,21 +200,47 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    if (sliderRef.current) {
-      setStartX(e.pageX - sliderRef.current.offsetLeft);
-      setScrollLeftPos(sliderRef.current.scrollLeft);
+    if (!sliderRef.current) return;
+    isMouseDownRef.current = true;
+    wasDraggingRef.current = false;
+    dragStartRef.current = {
+      x: e.pageX,
+      scrollLeft: sliderRef.current.scrollLeft,
+    };
+  };
+
+  const handleMouseLeave = () => {
+    isMouseDownRef.current = false;
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    isMouseDownRef.current = false;
+    if (isDragging) {
+      setIsDragging(false);
     }
   };
 
-  const handleMouseLeave = () => setIsDragging(false);
-  const handleMouseUp = () => setIsDragging(false);
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !sliderRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    sliderRef.current.scrollLeft = scrollLeftPos - walk;
+    if (!isMouseDownRef.current || !sliderRef.current) return;
+    const x = e.pageX;
+    const walk = x - dragStartRef.current.x;
+    if (Math.abs(walk) > 5) {
+      if (!isDragging) {
+        setIsDragging(true);
+        wasDraggingRef.current = true;
+      }
+      e.preventDefault();
+      sliderRef.current.scrollLeft = dragStartRef.current.scrollLeft - walk * 1.5;
+    }
+  };
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    if (wasDraggingRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      wasDraggingRef.current = false;
+    }
   };
 
   return (
@@ -213,7 +267,7 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
           >
             {packages.slice(0, 4).map((pkg) => (
               <div className={styles.senaruSlideItem} key={pkg.id}>
-                <Link href={`/packages/${pkg.slug}`}>
+                <Link href={`/packages/${pkg.slug}`} onClick={handleLinkClick}>
                   <PackageCard
                     title={pkg.title}
                     duration={pkg.duration}
@@ -278,8 +332,9 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
 export function ToreanPackages({ packages }: PackageSliderProps) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeftPos, setScrollLeftPos] = useState(0);
+  const dragStartRef = useRef({ x: 0, scrollLeft: 0 });
+  const isMouseDownRef = useRef(false);
+  const wasDraggingRef = useRef(false);
 
   const scrollLeft = () => {
     if (sliderRef.current) {
@@ -302,21 +357,47 @@ export function ToreanPackages({ packages }: PackageSliderProps) {
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    if (sliderRef.current) {
-      setStartX(e.pageX - sliderRef.current.offsetLeft);
-      setScrollLeftPos(sliderRef.current.scrollLeft);
+    if (!sliderRef.current) return;
+    isMouseDownRef.current = true;
+    wasDraggingRef.current = false;
+    dragStartRef.current = {
+      x: e.pageX,
+      scrollLeft: sliderRef.current.scrollLeft,
+    };
+  };
+
+  const handleMouseLeave = () => {
+    isMouseDownRef.current = false;
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    isMouseDownRef.current = false;
+    if (isDragging) {
+      setIsDragging(false);
     }
   };
 
-  const handleMouseLeave = () => setIsDragging(false);
-  const handleMouseUp = () => setIsDragging(false);
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !sliderRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - sliderRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    sliderRef.current.scrollLeft = scrollLeftPos - walk;
+    if (!isMouseDownRef.current || !sliderRef.current) return;
+    const x = e.pageX;
+    const walk = x - dragStartRef.current.x;
+    if (Math.abs(walk) > 5) {
+      if (!isDragging) {
+        setIsDragging(true);
+        wasDraggingRef.current = true;
+      }
+      e.preventDefault();
+      sliderRef.current.scrollLeft = dragStartRef.current.scrollLeft - walk * 1.5;
+    }
+  };
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    if (wasDraggingRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      wasDraggingRef.current = false;
+    }
   };
 
   return (
@@ -343,7 +424,7 @@ export function ToreanPackages({ packages }: PackageSliderProps) {
           >
             {packages.slice(0, 4).map((pkg) => (
               <div className={styles.toreanSlideItem} key={pkg.id}>
-                <Link href={`/packages/${pkg.slug}`}>
+                <Link href={`/packages/${pkg.slug}`} onClick={handleLinkClick}>
                   <PackageCard
                     title={pkg.title}
                     duration={pkg.duration}
