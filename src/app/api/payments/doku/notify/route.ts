@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     if (paymentStatus === "paid") {
       const payment = await prisma.payment.findFirst({
         where: { provider_order_id: invoiceNumber },
-        select: { booking_id: true },
+        select: { booking_id: true, transport_booking_id: true, ticket_booking_id: true },
       });
 
       if (payment && payment.booking_id) {
@@ -69,6 +69,31 @@ export async function POST(request: Request) {
         await prisma.booking.update({
           where: { id: payment.booking_id! },
           data: { status: "confirmed", payment_status: newPaymentStatus },
+        });
+      }
+
+      if (payment && payment.transport_booking_id) {
+        const transportBooking = await prisma.transportBooking.findUnique({
+          where: { id: payment.transport_booking_id! },
+          select: { payment_type: true },
+        });
+
+        const newPaymentStatus = transportBooking?.payment_type === "deposit" ? "deposit_paid" : "fully_paid";
+
+        await prisma.transportBooking.update({
+          where: { id: payment.transport_booking_id! },
+          data: { payment_status: newPaymentStatus },
+        });
+      }
+    } else if (paymentStatus === "failed") {
+      const payment = await prisma.payment.findFirst({
+        where: { provider_order_id: invoiceNumber },
+        select: { booking_id: true, transport_booking_id: true },
+      });
+      if (payment && payment.transport_booking_id) {
+        await prisma.transportBooking.update({
+          where: { id: payment.transport_booking_id! },
+          data: { payment_status: "failed" },
         });
       }
     }

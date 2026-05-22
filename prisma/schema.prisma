@@ -26,6 +26,7 @@ model User {
   // Relations
   bookings      Booking[]
   ticket_bookings TicketBooking[]
+  transport_bookings TransportBooking[]
   posts         Post[]    @relation("PostAuthor")
   refunds_requested Refund[] @relation("RefundRequester")
   refunds_approved  Refund[] @relation("RefundApprover")
@@ -187,6 +188,7 @@ model Payment {
   id                       String    @id @default(uuid())
   booking_id               String?
   ticket_booking_id        String?
+  transport_booking_id     String?
   provider                 String    // 'doku' | 'paypal'
   provider_order_id        String?   // DOKU invoice number or PayPal order ID
   provider_transaction_id  String?   // Transaction ID from provider
@@ -210,9 +212,11 @@ model Payment {
   // Relations
   booking                  Booking?         @relation(fields: [booking_id], references: [id], onDelete: Cascade)
   ticket_booking           TicketBooking?  @relation(fields: [ticket_booking_id], references: [id], onDelete: Cascade)
+  transport_booking        TransportBooking? @relation(fields: [transport_booking_id], references: [id], onDelete: Cascade)
 
   @@index([booking_id])
   @@index([ticket_booking_id])
+  @@index([transport_booking_id])
   @@index([invoice])
   @@index([parent_invoice])
   @@map("payments")
@@ -363,4 +367,46 @@ model TicketSetting {
   updated_at      DateTime @updatedAt
 
   @@map("ticket_settings")
+}
+
+model TransportOption {
+  id          String   @id @default(uuid())
+  route       String
+  price       Int      // Price in IDR
+  image       String?  @db.Text
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("transport_options")
+}
+
+model TransportBooking {
+  id                  String   @id @default(uuid())
+  user_id             String?
+  full_name             String
+  whatsapp              String
+  passport              String
+  booking_date        DateTime @db.Date
+  pickup_time         String?
+  pickup_location     String?
+  dropoff_location    String?
+  number_of_pax       Int      @default(1)
+  route_title         String
+  total_price         Int      // Total in IDR
+  payment_type        String   @default("full") // 'full' | 'deposit'
+  deposit_amount      Int?
+  balance_amount      Int?
+  payment_status      String   @default("pending") // 'pending' | 'deposit_paid' | 'fully_paid' | 'failed'
+  doku_invoice        String?  @unique
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  // Relations
+  user              User?     @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  payments          Payment[]
+
+  @@index([user_id])
+  @@index([payment_status])
+  @@map("transport_bookings")
 }

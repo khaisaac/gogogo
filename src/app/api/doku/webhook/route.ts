@@ -64,6 +64,41 @@ export async function POST(req: Request) {
       });
     }
 
+    // Also update TransportBooking if this invoice belongs to one
+    if (paymentRecord.transport_booking_id || invoiceNumber.startsWith("TRP-")) {
+      if (newStatus === "success") {
+        const transportBooking = await prisma.transportBooking.findFirst({
+          where: {
+            OR: [
+              { id: paymentRecord.transport_booking_id || undefined },
+              { doku_invoice: invoiceNumber }
+            ]
+          }
+        });
+        const newPaymentStatus = transportBooking?.payment_type === "deposit" ? "deposit_paid" : "fully_paid";
+        
+        await prisma.transportBooking.updateMany({
+          where: {
+            OR: [
+              { id: paymentRecord.transport_booking_id || undefined },
+              { doku_invoice: invoiceNumber }
+            ]
+          },
+          data: { payment_status: newPaymentStatus },
+        });
+      } else if (newStatus === "failed") {
+        await prisma.transportBooking.updateMany({
+          where: {
+            OR: [
+              { id: paymentRecord.transport_booking_id || undefined },
+              { doku_invoice: invoiceNumber }
+            ]
+          },
+          data: { payment_status: "failed" },
+        });
+      }
+    }
+
     if (finalStatusToSave === "paid_dp") {
       console.log(`DP paid for ${invoiceNumber}.`);
     }
