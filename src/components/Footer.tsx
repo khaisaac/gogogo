@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./Footer.module.css";
 
 export default function Footer() {
@@ -29,7 +30,7 @@ export default function Footer() {
           <ul className={styles.list}>
             <li><a href="#sembalun">Sembalun Trekking Route</a></li>
             <li><a href="#senaru">Senaru Trekking Route</a></li>
-            <li><a href="#">Senaru Transport</a></li>
+            <li><Link href="/booking-transport">Senaru Transport</Link></li>
           </ul>
         </div>
 
