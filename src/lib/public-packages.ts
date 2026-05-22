@@ -29,7 +29,13 @@ function getDisplayPrice(pkg: any) {
 
 function mapPackage(pkg: any): PublicPackage {
   // If slug is not in DB, generate one dynamically
-  const slug = pkg.slug || slugifyPackageTitle(pkg.title);
+  let slug = pkg.slug || slugifyPackageTitle(pkg.title);
+  
+  // Prevent collision with Next.js static routes
+  if (["torean", "sembalun", "senaru"].includes(slug)) {
+    slug = `${slug}-trekking-package`;
+  }
+
   return {
     ...pkg,
     slug,
