@@ -85,6 +85,7 @@ export default async function AdminNewPackagePage({
             <select id="route" name="route" defaultValue="sembalun">
               <option value="sembalun">Sembalun</option>
               <option value="senaru">Senaru</option>
+              <option value="torean">Torean</option>
             </select>
           </div>
 

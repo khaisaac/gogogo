@@ -274,3 +274,134 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
     </section>
   );
 }
+
+export function ToreanPackages({ packages }: PackageSliderProps) {
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftPos, setScrollLeftPos] = useState(0);
+
+  const scrollLeft = () => {
+    if (sliderRef.current) {
+      const slideItem = sliderRef.current.querySelector(
+        `.${styles.toreanSlideItem}`,
+      ) as HTMLElement;
+      const scrollAmount = slideItem ? slideItem.offsetWidth + 20 : 320;
+      sliderRef.current.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (sliderRef.current) {
+      const slideItem = sliderRef.current.querySelector(
+        `.${styles.toreanSlideItem}`,
+      ) as HTMLElement;
+      const scrollAmount = slideItem ? slideItem.offsetWidth + 20 : 320;
+      sliderRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    if (sliderRef.current) {
+      setStartX(e.pageX - sliderRef.current.offsetLeft);
+      setScrollLeftPos(sliderRef.current.scrollLeft);
+    }
+  };
+
+  const handleMouseLeave = () => setIsDragging(false);
+  const handleMouseUp = () => setIsDragging(false);
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !sliderRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - sliderRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    sliderRef.current.scrollLeft = scrollLeftPos - walk;
+  };
+
+  return (
+    <section id="torean" className={styles.toreanSection}>
+      <div className={styles.toreanDeco} />
+      <div className={styles.container}>
+        <div className={styles.toreanHeader}>
+          <h2 className={styles.toreanTitle}>Torean Trekking Tour Packages</h2>
+          <p className={styles.toreanDesc}>
+            Torean Route is widely renowned for its breathtaking vertical canyon cliffs,
+            cascading river streams, lush rainforests, and natural hot spring pathways.
+            Often described as a journey into a mystical world, it offers one of the most
+            dramatic and visually stunning landscape trails on Mount Rinjani.
+          </p>
+        </div>
+        <div className={styles.wrapper}>
+          <div
+            className={`${styles.toreanSlider} ${isDragging ? styles.dragging : ""}`}
+            ref={sliderRef}
+            onMouseDown={handleMouseDown}
+            onMouseLeave={handleMouseLeave}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+          >
+            {packages.slice(0, 4).map((pkg) => (
+              <div className={styles.toreanSlideItem} key={pkg.id}>
+                <Link href={`/packages/${pkg.slug}`}>
+                  <PackageCard
+                    title={pkg.title}
+                    duration={pkg.duration}
+                    price={pkg.displayPrice}
+                    image={pkg.image || "/n.jpg"}
+                    difficulty={pkg.difficulty}
+                    location="Torean"
+                  />
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile-only controls below the card */}
+          <div className={styles.mobileControls}>
+            <button
+              onClick={scrollLeft}
+              className={styles.arrowBtn}
+              aria-label="Previous"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="square"
+              >
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={scrollRight}
+              className={styles.arrowBtn}
+              aria-label="Next"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="square"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div className={styles.toreanActions}>
+          <Link href="/packages/torean" className="btn-primary">
+            SHOW MORE
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+

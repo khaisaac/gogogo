@@ -74,6 +74,7 @@ export default async function AdminEditPackagePage({
             >
               <option value="sembalun">Sembalun</option>
               <option value="senaru">Senaru</option>
+              <option value="torean">Torean</option>
             </select>
           </div>
 

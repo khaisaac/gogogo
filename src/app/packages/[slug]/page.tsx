@@ -39,7 +39,11 @@ export default async function PackageDetailPage({
 
   const content = parsePackageContent(trekkingPackage.description);
   const routeLabel =
-    trekkingPackage.route === "sembalun" ? "Sembalun" : "Senaru";
+    trekkingPackage.route === "sembalun"
+      ? "Sembalun"
+      : trekkingPackage.route === "torean"
+      ? "Torean"
+      : "Senaru";
   const highlights = toList(content.highlights);
   const includeItems = toList(content.include);
   const excludeItems = toList(content.exclude);
@@ -48,6 +52,8 @@ export default async function PackageDetailPage({
   const relatedPackages = (
     trekkingPackage.route === "sembalun"
       ? allPackages.sembalun
+      : trekkingPackage.route === "torean"
+      ? allPackages.torean
       : allPackages.senaru
   )
     .filter((pkg) => pkg.slug !== trekkingPackage.slug)
@@ -95,6 +101,32 @@ export default async function PackageDetailPage({
             ],
             overview: ["Easy descent and return transfer."],
           },
+        ]
+      : trekkingPackage.route === "torean"
+      ? [
+          {
+            title: "Day 1",
+            schedule: [
+              "08.00: Check-in at Torean Gate and gear preparation.",
+              "11.30: Trek through Torean canyon and rainforest, lunch stop.",
+              "17.00: Arrive at Camp site, dinner and camp.",
+            ],
+            overview: [
+              "Distance: 9 KM",
+              "Walk duration: 5-6 Hours",
+              "Difficulty: Moderate",
+            ],
+          },
+          {
+            title: "Day 2",
+            schedule: [
+              "09.00: Visit Segara Anak Lake.",
+              "12.00: Soak at the hot spring and lunch.",
+              "15.00: Return to camp and overnight.",
+            ],
+            overview: [],
+          },
+          { title: "Day 3", schedule: [], overview: [] },
         ]
       : [
           {

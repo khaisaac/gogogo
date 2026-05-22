@@ -86,6 +86,7 @@ export async function getPublicPackages() {
   return {
     sembalun: all.filter((p) => p.route === "sembalun"),
     senaru: all.filter((p) => p.route === "senaru"),
+    torean: all.filter((p) => p.route === "torean"),
   };
 }
 

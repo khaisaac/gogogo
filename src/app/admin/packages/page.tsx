@@ -21,7 +21,7 @@ export default async function AdminPackagesPage() {
       </div>
 
       <p className={styles.helper}>
-        Kelola package route Sembalun dan Senaru lengkap dengan detail,
+        Kelola package route Sembalun, Senaru, dan Torean lengkap dengan detail,
         highlights, dan itinerary.
       </p>
 

@@ -28,7 +28,7 @@ const MAX_GALLERY_IMAGES = 10;
 
 type PackagePayload = {
   title: string;
-  route: "sembalun" | "senaru";
+  route: "sembalun" | "senaru" | "torean";
   duration: string;
   difficulty: number;
   image: string | null;
@@ -123,9 +123,16 @@ function getPayload(formData: FormData): PackagePayload {
   const difficultyRaw = String(formData.get("difficulty") || "moderate");
   const pricing = parsePricingFields(formData);
 
+  let route: "sembalun" | "senaru" | "torean" = "sembalun";
+  if (routeValue === "senaru") {
+    route = "senaru";
+  } else if (routeValue === "torean") {
+    route = "torean";
+  }
+
   return {
     title,
-    route: routeValue === "senaru" ? "senaru" : "sembalun",
+    route,
     duration,
     ...pricing,
     difficulty: difficultyValueToScore(difficultyRaw),

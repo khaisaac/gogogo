@@ -1,7 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import About from "@/components/About";
-import { SembalunPackages, SenaruPackages } from "@/components/Packages";
+import { SembalunPackages, SenaruPackages, ToreanPackages } from "@/components/Packages";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import PriceTable from "@/components/PriceTable";
 import HowToBook from "@/components/HowToBook";
@@ -16,7 +16,7 @@ import ERinjaniSection from "@/components/ERinjaniSection";
 export const revalidate = 60; // ISR: re-generate every 60 seconds
 
 export default async function Home() {
-  const { sembalun, senaru } = await getPublicPackages();
+  const { sembalun, senaru, torean } = await getPublicPackages();
 
   return (
     <>
@@ -26,9 +26,10 @@ export default async function Home() {
         <About />
         <SembalunPackages packages={sembalun} />
         <SenaruPackages packages={senaru} />
+        <ToreanPackages packages={torean} />
         <ERinjaniSection />
         <WhyChooseUs />
-        <PriceTable packages={[...sembalun, ...senaru]} />
+        <PriceTable packages={[...sembalun, ...senaru, ...torean]} />
         <HowToBook />
         <HappyGuests />
         <BlogSection />
