@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
       check_out
     );
 
-    const insurancePrice = insurance_type === "regular" ? 10000 : 280000;
+    const insurancePrice = insurance_type === "regular" ? 10000 : 290000;
     const totalPrice = (totalBasePrice * number_of_pax) + (insurancePrice * number_of_pax);
 
     // Create booking in DB

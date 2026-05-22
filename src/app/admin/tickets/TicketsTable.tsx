@@ -185,7 +185,7 @@ export default function TicketsTable({ tickets: initialTickets }: { tickets: any
     try {
       const checkInDate = new Date(editForm.check_in);
       const checkOutDate = new Date(editForm.check_out);
-      const insurancePrice = editForm.insurance_type === "regular" ? 10000 : 280000;
+      const insurancePrice = editForm.insurance_type === "regular" ? 10000 : 290000;
       
       const totalBasePrice = calculateBasePrice(
         editForm.citizen_type,
@@ -461,7 +461,7 @@ export default function TicketsTable({ tickets: initialTickets }: { tickets: any
                       style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', background: 'white', width: '100%' }}
                     >
                       <option value="regular">Regular Insurance (Rp 10,000)</option>
-                      <option value="premium">Premium Insurance (Rp 280,000)</option>
+                      <option value="premium">Premium Insurance (Rp 290,000)</option>
                     </select>
                   </div>
 

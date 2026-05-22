@@ -427,7 +427,7 @@ export default function TicketBookingClient({
     }
   };
 
-  const insurancePrice = insuranceType === "regular" ? 10000 : 280000;
+  const insurancePrice = insuranceType === "regular" ? 10000 : 290000;
   const durationInDays = checkIn && checkOut ? 
     Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)) + 1 : 0;
   
@@ -692,7 +692,7 @@ export default function TicketBookingClient({
                     <ShieldCheck size={24} color={insuranceType === "premium" ? "#1a4d43" : "#9ca3af"} />
                     <div className={styles.insuranceInfo}>
                       <span className={styles.insuranceTitle}>Premium Insurance</span>
-                      <span className={styles.insurancePrice}>Rp 280,000 / person</span>
+                      <span className={styles.insurancePrice}>Rp 290,000 / person</span>
                     </div>
                     {insuranceType === "premium" && <CheckCircle2 size={20} color="#1a4d43" />}
                   </div>
