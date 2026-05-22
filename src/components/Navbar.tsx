@@ -102,6 +102,13 @@ export default function Navbar() {
                   <small>The Green Route — Forests & Waterfalls</small>
                 </div>
               </Link>
+              <Link href="/#torean" className={styles.dropdownItem} onClick={closeMenu}>
+                <span className={styles.dropdownIcon}>🌊</span>
+                <div>
+                  <strong>Torean Route</strong>
+                  <small>The Majestic Canyon — Rivers & Hot Springs</small>
+                </div>
+              </Link>
             </div>
           </div>
 
