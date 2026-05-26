@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/app/admin/_lib";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { uploadAdminImage } from "@/lib/supabase/storage";
+import { uploadImage } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -34,8 +33,7 @@ export async function POST(req: NextRequest) {
 
     let imageUrl = null;
     if (imageFile && imageFile.size > 0) {
-      const supabase = createAdminClient();
-      imageUrl = await uploadAdminImage(supabase, imageFile, "packages");
+      imageUrl = await uploadImage(imageFile, "packages");
     }
 
     const newOption = await prisma.transportOption.create({
@@ -71,8 +69,7 @@ export async function PUT(req: NextRequest) {
 
     let imageUrl = existingImageUrl || null;
     if (imageFile && imageFile.size > 0) {
-      const supabase = createAdminClient();
-      imageUrl = await uploadAdminImage(supabase, imageFile, "packages");
+      imageUrl = await uploadImage(imageFile, "packages");
     }
 
     const updatedOption = await prisma.transportOption.update({

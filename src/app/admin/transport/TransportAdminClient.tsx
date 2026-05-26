@@ -147,7 +147,10 @@ export default function TransportAdminClient({
         body: formData,
       });
 
-      if (!res.ok) throw new Error("Failed to save option");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to save option");
+      }
 
       const saved = await res.json();
       if (editingOption) {
@@ -157,9 +160,9 @@ export default function TransportAdminClient({
       }
 
       setIsFormOpen(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Error saving transfer route option.");
+      alert("Error saving transfer route option: " + err.message);
     }
   };
 

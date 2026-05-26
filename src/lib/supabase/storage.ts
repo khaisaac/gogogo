@@ -42,12 +42,15 @@ export async function uploadAdminImage(
   const safeName = sanitizeFileName(file.name || "image");
   const path = `${folder}/${Date.now()}-${crypto.randomUUID()}-${safeName}`;
 
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
   const { error: uploadError } = await supabase
     .storage
     .from(ADMIN_MEDIA_BUCKET)
-    .upload(path, file, {
+    .upload(path, buffer, {
       upsert: false,
-      contentType: file.type || undefined,
+      contentType: file.type || "image/png",
     });
 
   if (uploadError) {
