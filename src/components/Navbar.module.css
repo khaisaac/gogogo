@@ -270,8 +270,11 @@
     right: 0;
     bottom: 0;
     flex-direction: column;
-    justify-content: center;
-    gap: 4px;
+    justify-content: flex-start;
+    padding-top: 100px;
+    padding-bottom: 40px;
+    overflow-y: auto;
+    gap: 8px;
     background: #1a3d2b;
     transform: translateX(100%);
     transition: transform var(--transition-normal);
@@ -297,10 +300,15 @@
     max-width: 300px;
     border-left: 3px solid var(--color-primary);
     border-radius: 0 4px 4px 0;
+    display: none;
+    opacity: 1;
+    visibility: visible;
+    margin: 0 auto;
   }
 
   .dropdownOpen {
     transform: none;
+    display: block;
   }
 
   .dropdownItem {
