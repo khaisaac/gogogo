@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 const ADMIN_MEDIA_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || "admin-media";
 const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
 

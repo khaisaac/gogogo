@@ -102,6 +102,13 @@ export default function Navbar() {
                   <small>The Green Route — Forests & Crater Rim View</small>
                 </div>
               </Link>
+              <Link href="/booking-transport" className={styles.dropdownItem} onClick={closeMenu}>
+                <span className={styles.dropdownIcon}>🚙</span>
+                <div>
+                  <strong>Senaru Transport</strong>
+                  <small>Airport Transfers & Shuttle Services</small>
+                </div>
+              </Link>
               <Link href="/#torean" className={styles.dropdownItem} onClick={closeMenu}>
                 <span className={styles.dropdownIcon}>🌊</span>
                 <div>
