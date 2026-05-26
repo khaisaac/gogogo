@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/app/admin/_lib";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { uploadAdminImage } from "@/lib/supabase/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -20,19 +22,28 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     await requireAdmin();
-    const body = await req.json();
-    const { route, price, image, is_active } = body;
+    const formData = await req.formData();
+    const route = formData.get("route") as string;
+    const priceStr = formData.get("price") as string;
+    const isActiveStr = formData.get("is_active") as string;
+    const imageFile = formData.get("image") as File | null;
 
-    if (!route || price === undefined) {
+    if (!route || !priceStr) {
       return NextResponse.json({ error: "Route and price are required" }, { status: 400 });
+    }
+
+    let imageUrl = null;
+    if (imageFile && imageFile.size > 0) {
+      const supabase = createAdminClient();
+      imageUrl = await uploadAdminImage(supabase, imageFile, "packages");
     }
 
     const newOption = await prisma.transportOption.create({
       data: {
         route,
-        price: parseInt(price),
-        image,
-        is_active: is_active ?? true,
+        price: parseInt(priceStr),
+        image: imageUrl,
+        is_active: isActiveStr === "true",
       },
     });
 
@@ -46,20 +57,31 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     await requireAdmin();
-    const body = await req.json();
-    const { id, route, price, image, is_active } = body;
+    const formData = await req.formData();
+    const id = formData.get("id") as string;
+    const route = formData.get("route") as string;
+    const priceStr = formData.get("price") as string;
+    const isActiveStr = formData.get("is_active") as string;
+    const imageFile = formData.get("image") as File | null;
+    const existingImageUrl = formData.get("existing_image") as string | null;
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
+    let imageUrl = existingImageUrl || null;
+    if (imageFile && imageFile.size > 0) {
+      const supabase = createAdminClient();
+      imageUrl = await uploadAdminImage(supabase, imageFile, "packages");
+    }
+
     const updatedOption = await prisma.transportOption.update({
       where: { id },
       data: {
-        route,
-        price: price !== undefined ? parseInt(price) : undefined,
-        image,
-        is_active,
+        route: route || undefined,
+        price: priceStr ? parseInt(priceStr) : undefined,
+        image: imageUrl,
+        is_active: isActiveStr ? isActiveStr === "true" : undefined,
       },
     });
 

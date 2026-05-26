@@ -77,6 +77,7 @@ export default function TransportAdminClient({
   const [route, setRoute] = useState("");
   const [price, setPrice] = useState("");
   const [image, setImage] = useState("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isActive, setIsActive] = useState(true);
 
   // Search/Filter state
@@ -105,6 +106,7 @@ export default function TransportAdminClient({
     setRoute("");
     setPrice("");
     setImage("");
+    setImageFile(null);
     setIsActive(true);
     setIsFormOpen(true);
   };
@@ -114,6 +116,7 @@ export default function TransportAdminClient({
     setRoute(opt.route);
     setPrice(opt.price.toString());
     setImage(opt.image || "");
+    setImageFile(null);
     setIsActive(opt.is_active);
     setIsFormOpen(true);
   };
@@ -125,18 +128,23 @@ export default function TransportAdminClient({
     try {
       const url = "/api/transport/options";
       const method = editingOption ? "PUT" : "POST";
-      const body = {
-        id: editingOption?.id,
-        route,
-        price: parseInt(price),
-        image: image || null,
-        is_active: isActive,
-      };
+      
+      const formData = new FormData();
+      if (editingOption) formData.append("id", editingOption.id);
+      formData.append("route", route);
+      formData.append("price", price);
+      formData.append("is_active", isActive.toString());
+      
+      if (imageFile) {
+        formData.append("image", imageFile);
+      }
+      if (editingOption && image) {
+        formData.append("existing_image", image);
+      }
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: formData,
       });
 
       if (!res.ok) throw new Error("Failed to save option");
@@ -495,13 +503,24 @@ export default function TransportAdminClient({
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label>Image cover URL or Path (optional)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g., /airport.jpg"
-                      value={image}
-                      onChange={(e) => setImage(e.target.value)}
-                    />
+                    <label>Image Cover</label>
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      {image && !imageFile && (
+                        <img src={image} alt="Current cover" style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "6px" }} />
+                      )}
+                      {imageFile && (
+                        <img src={URL.createObjectURL(imageFile)} alt="New cover preview" style={{ width: "50px", height: "50px", objectFit: "cover", borderRadius: "6px" }} />
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setImageFile(e.target.files[0]);
+                          }
+                        }}
+                      />
+                    </div>
                   </div>
 
                   <div className={styles.formGroup} style={{ display: "flex", alignItems: "center", gap: "10px" }}>

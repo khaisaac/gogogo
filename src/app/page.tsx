@@ -10,6 +10,7 @@ import BlogSection from "@/components/BlogSection";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { getPublicPackages } from "@/lib/public-packages";
+import SenaruTransportSection from "@/components/SenaruTransportSection";
 
 import ERinjaniSection from "@/components/ERinjaniSection";
 
@@ -26,6 +27,7 @@ export default async function Home() {
         <About />
         <SembalunPackages packages={sembalun} />
         <SenaruPackages packages={senaru} />
+        <SenaruTransportSection />
         <ToreanPackages packages={torean} />
         <ERinjaniSection />
         <WhyChooseUs />
