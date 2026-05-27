@@ -9,7 +9,7 @@ export default function TripAdvisorWidget() {
           border: 'none', 
           width: '100%', 
           maxWidth: '250px',
-          height: '95px', 
+          height: '105px', 
           overflow: 'hidden' 
         }}
         title="TripAdvisor Reviews"
