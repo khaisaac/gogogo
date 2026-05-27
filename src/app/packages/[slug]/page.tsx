@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { difficultyScoreToLabel } from "@/lib/difficulty";
 import { parsePackageContent } from "@/lib/package-content";
 import {
@@ -15,6 +14,7 @@ import PackagePricingSelector from "./PackagePricingSelector";
 import PackagePricingTable from "./PackagePricingTable";
 import PackageSectionsAccordion from "./PackageSectionsAccordion";
 import BottomBookingScrollButton from "./BottomBookingScrollButton";
+import TripAdvisorWidget from "@/components/TripAdvisorWidget";
 import styles from "./PackageDetailPage.module.css";
 
 export const dynamic = "force-dynamic";
@@ -174,15 +174,8 @@ export default async function PackageDetailPage({
           <div className={styles.container}>
             <p className={styles.locationLabel}>{routeLabel} Route</p>
             <h1 className={styles.title}>{trekkingPackage.title}</h1>
-            <div className={styles.reviewRow} style={{ color: '#2e7d32', fontFamily: "'Georgia', serif", marginTop: '8px', marginBottom: '16px' }}>
-              <div id="TA_selfserveprop726" className="TA_selfserveprop">
-                <ul id="Pe1XyuZT" className="TA_links nSfL8Pjb">
-                  <li id="HaaVH0bX" className="PTsTj2ung7">
-                    <a target="_blank" href="https://www.tripadvisor.com/" rel="noopener noreferrer"><img src="https://www.tripadvisor.com/img/cdsi/img2/branding/150_logo-11900-2.png" alt="TripAdvisor"/></a>
-                  </li>
-                </ul>
-              </div>
-              <Script src="https://www.jscache.com/wejs?wtype=selfserveprop&uniq=726&locationId=10755003&lang=en_US&rating=true&nreviews=5&writereviewlink=true&popIdx=false&iswide=false&border=false&display_version=2" strategy="lazyOnload" />
+            <div className={styles.reviewRow}>
+              <TripAdvisorWidget />
             </div>
 
             <div className={styles.mediaAndBooking}>
