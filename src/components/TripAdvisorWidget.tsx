@@ -2,7 +2,7 @@
 
 export default function TripAdvisorWidget() {
   return (
-    <div className="tripadvisor-widget-container" style={{ marginTop: '8px', marginBottom: '16px' }}>
+    <div className="tripadvisor-widget-container" style={{ marginTop: '8px', marginBottom: '8px' }}>
       <iframe 
         src="/tripadvisor-widget.html" 
         style={{ 
