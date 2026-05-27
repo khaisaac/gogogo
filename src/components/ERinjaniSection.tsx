@@ -21,6 +21,9 @@ export default function ERinjaniSection() {
               src="https://lh3.googleusercontent.com/d/1eEbPQwKIIIq6THCCFQ56XUGPqJljgD1u" 
               alt="e-Rinjani Hiking" 
               className={styles.promoImage}
+              width={600}
+              height={400}
+              loading="lazy"
             />
           </div>
 

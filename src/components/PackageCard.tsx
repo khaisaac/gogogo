@@ -1,4 +1,5 @@
 import styles from "./PackageCard.module.css";
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import {
   difficultyScoreToLabel,
@@ -40,12 +41,13 @@ export default function PackageCard({
     <div className={`${styles.card} ${hideImage ? styles.cardNoImage : ""}`}>
       {!hideImage && (
         <div className={styles.imageWrapper}>
-          <img
-            src={image}
+          <Image
+            src={image.startsWith('/') ? image : `https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/${image.split('/').pop()}`}
             alt={title}
             className={styles.image}
-            loading="lazy"
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: "cover" }}
           />
         </div>
       )}
