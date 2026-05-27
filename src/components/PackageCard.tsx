@@ -41,13 +41,14 @@ export default function PackageCard({
     <div className={`${styles.card} ${hideImage ? styles.cardNoImage : ""}`}>
       {!hideImage && (
         <div className={styles.imageWrapper}>
-          <Image
-            src={image.startsWith('/') ? image : `https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/${image.split('/').pop()}`}
+          <img
+            src={image}
             alt={title}
             className={styles.image}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            style={{ objectFit: "cover" }}
+            loading="lazy"
+            width={400}
+            height={300}
+            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }}
           />
         </div>
       )}

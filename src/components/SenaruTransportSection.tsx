@@ -14,12 +14,13 @@ export default function SenaruTransportSection() {
         </div>
         
         <div className={styles.imageWrapper}>
-          <Image
+          <img
             src="/senaru-transport.jpg"
             alt="Senaru Transport Services"
             className={styles.image}
             width={800}
             height={500}
+            loading="lazy"
             style={{ width: '100%', height: 'auto' }}
           />
         </div>
