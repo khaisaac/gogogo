@@ -1,9 +1,17 @@
+import Image from "next/image";
 import RotatingBadge from "./RotatingBadge";
 import styles from "./Hero.module.css";
 
 export default function Hero() {
   return (
     <section id="hero" className={styles.hero}>
+      <Image
+        src="https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/hero-banner.svg"
+        alt="Mount Rinjani Trekking"
+        fill
+        priority
+        className={styles.bgImage}
+      />
       <div className={styles.overlay} />
       <div className={styles.content}>
         {/* <span className={styles.badge}>✅ Free Cancellation 24 Hours</span> */}

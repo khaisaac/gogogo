@@ -14,6 +14,7 @@ export default function TripAdvisorWidget() {
         }}
         title="TripAdvisor Reviews"
         scrolling="no"
+        loading="lazy"
       />
     </div>
   );
