@@ -14,7 +14,6 @@ import PackagePricingSelector from "./PackagePricingSelector";
 import PackagePricingTable from "./PackagePricingTable";
 import PackageSectionsAccordion from "./PackageSectionsAccordion";
 import BottomBookingScrollButton from "./BottomBookingScrollButton";
-import TripAdvisorWidget from "@/components/TripAdvisorWidget";
 import styles from "./PackageDetailPage.module.css";
 
 export const dynamic = "force-dynamic";
@@ -174,9 +173,6 @@ export default async function PackageDetailPage({
           <div className={styles.container}>
             <p className={styles.locationLabel}>{routeLabel} Route</p>
             <h1 className={styles.title}>{trekkingPackage.title}</h1>
-            <div className={styles.reviewRow}>
-              <TripAdvisorWidget />
-            </div>
 
             <div className={styles.mediaAndBooking}>
               <div>
