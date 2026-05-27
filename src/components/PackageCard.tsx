@@ -41,14 +41,13 @@ export default function PackageCard({
     <div className={`${styles.card} ${hideImage ? styles.cardNoImage : ""}`}>
       {!hideImage && (
         <div className={styles.imageWrapper}>
-          <img
+          <Image
             src={image}
             alt={title}
             className={styles.image}
-            loading="lazy"
-            width={400}
-            height={300}
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: "cover" }}
           />
         </div>
       )}
