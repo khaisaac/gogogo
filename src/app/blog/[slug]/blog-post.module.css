@@ -88,6 +88,15 @@
   margin-bottom: 1.5rem;
 }
 
+.postBody a {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+.postBody a:hover {
+  color: #004c99;
+}
+
 .sidebar {
   width: 100%;
 }

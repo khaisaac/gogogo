@@ -488,6 +488,11 @@ export default function TicketBookingClient({
             <p className={styles.detailDesc}>
               {pageSettings.description}
             </p>
+            <div style={{ marginTop: '8px', marginBottom: '16px' }}>
+              <a href="https://trekkingmountrinjani.com/blog/premium-vs-regular-insurance-on-e-rinjani-ticket-booking-which-one-should-you-choose" target="_blank" rel="noopener noreferrer" style={{ color: '#0066cc', textDecoration: 'underline', fontSize: '0.95rem', fontWeight: 500 }}>
+                Learn the difference between Premium and Regular Insurance here
+              </a>
+            </div>
             {aboutLines.length > 0 && (
               <div className={styles.activityInfo}>
                 <h3 className={styles.infoSectionTitle}>About This Ticket</h3>
