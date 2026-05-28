@@ -6,10 +6,10 @@ import RotatingBadge from "./RotatingBadge";
 import styles from "./About.module.css";
 
 const aboutImages = [
-  "/sembalun.jpg",
+  "/1.jpeg",
   "/n.jpg",
   "/senaru.jpg",
-  "/hero-banner.png"
+  "/sembalun.jpg"
 ];
 
 export default function About() {
