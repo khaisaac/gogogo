@@ -152,7 +152,7 @@ export default function BookingsTable({ bookings }: BookingsTableProps) {
                       {booking.package_title || "Custom"}
                     </div>
                   </td>
-                  <td>{booking.trekking_date}</td>
+                  <td>{new Date(booking.trekking_date).toLocaleDateString()}</td>
                   <td>
                     <span
                       className={styles.badge}
@@ -335,10 +335,10 @@ function BookingDetail({
               <strong>Package:</strong> {booking.package_title}
             </p>
             <p>
-              <strong>Date:</strong> {booking.trekking_date}
+              <strong>Date:</strong> {new Date(booking.trekking_date).toLocaleDateString()}
             </p>
             <p>
-              <strong>Arrival Day:</strong> {booking.arrival_day || "N/A"}
+              <strong>Arrival Day:</strong> {booking.arrival_day ? new Date(booking.arrival_day).toLocaleDateString() : "N/A"}
             </p>
             <p>
               <strong>Pickup Location:</strong> {booking.hotel_pickup_location}

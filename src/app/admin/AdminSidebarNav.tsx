@@ -23,7 +23,6 @@ export default function AdminSidebarNav() {
     { href: "/admin/transport", label: "🚗 Transport Bookings" },
     { href: "/admin/availability", label: "📅 Availability" },
     { href: "/admin/blog", label: "Posts" },
-    { href: "/admin/blog/categories", label: "Categories" },
     { href: "/admin/blog/new", label: "Add New Post" },
     { href: "/admin/packages", label: "All Packages" },
     { href: "/admin/packages/new", label: "Add New Package" },
