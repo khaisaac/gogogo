@@ -32,6 +32,7 @@ export default function Footer() {
           <ul className={styles.list}>
             <li><a href="#sembalun">Sembalun Trekking Route</a></li>
             <li><a href="#senaru">Senaru Trekking Route</a></li>
+            <li><a href="#torean">Torean Trekking Route</a></li>
             <li><Link href="/booking-transport">Senaru Transport</Link></li>
           </ul>
         </div>
