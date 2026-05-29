@@ -41,7 +41,7 @@ export default function MultiImageUploadField({
       <input type="hidden" name={`${name}_uploaded_urls`} value={uploadedUrls.join("\n")} />
       <p className={styles.helperText}>Current images will stay and new uploads will be added. Max total: {maxFiles} photos. Each file max 10MB.</p>
       <input
-        ref={inputRef} id={id} name={`${name}_local`} type="file" accept="image/*" multiple
+        ref={inputRef} id={id} name={name} type="file" accept="image/*" multiple
         className={styles.input} disabled={isUploading}
         onChange={async (event) => {
           const files = Array.from(event.target.files || []);

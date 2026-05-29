@@ -40,7 +40,7 @@ export default function ImageUploadField({
       <input
         ref={inputRef}
         id={id}
-        name={`${name}_local`}
+        name={name}
         type="file"
         accept="image/*"
         className={styles.input}
