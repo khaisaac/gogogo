@@ -3,6 +3,7 @@ import { getUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Resend } from "resend";
 import { getPerPaxPrice, getTotalPackagePrice, type PriceType, type TotalDayOption } from "@/lib/pricing";
+import { parsePackageContent } from "@/lib/package-content";
 
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -35,6 +36,8 @@ export async function POST(request: Request) {
 
     let package_title = null;
     let total_price = null;
+    let includeHtml = "";
+    let excludeHtml = "";
 
     if (package_id) {
       const pkg = await prisma.package.findUnique({ where: { id: package_id } });
@@ -52,6 +55,34 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Selected pax count is unavailable for this service type" }, { status: 422 });
           }
           total_price = perPaxPrice * trekkersCount;
+        }
+
+        if (pkg.description) {
+          const content = parsePackageContent(pkg.description);
+          
+          const includeItems = content.include.split("\n").map((i) => i.trim()).filter(Boolean);
+          if (includeItems.length > 0) {
+            includeHtml = `
+              <div style="margin-top: 16px;">
+                <h3 style="color: #1a5c2e; font-size: 16px; margin-bottom: 8px;">✅ Include</h3>
+                <ul style="margin: 0; padding-left: 20px; color: #444; font-size: 14px;">
+                  ${includeItems.map((item) => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
+                </ul>
+              </div>
+            `;
+          }
+          
+          const excludeItems = content.exclude.split("\n").map((i) => i.trim()).filter(Boolean);
+          if (excludeItems.length > 0) {
+            excludeHtml = `
+              <div style="margin-top: 16px;">
+                <h3 style="color: #721c24; font-size: 16px; margin-bottom: 8px;">❌ Exclude</h3>
+                <ul style="margin: 0; padding-left: 20px; color: #444; font-size: 14px;">
+                  ${excludeItems.map((item) => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
+                </ul>
+              </div>
+            `;
+          }
         }
       }
     }
@@ -102,7 +133,7 @@ export async function POST(request: Request) {
           from: "Trekking Mount Rinjani <noreply@trekkingmountrinjani.com>",
           to: email,
           subject: `Booking Confirmation — ${package_title || "Rinjani Trek"}`,
-          html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #1a5c2e;">🏔️ Booking Received!</h2><p>Hi <strong>${full_name}</strong>,</p><p>Thank you for booking with Trekking Mount Rinjani.</p><table style="width: 100%; border-collapse: collapse; margin: 16px 0;"><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Package</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${package_title || "Custom"}</strong></td></tr><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Date</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${trekking_date}</strong></td></tr><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Adults</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${trekkersCount}</strong></td></tr>${total_price ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Total</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>$${total_price} USD</strong></td></tr>` : ""}</table><p style="color: #666;">Booking ID: <code>${booking.id}</code></p></div>`,
+          html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #1a5c2e;">🏔️ Booking Received!</h2><p>Hi <strong>${full_name}</strong>,</p><p>Thank you for booking with Trekking Mount Rinjani.</p><table style="width: 100%; border-collapse: collapse; margin: 16px 0;"><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Package</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${package_title || "Custom"}</strong></td></tr><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Date</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${trekking_date}</strong></td></tr><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Adults</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${trekkersCount}</strong></td></tr>${total_price ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Total</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>$${total_price} USD</strong></td></tr>` : ""}</table>${includeHtml}${excludeHtml}<div style="margin-top: 24px;"><p style="color: #666;">Booking ID: <code>${booking.id}</code></p></div></div>`,
         });
       } catch (emailErr) { console.error("Email send error:", emailErr); }
 
