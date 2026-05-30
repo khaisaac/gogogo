@@ -130,7 +130,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const origin = new URL(req.url).origin;
+    const forwardedHost = req.headers.get("x-forwarded-host") || req.headers.get("host");
+    const protocol = req.headers.get("x-forwarded-proto") || "https";
+    let origin = process.env.NEXT_PUBLIC_BASE_URL || (forwardedHost ? `${protocol}://${forwardedHost}` : new URL(req.url).origin);
+    origin = origin.replace("0.0.0.0", "localhost");
     const callbackUrl = `${origin}/api/doku/webhook`;
     const redirectUrl = `${origin}/booking-ticket/success?booking_id=${booking.id}`;
 

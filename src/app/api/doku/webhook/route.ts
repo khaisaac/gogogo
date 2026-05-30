@@ -53,10 +53,19 @@ export async function POST(req: Request) {
 
     // Also update TicketBooking if this invoice belongs to one
     if (newStatus === "success") {
-      await prisma.ticketBooking.updateMany({
-        where: { doku_invoice: invoiceNumber },
-        data: { payment_status: "paid" },
+      const ticketsToUpdate = await prisma.ticketBooking.findMany({
+        where: { doku_invoice: invoiceNumber, payment_status: { not: "paid" } }
       });
+      if (ticketsToUpdate.length > 0) {
+        await prisma.ticketBooking.updateMany({
+          where: { doku_invoice: invoiceNumber },
+          data: { payment_status: "paid" },
+        });
+        const { sendTicketConfirmationEmail } = await import("@/lib/emails");
+        for (const ticket of ticketsToUpdate) {
+          await sendTicketConfirmationEmail({ ...ticket, payment_status: "paid" });
+        }
+      }
     } else if (newStatus === "failed") {
       await prisma.ticketBooking.updateMany({
         where: { doku_invoice: invoiceNumber },

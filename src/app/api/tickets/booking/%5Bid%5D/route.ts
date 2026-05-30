@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/app/admin/_lib";
+import { sendTicketConfirmationEmail } from "@/lib/emails";
 
 export async function DELETE(
   req: NextRequest,
@@ -30,10 +31,18 @@ export async function PATCH(
     const { id } = await params;
     const body = await req.json();
 
+    const existingBooking = await prisma.ticketBooking.findUnique({
+      where: { id },
+    });
+
     const updated = await prisma.ticketBooking.update({
       where: { id },
       data: body,
     });
+
+    if (existingBooking && existingBooking.payment_status !== "paid" && body.payment_status === "paid") {
+      await sendTicketConfirmationEmail(updated);
+    }
 
     return NextResponse.json(updated);
   } catch (error: any) {
