@@ -30,6 +30,10 @@ export async function PATCH(
     await requireAdmin();
     const { id } = await params;
     const body = await req.json();
+    
+    // Prisma 6 strictly requires Date objects for DateTime fields
+    if (body.check_in) body.check_in = new Date(body.check_in);
+    if (body.check_out) body.check_out = new Date(body.check_out);
 
     const existingBooking = await prisma.ticketBooking.findUnique({
       where: { id },
