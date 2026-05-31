@@ -422,3 +422,13 @@ model TransportBooking {
   @@index([payment_status])
   @@map("transport_bookings")
 }
+
+// 13. Stored Images (Database Storage Workaround)
+model StoredImage {
+  id        String   @id @default(uuid())
+  data      Bytes    @db.LongBlob
+  mimeType  String
+  createdAt DateTime @default(now())
+
+  @@map("stored_images")
+}

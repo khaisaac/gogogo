@@ -1,8 +1,5 @@
-import path from "path";
-import fs from "fs/promises";
-import crypto from "crypto";
+import { prisma } from "@/lib/db";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 const ALLOWED_MIME_TYPES = [
   "image/png",
@@ -11,20 +8,6 @@ const ALLOWED_MIME_TYPES = [
   "image/gif",
 ];
 
-function sanitizeFileName(name: string) {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]/g, "-")
-    .replace(/-+/g, "-");
-}
-
-async function ensureDirectoryExists(dirPath: string) {
-  try {
-    await fs.access(dirPath);
-  } catch {
-    await fs.mkdir(dirPath, { recursive: true });
-  }
-}
 
 /**
  * Upload a single image to local filesystem.
@@ -50,21 +33,17 @@ export async function uploadImage(
     );
   }
 
-  const folderPath = path.join(UPLOAD_DIR, folder);
-  await ensureDirectoryExists(folderPath);
-
-  const safeName = sanitizeFileName(file.name || "image");
-  const uniqueId = crypto.randomUUID();
-  const fileName = `${Date.now()}-${uniqueId}-${safeName}`;
-  const filePath = path.join(folderPath, fileName);
-
-  // Convert File to Buffer and write
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  await fs.writeFile(filePath, buffer);
 
-  // Return public URL path
-  return `/uploads/${folder}/${fileName}`;
+  const storedImage = await prisma.storedImage.create({
+    data: {
+      data: buffer,
+      mimeType: file.type,
+    },
+  });
+
+  return `/api/images/${storedImage.id}`;
 }
 
 /**
@@ -92,15 +71,19 @@ export async function uploadImages(
  */
 export async function deleteUploadedFile(publicUrl: string): Promise<boolean> {
   try {
-    // Only delete files in /uploads/ directory
-    if (!publicUrl.startsWith("/uploads/")) {
+    if (!publicUrl.startsWith("/api/images/")) {
       return false;
     }
 
-    const filePath = path.join(process.cwd(), "public", publicUrl);
-    await fs.unlink(filePath);
+    const id = publicUrl.replace("/api/images/", "").split("?")[0];
+    
+    await prisma.storedImage.delete({
+      where: { id },
+    });
+    
     return true;
-  } catch {
+  } catch (error) {
+    console.error("Failed to delete stored image:", error);
     return false;
   }
 }
