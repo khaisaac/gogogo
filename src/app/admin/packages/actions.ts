@@ -218,6 +218,7 @@ export async function createPackage(formData: FormData) {
     const { itinerary: _itinerary, ...databasePayload } = payload;
     await prisma.package.create({ data: databasePayload as any });
 
+    revalidatePath("/");
     revalidatePath("/admin/packages");
     redirect("/admin/packages");
   } catch (error) {
@@ -278,6 +279,7 @@ export async function updatePackage(id: string, formData: FormData) {
       data: databasePayload as any,
     });
 
+    revalidatePath("/");
     revalidatePath("/admin/packages");
     redirect("/admin/packages");
   } catch (error) {
@@ -294,5 +296,6 @@ export async function updatePackage(id: string, formData: FormData) {
 export async function deletePackage(id: string) {
   await requireAdmin();
   await prisma.package.delete({ where: { id } });
+  revalidatePath("/");
   revalidatePath("/admin/packages");
 }
