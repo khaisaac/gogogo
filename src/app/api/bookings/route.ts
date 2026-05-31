@@ -14,7 +14,7 @@ function getResendClient() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { package_id, full_name, email, whatsapp, trekking_date, number_of_trekkers, price_type, price_mode, total_days, hotel_pickup_location, special_requirements, order_note, payment_type, passport_number, nationality, gender, birthday, height, weight, arrival_day } = body;
+    const { package_id, full_name, email, whatsapp, trekking_date, number_of_trekkers, price_type, price_mode, total_days, hotel_pickup_location, special_requirements, order_note, payment_type, passport_number, nationality, gender, birthday, height, weight, arrival_day, promo_code_applied } = body;
 
     const trekkersCount = Number(number_of_trekkers);
     const selectedPriceType: PriceType = price_type === "private" ? "private" : "standard";
@@ -55,6 +55,18 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Selected pax count is unavailable for this service type" }, { status: 422 });
           }
           total_price = perPaxPrice * trekkersCount;
+        }
+
+        if (pkg.is_direct_promo || (promo_code_applied && pkg.promo_code && promo_code_applied.toUpperCase() === pkg.promo_code.toUpperCase())) {
+          let discount = 0;
+          if (pkg.discount_percentage) {
+            discount = Math.round(total_price * (pkg.discount_percentage / 100));
+          } else if (pkg.discount_amount) {
+            discount = pkg.discount_amount;
+          }
+          if (discount > 0) {
+            total_price = Math.max(0, total_price - discount);
+          }
         }
 
         if (pkg.description) {
@@ -116,6 +128,8 @@ export async function POST(request: Request) {
         payment_type: payment_type || "full",
         deposit_amount, balance_amount,
         payment_status: "pending", status: "pending",
+        promo_code_applied: promo_code_applied || null,
+        discount_amount_applied: body.discount_amount_applied || null,
         passport_number: passport_number || null,
         nationality: nationality || null,
         gender: gender || null,

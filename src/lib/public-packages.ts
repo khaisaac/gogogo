@@ -12,6 +12,11 @@ export type PublicPackage = {
   description: string | null;
   is_active: boolean;
   displayPrice: number;
+  originalDisplayPrice?: number;
+  is_direct_promo?: boolean;
+  promo_code?: string | null;
+  discount_percentage?: number | null;
+  discount_amount?: number | null;
 } & PackagePricingFields;
 
 export function slugifyPackageTitle(input: string) {
@@ -36,10 +41,22 @@ function mapPackage(pkg: any): PublicPackage {
     slug = `${slug}-trekking-package`;
   }
 
+  let originalDisplayPrice = getDisplayPrice(pkg);
+  let displayPrice = originalDisplayPrice;
+
+  if (pkg.is_direct_promo) {
+    if (pkg.discount_percentage) {
+      displayPrice = Math.round(originalDisplayPrice * (1 - pkg.discount_percentage / 100));
+    } else if (pkg.discount_amount) {
+      displayPrice = Math.max(0, originalDisplayPrice - pkg.discount_amount);
+    }
+  }
+
   return {
     ...pkg,
     slug,
-    displayPrice: getDisplayPrice(pkg),
+    displayPrice,
+    originalDisplayPrice: pkg.is_direct_promo ? originalDisplayPrice : undefined,
   };
 }
 
@@ -55,6 +72,10 @@ export async function getPublicPackages() {
       difficulty: true,
       image: true,
       is_active: true,
+      is_direct_promo: true,
+      promo_code: true,
+      discount_percentage: true,
+      discount_amount: true,
       price_1pax: true,
       price_2_3pax: true,
       price_4_5pax: true,

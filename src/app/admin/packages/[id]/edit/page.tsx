@@ -167,6 +167,54 @@ export default async function AdminEditPackagePage({
           </div>
 
           <div className={`${styles.field} ${styles.full}`}>
+            <label>Promo / Discount Settings</label>
+            <div className={styles.pricingMatrix} style={{ gap: '1rem', display: 'flex', flexDirection: 'column' }}>
+              <label className={styles.inlineCheck}>
+                <input type="checkbox" name="is_direct_promo" defaultChecked={Boolean(pkg.is_direct_promo)} />
+                Direct Promo (Shows crossed-out price automatically, no code needed)
+              </label>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <div className={styles.field} style={{ flex: 1 }}>
+                  <label htmlFor="promo_code">Voucher Code</label>
+                  <input
+                    id="promo_code"
+                    name="promo_code"
+                    type="text"
+                    defaultValue={pkg.promo_code || ""}
+                    placeholder="e.g. SUMMER2026 (Leave empty for direct promo)"
+                  />
+                </div>
+                <div className={styles.field} style={{ flex: 1 }}>
+                  <label htmlFor="discount_percentage">Discount Percentage (%)</label>
+                  <input
+                    id="discount_percentage"
+                    name="discount_percentage"
+                    type="number"
+                    min="0"
+                    max="100"
+                    defaultValue={pkg.discount_percentage || ""}
+                    placeholder="e.g. 10"
+                  />
+                </div>
+                <div className={styles.field} style={{ flex: 1 }}>
+                  <label htmlFor="discount_amount">Discount Amount (USD)</label>
+                  <input
+                    id="discount_amount"
+                    name="discount_amount"
+                    type="number"
+                    min="0"
+                    defaultValue={pkg.discount_amount || ""}
+                    placeholder="e.g. 50"
+                  />
+                </div>
+              </div>
+              <p className={styles.helper}>
+                You can use either Percentage OR Amount. If both are set, Percentage will be applied first.
+              </p>
+            </div>
+          </div>
+
+          <div className={`${styles.field} ${styles.full}`}>
             <label htmlFor="image_file">Package Image</label>
             <ImageUploadField
               id="image_file"

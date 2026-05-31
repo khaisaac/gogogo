@@ -62,7 +62,22 @@ export default async function CheckoutPage({
     <><Navbar /><main className={styles.page}><div className="container">
       <h1 className={styles.title}>Secure Checkout</h1>
       <p className={styles.subtitle}>Please complete your booking details below.</p>
-      <CheckoutClient packageId={pkgData.id} packageTitle={pkgData.title} date={date || ""} pax={pax} priceType={price_type} priceMode={price_mode} totalDays={total_days} totalPrice={summaryPrice} userEmail={user.email} userRole={user.role} />
+      <CheckoutClient 
+        packageId={pkgData.id} 
+        packageTitle={pkgData.title} 
+        date={date || ""} 
+        pax={pax} 
+        priceType={price_type} 
+        priceMode={price_mode} 
+        totalDays={total_days} 
+        totalPrice={summaryPrice} 
+        userEmail={user.email} 
+        userRole={user.role} 
+        isDirectPromo={pkgData.is_direct_promo}
+        packagePromoCode={pkgData.promo_code}
+        discountPercentage={pkgData.discount_percentage}
+        discountAmount={pkgData.discount_amount}
+      />
     </div></main><Footer /></>
   );
 }

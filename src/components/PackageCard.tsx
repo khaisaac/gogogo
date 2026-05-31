@@ -10,6 +10,7 @@ interface PackageCardProps {
   title: string;
   duration: string;
   price: number;
+  originalPrice?: number | null;
   image: string;
   badge?: string;
   rating?: number;
@@ -22,6 +23,7 @@ export default function PackageCard({
   title,
   duration,
   price,
+  originalPrice,
   image,
   difficulty = 1,
   location = "Indonesia",
@@ -58,6 +60,11 @@ export default function PackageCard({
         <h3 className={styles.title}>{title}</h3>
         <div className={styles.priceRow}>
           <span className={styles.fromText}>from</span>
+          {originalPrice && originalPrice > price && (
+            <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.85em', marginRight: '6px' }}>
+              ${originalPrice}
+            </span>
+          )}
           <span className={styles.priceValue}>${price}</span>
         </div>
         <div className={styles.footer}>

@@ -281,6 +281,7 @@ export default async function PackageDetailPage({
                           title={pkg.title}
                           duration={pkg.duration}
                           price={pkg.displayPrice}
+                          originalPrice={pkg.originalDisplayPrice}
                           image={pkg.image || "/hero-banner.png"}
                           difficulty={pkg.difficulty}
                           location={routeLabel}
@@ -303,6 +304,11 @@ export default async function PackageDetailPage({
             <div className={styles.bottomBookingPriceWrap}>
               <p className={styles.bottomBookingLabel}>Start from</p>
               <p className={styles.bottomBookingPrice}>
+                {trekkingPackage.originalDisplayPrice && trekkingPackage.originalDisplayPrice > trekkingPackage.displayPrice && (
+                  <span style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.6em', marginRight: '6px' }}>
+                    ${trekkingPackage.originalDisplayPrice}
+                  </span>
+                )}
                 ${trekkingPackage.displayPrice}
                 <span>/ person</span>
               </p>

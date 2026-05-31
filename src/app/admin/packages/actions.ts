@@ -35,6 +35,10 @@ type PackagePayload = {
   description: string | null;
   itinerary: ReturnType<typeof parseItineraryInput>;
   is_active: boolean;
+  is_direct_promo: boolean;
+  promo_code: string | null;
+  discount_percentage: number | null;
+  discount_amount: number | null;
 } & Record<PriceFieldName, number | null>;
 
 function parseOptionalNumber(value: FormDataEntryValue | null) {
@@ -130,6 +134,11 @@ function getPayload(formData: FormData): PackagePayload {
     route = "torean";
   }
 
+  const is_direct_promo = formData.get("is_direct_promo") === "on";
+  const promo_code = String(formData.get("promo_code") || "").trim() || null;
+  const discount_percentage = parseOptionalNumber(formData.get("discount_percentage"));
+  const discount_amount = parseOptionalNumber(formData.get("discount_amount"));
+
   return {
     title,
     route,
@@ -149,6 +158,10 @@ function getPayload(formData: FormData): PackagePayload {
     }),
     itinerary: itineraryValue,
     is_active: formData.get("is_active") === "on",
+    is_direct_promo,
+    promo_code,
+    discount_percentage,
+    discount_amount,
   };
 }
 

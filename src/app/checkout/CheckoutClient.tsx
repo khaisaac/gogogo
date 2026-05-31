@@ -15,6 +15,10 @@ type CheckoutClientProps = {
   totalPrice: number;
   userEmail: string;
   userRole: string;
+  isDirectPromo: boolean;
+  packagePromoCode: string | null;
+  discountPercentage: number | null;
+  discountAmount: number | null;
 };
 
 export default function CheckoutClient({
@@ -28,10 +32,16 @@ export default function CheckoutClient({
   totalPrice,
   userEmail,
   userRole,
+  isDirectPromo,
+  packagePromoCode,
+  discountPercentage,
+  discountAmount,
 }: CheckoutClientProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [email, setEmail] = useState(userEmail);
+  const [inputPromoCode, setInputPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState(isDirectPromo);
   const isAdmin = userRole === "admin";
 
   const [formData, setFormData] = useState({
@@ -63,6 +73,28 @@ Special/Dietary Requirements: `,
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleApplyPromo = () => {
+    if (!packagePromoCode) return;
+    if (inputPromoCode.trim().toUpperCase() === packagePromoCode.toUpperCase()) {
+      setPromoApplied(true);
+      setError("");
+    } else {
+      setError("Invalid voucher code.");
+      setPromoApplied(false);
+    }
+  };
+
+  let finalPrice = totalPrice;
+  let appliedDiscountAmount = 0;
+  if (promoApplied) {
+    if (discountPercentage) {
+      appliedDiscountAmount = Math.round(totalPrice * (discountPercentage / 100));
+    } else if (discountAmount) {
+      appliedDiscountAmount = discountAmount;
+    }
+    finalPrice = Math.max(0, totalPrice - appliedDiscountAmount);
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -85,6 +117,8 @@ Special/Dietary Requirements: `,
         order_note: formData.orderNote,
         payment_type: formData.paymentType,
         arrival_day: formData.arrivalDay,
+        promo_code_applied: promoApplied ? (isDirectPromo ? "DIRECT_PROMO" : packagePromoCode) : null,
+        discount_amount_applied: appliedDiscountAmount,
       };
 
       const bookingRes = await fetch("/api/bookings", {
@@ -132,9 +166,9 @@ Special/Dietary Requirements: `,
     }
   };
 
-  let amountToPay = totalPrice;
+  let amountToPay = finalPrice;
   if (formData.paymentType === "deposit") {
-    amountToPay = Math.round(totalPrice * 0.3);
+    amountToPay = Math.round(finalPrice * 0.3);
   } else if (formData.paymentType === "pay_later") {
     amountToPay = 0;
   }
@@ -251,7 +285,7 @@ Special/Dietary Requirements: `,
               />
               <div className={styles.radioContent}>
                 <strong>Pay in Full (100%)</strong>
-                <span>Pay the total amount (${totalPrice} USD) now.</span>
+                <span>Pay the total amount (${finalPrice} USD) now.</span>
               </div>
             </label>
 
@@ -268,7 +302,7 @@ Special/Dietary Requirements: `,
                 <strong>Pay Deposit Only (30%)</strong>
                 <span>
                   Secure your booking now, pay the rest later. ($
-                  {Math.round(totalPrice * 0.3)} USD)
+                  {Math.round(finalPrice * 0.3)} USD)
                 </span>
               </div>
             </label>
@@ -286,7 +320,7 @@ Special/Dietary Requirements: `,
                 <strong>Pay Later</strong>
                 <span>
                   Secure your booking now and pay the full amount ($
-                  {totalPrice} USD) later.
+                  {finalPrice} USD) later.
                 </span>
               </div>
             </label>
@@ -360,10 +394,48 @@ Special/Dietary Requirements: `,
             <span>Participants</span>
             <strong>{pax} Adults</strong>
           </div>
+
+          {!isDirectPromo && packagePromoCode && (
+            <div className={styles.summaryItem} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px', marginTop: '16px', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px' }}>
+              <span style={{ fontWeight: 600, fontSize: '0.9em' }}>Have a voucher code?</span>
+              <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
+                <input 
+                  type="text" 
+                  value={inputPromoCode} 
+                  onChange={(e) => setInputPromoCode(e.target.value)} 
+                  disabled={promoApplied || loading}
+                  placeholder="Enter code"
+                  style={{ flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                />
+                <button 
+                  type="button" 
+                  onClick={promoApplied ? () => { setPromoApplied(false); setInputPromoCode(''); } : handleApplyPromo}
+                  disabled={loading || (!inputPromoCode && !promoApplied)}
+                  style={{ padding: '8px 16px', background: promoApplied ? '#dc3545' : '#000', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  {promoApplied ? 'Remove' : 'Apply'}
+                </button>
+              </div>
+            </div>
+          )}
+
           <hr className={styles.divider} />
+          
+          {promoApplied && appliedDiscountAmount > 0 && (
+            <div className={styles.summaryItem} style={{ color: '#28a745' }}>
+              <span>Discount {discountPercentage ? `(${discountPercentage}%)` : ''}</span>
+              <strong>-${appliedDiscountAmount} USD</strong>
+            </div>
+          )}
+          
           <div className={styles.summaryTotal}>
             <span>Total Due</span>
             <div style={{ textAlign: "right" }}>
+              {promoApplied && appliedDiscountAmount > 0 && (
+                <div style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.7em', marginBottom: '4px' }}>
+                  ${totalPrice} USD
+                </div>
+              )}
               <span>${amountToPay} USD</span>
               {formData.paymentType === "deposit" && (
                 <div
@@ -374,7 +446,7 @@ Special/Dietary Requirements: `,
                     fontWeight: "normal",
                   }}
                 >
-                  (30% Deposit of ${totalPrice})
+                  (30% Deposit of ${finalPrice})
                 </div>
               )}
             </div>

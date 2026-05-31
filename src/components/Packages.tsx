@@ -116,6 +116,7 @@ export function SembalunPackages({ packages }: PackageSliderProps) {
                     title={pkg.title}
                     duration={pkg.duration}
                     price={pkg.displayPrice}
+                    originalPrice={pkg.originalDisplayPrice}
                     image={pkg.image || "/hero-banner.png"}
                     difficulty={pkg.difficulty}
                     location="Sembalun"
@@ -272,6 +273,7 @@ export function SenaruPackages({ packages }: PackageSliderProps) {
                     title={pkg.title}
                     duration={pkg.duration}
                     price={pkg.displayPrice}
+                    originalPrice={pkg.originalDisplayPrice}
                     image={pkg.image || "/senaru.jpg"}
                     difficulty={pkg.difficulty}
                     location="Senaru"
@@ -429,6 +431,7 @@ export function ToreanPackages({ packages }: PackageSliderProps) {
                     title={pkg.title}
                     duration={pkg.duration}
                     price={pkg.displayPrice}
+                    originalPrice={pkg.originalDisplayPrice}
                     image={pkg.image || "/n.jpg"}
                     difficulty={pkg.difficulty}
                     location="Torean"

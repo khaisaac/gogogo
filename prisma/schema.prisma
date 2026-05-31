@@ -90,6 +90,12 @@ model Package {
   difficulty  Int      @default(3)
   image       String?  @db.Text
   description String?  @db.LongText
+  // Promo / Discount fields
+  is_direct_promo      Boolean @default(false)
+  promo_code           String?
+  discount_percentage  Int?
+  discount_amount      Int?
+
   is_active   Boolean  @default(true)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
@@ -138,6 +144,10 @@ model Booking {
   status                String    @default("pending") // 'pending' | 'confirmed' | 'cancelled' | 'completed'
   total_price           Int?
   package_title         String?   // Denormalized for quick access
+
+  // Promo / Discount fields applied
+  promo_code_applied    String?
+  discount_amount_applied Int?
 
   // Split payment fields
   payment_type          String    @default("full") // 'full' | 'deposit'
