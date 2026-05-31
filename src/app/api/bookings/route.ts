@@ -58,14 +58,18 @@ export async function POST(request: Request) {
         }
 
         if (pkg.is_direct_promo || (promo_code_applied && pkg.promo_code && promo_code_applied.toUpperCase() === pkg.promo_code.toUpperCase())) {
-          let discount = 0;
-          if (pkg.discount_percentage) {
-            discount = Math.round(total_price * (pkg.discount_percentage / 100));
-          } else if (pkg.discount_amount) {
-            discount = pkg.discount_amount;
-          }
-          if (discount > 0) {
-            total_price = Math.max(0, total_price - discount);
+          const isPromoExhausted = pkg.promo_usage_limit !== null && pkg.promo_usage_count >= pkg.promo_usage_limit;
+          
+          if (!isPromoExhausted) {
+            let discount = 0;
+            if (pkg.discount_percentage) {
+              discount = Math.round(total_price * (pkg.discount_percentage / 100));
+            } else if (pkg.discount_amount) {
+              discount = pkg.discount_amount;
+            }
+            if (discount > 0) {
+              total_price = Math.max(0, total_price - discount);
+            }
           }
         }
 
@@ -114,30 +118,51 @@ export async function POST(request: Request) {
       }
     }
 
-    const booking = await prisma.booking.create({
-      data: {
-        user_id: validUserId,
-        package_id: package_id || null,
-        full_name, email, whatsapp,
-        trekking_date: new Date(trekking_date),
-        number_of_trekkers: trekkersCount,
-        hotel_pickup_location,
-        special_requirements: special_requirements || null,
-        order_note: order_note || null,
-        package_title, total_price,
-        payment_type: payment_type || "full",
-        deposit_amount, balance_amount,
-        payment_status: "pending", status: "pending",
-        promo_code_applied: promo_code_applied || null,
-        discount_amount_applied: body.discount_amount_applied || null,
-        passport_number: passport_number || null,
-        nationality: nationality || null,
-        gender: gender || null,
-        birthday: birthday ? new Date(birthday) : null,
-        height: height ? Number(height) : null,
-        weight: weight ? Number(weight) : null,
-        arrival_day: arrival_day ? new Date(arrival_day) : null,
-      },
+    const booking = await prisma.$transaction(async (tx) => {
+      let isPromoSuccessfullyApplied = false;
+
+      // Double check quota inside transaction
+      if (package_id && (body.promo_code_applied || body.discount_amount_applied)) {
+        const pkgForUpdate = await tx.package.findUnique({ where: { id: package_id } });
+        if (pkgForUpdate) {
+          const isPromoExhausted = pkgForUpdate.promo_usage_limit !== null && pkgForUpdate.promo_usage_count >= pkgForUpdate.promo_usage_limit;
+          const isMatchingCode = body.promo_code_applied === "DIRECT_PROMO" || (body.promo_code_applied && pkgForUpdate.promo_code && body.promo_code_applied.toUpperCase() === pkgForUpdate.promo_code.toUpperCase());
+          
+          if (!isPromoExhausted && isMatchingCode) {
+            isPromoSuccessfullyApplied = true;
+            await tx.package.update({
+              where: { id: package_id },
+              data: { promo_usage_count: { increment: 1 } },
+            });
+          }
+        }
+      }
+
+      return await tx.booking.create({
+        data: {
+          user_id: validUserId,
+          package_id: package_id || null,
+          full_name, email, whatsapp,
+          trekking_date: new Date(trekking_date),
+          number_of_trekkers: trekkersCount,
+          hotel_pickup_location,
+          special_requirements: special_requirements || null,
+          order_note: order_note || null,
+          package_title, total_price,
+          payment_type: payment_type || "full",
+          deposit_amount, balance_amount,
+          payment_status: "pending", status: "pending",
+          promo_code_applied: isPromoSuccessfullyApplied ? (promo_code_applied || null) : null,
+          discount_amount_applied: isPromoSuccessfullyApplied ? (body.discount_amount_applied || null) : null,
+          passport_number: passport_number || null,
+          nationality: nationality || null,
+          gender: gender || null,
+          birthday: birthday ? new Date(birthday) : null,
+          height: height ? Number(height) : null,
+          weight: weight ? Number(weight) : null,
+          arrival_day: arrival_day ? new Date(arrival_day) : null,
+        },
+      });
     });
 
     const resend = getResendClient();

@@ -207,9 +207,25 @@ export default async function AdminEditPackagePage({
                     placeholder="e.g. 50"
                   />
                 </div>
+                <div className={styles.field} style={{ flex: 1 }}>
+                  <label htmlFor="promo_usage_limit">Voucher Quota</label>
+                  <input
+                    id="promo_usage_limit"
+                    name="promo_usage_limit"
+                    type="number"
+                    min="1"
+                    defaultValue={pkg.promo_usage_limit || ""}
+                    placeholder="e.g. 5 (Leave empty for unlimited)"
+                  />
+                  {pkg.promo_usage_limit && (
+                    <span style={{ fontSize: '0.8em', color: '#666', marginTop: '4px', display: 'block' }}>
+                      Used: {pkg.promo_usage_count} of {pkg.promo_usage_limit}
+                    </span>
+                  )}
+                </div>
               </div>
               <p className={styles.helper}>
-                You can use either Percentage OR Amount. If both are set, Percentage will be applied first.
+                You can use either Percentage OR Amount. If both are set, Percentage will be applied first. Quota limits how many times a voucher can be used.
               </p>
             </div>
           </div>

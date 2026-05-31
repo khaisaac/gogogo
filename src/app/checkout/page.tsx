@@ -77,6 +77,8 @@ export default async function CheckoutPage({
         packagePromoCode={pkgData.promo_code}
         discountPercentage={pkgData.discount_percentage}
         discountAmount={pkgData.discount_amount}
+        promoUsageLimit={pkgData.promo_usage_limit}
+        promoUsageCount={pkgData.promo_usage_count}
       />
     </div></main><Footer /></>
   );

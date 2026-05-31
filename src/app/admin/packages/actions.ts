@@ -39,6 +39,7 @@ type PackagePayload = {
   promo_code: string | null;
   discount_percentage: number | null;
   discount_amount: number | null;
+  promo_usage_limit: number | null;
 } & Record<PriceFieldName, number | null>;
 
 function parseOptionalNumber(value: FormDataEntryValue | null) {
@@ -138,6 +139,7 @@ function getPayload(formData: FormData): PackagePayload {
   const promo_code = String(formData.get("promo_code") || "").trim() || null;
   const discount_percentage = parseOptionalNumber(formData.get("discount_percentage"));
   const discount_amount = parseOptionalNumber(formData.get("discount_amount"));
+  const promo_usage_limit = parseOptionalNumber(formData.get("promo_usage_limit"));
 
   return {
     title,
@@ -162,6 +164,7 @@ function getPayload(formData: FormData): PackagePayload {
     promo_code,
     discount_percentage,
     discount_amount,
+    promo_usage_limit,
   };
 }
 

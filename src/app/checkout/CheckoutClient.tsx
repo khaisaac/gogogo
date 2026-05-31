@@ -19,6 +19,8 @@ type CheckoutClientProps = {
   packagePromoCode: string | null;
   discountPercentage: number | null;
   discountAmount: number | null;
+  promoUsageLimit: number | null;
+  promoUsageCount: number;
 };
 
 export default function CheckoutClient({
@@ -36,6 +38,8 @@ export default function CheckoutClient({
   packagePromoCode,
   discountPercentage,
   discountAmount,
+  promoUsageLimit,
+  promoUsageCount,
 }: CheckoutClientProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -73,11 +77,18 @@ Special/Dietary Requirements: `,
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const isPromoExhausted = promoUsageLimit !== null && promoUsageCount >= promoUsageLimit;
+
   const handleApplyPromo = () => {
     if (!packagePromoCode) return;
     if (inputPromoCode.trim().toUpperCase() === packagePromoCode.toUpperCase()) {
-      setPromoApplied(true);
-      setError("");
+      if (isPromoExhausted) {
+        setError("Voucher quota has been exhausted.");
+        setPromoApplied(false);
+      } else {
+        setPromoApplied(true);
+        setError("");
+      }
     } else {
       setError("Invalid voucher code.");
       setPromoApplied(false);
@@ -86,7 +97,7 @@ Special/Dietary Requirements: `,
 
   let finalPrice = totalPrice;
   let appliedDiscountAmount = 0;
-  if (promoApplied) {
+  if (promoApplied && !isPromoExhausted) {
     if (discountPercentage) {
       appliedDiscountAmount = Math.round(totalPrice * (discountPercentage / 100));
     } else if (discountAmount) {
@@ -395,7 +406,7 @@ Special/Dietary Requirements: `,
             <strong>{pax} Adults</strong>
           </div>
 
-          {!isDirectPromo && packagePromoCode && (
+          {!isDirectPromo && packagePromoCode && !isPromoExhausted && (
             <div className={styles.summaryItem} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px', marginTop: '16px', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px' }}>
               <span style={{ fontWeight: 600, fontSize: '0.9em' }}>Have a voucher code?</span>
               <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
@@ -419,9 +430,15 @@ Special/Dietary Requirements: `,
             </div>
           )}
 
+          {isPromoExhausted && (
+            <div className={styles.summaryItem} style={{ color: '#dc3545', fontSize: '0.9em', marginTop: '16px' }}>
+              <span>Voucher quota has been reached.</span>
+            </div>
+          )}
+
           <hr className={styles.divider} />
           
-          {promoApplied && appliedDiscountAmount > 0 && (
+          {promoApplied && !isPromoExhausted && appliedDiscountAmount > 0 && (
             <div className={styles.summaryItem} style={{ color: '#28a745' }}>
               <span>Discount {discountPercentage ? `(${discountPercentage}%)` : ''}</span>
               <strong>-${appliedDiscountAmount} USD</strong>
@@ -431,7 +448,7 @@ Special/Dietary Requirements: `,
           <div className={styles.summaryTotal}>
             <span>Total Due</span>
             <div style={{ textAlign: "right" }}>
-              {promoApplied && appliedDiscountAmount > 0 && (
+              {promoApplied && !isPromoExhausted && appliedDiscountAmount > 0 && (
                 <div style={{ textDecoration: 'line-through', color: '#999', fontSize: '0.7em', marginBottom: '4px' }}>
                   ${totalPrice} USD
                 </div>
