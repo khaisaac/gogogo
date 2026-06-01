@@ -63,7 +63,7 @@ export default async function BlogPage({
                   return (
                     <Link key={post.id} href={`/blog/${post.slug}`} className={styles.card}>
                       <div className={styles.imageWrapper}>
-                        <img src={imageUrl} alt={post.title} className={styles.image} />
+                        <img src={imageUrl} alt={post.title} className={styles.image} loading="lazy" decoding="async" />
                         <span className={styles.categoryBadge}>{categoryName}</span>
                       </div>
                       <div className={styles.cardContent}>

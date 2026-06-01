@@ -481,6 +481,8 @@ export default function TicketBookingClient({
               src={pageSettings.image || "/sembalun.jpg"} 
               alt={pageSettings.title || "Mount Rinjani Trekking"} 
               className={styles.galleryImageMain}
+              loading="lazy"
+              decoding="async"
             />
           </div>
           <div className={styles.detailCard}>
@@ -534,6 +536,8 @@ export default function TicketBookingClient({
                     src={entranceGate?.image || "/placeholder-gate.jpg"} 
                     alt={entranceGate?.name} 
                     className={styles.gateImage}
+                    loading="lazy"
+                    decoding="async"
                   />
                   <span className={styles.gateName}>{entranceGate?.name}</span>
                 </div>
@@ -554,6 +558,8 @@ export default function TicketBookingClient({
                     src={exitGate?.image || "/placeholder-gate.jpg"} 
                     alt={exitGate?.name} 
                     className={styles.gateImage}
+                    loading="lazy"
+                    decoding="async"
                   />
                   <span className={styles.gateName}>{exitGate?.name}</span>
                 </div>

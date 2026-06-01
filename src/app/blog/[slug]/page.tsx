@@ -81,7 +81,7 @@ export default async function BlogPostPage({
                 const rpImageUrl = getValidImageUrl(rp.featured_image);
                 return (
                   <div key={rp.id} className={styles.articleCard}>
-                    <img src={rpImageUrl} alt={rp.title} className={styles.articleImage} />
+                    <img src={rpImageUrl} alt={rp.title} className={styles.articleImage} loading="lazy" decoding="async" />
                     <div className={styles.articleInfo}>
                       <Link href={`/blog/${rp.slug}`} className={styles.articleTitle}>{rp.title}</Link>
                       <div className={styles.articleDate}>{new Date(rp.published_at || new Date()).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</div>

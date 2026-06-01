@@ -62,6 +62,8 @@ export default function PackageGallery({
               src={src}
               alt={`${packageTitle} photo ${index + 1}`}
               className={styles.galleryImage}
+              loading="lazy"
+              decoding="async"
             />
           </button>
         ))}
@@ -107,6 +109,8 @@ export default function PackageGallery({
                 src={src}
                 alt={`${packageTitle} photo ${index + 1}`}
                 className={styles.galleryImage}
+                loading="lazy"
+                decoding="async"
               />
             </button>
           ))}
@@ -136,6 +140,8 @@ export default function PackageGallery({
               src={images[activeIndex]}
               alt={`${packageTitle} large preview ${activeIndex + 1}`}
               className={styles.modalImage}
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
