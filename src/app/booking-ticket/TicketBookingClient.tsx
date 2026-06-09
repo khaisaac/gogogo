@@ -80,7 +80,11 @@ function calculateBasePrice(
 
     let pricePerDay = 0;
     if (citizenType === "foreign") {
-      pricePerDay = isClass1(entranceGateName) ? 250000 : 150000;
+      if (isClass1(entranceGateName)) {
+        pricePerDay = isWeekend ? 225000 : 150000;
+      } else {
+        pricePerDay = isWeekend ? 225000 : 150000;
+      }
     } else {
       // Local (WNI)
       if (isClass1(entranceGateName)) {
@@ -120,8 +124,8 @@ export default function TicketBookingClient({
   const [gates, setGates] = useState<Gate[]>([]);
   const [loadingGates, setLoadingGates] = useState(true);
   
-  const [entranceGate, setEntranceGate] = useState<Gate | null>(TICKET_GATES[0]);
-  const [exitGate, setExitGate] = useState<Gate | null>(TICKET_GATES[2]);
+  const [entranceGate, setEntranceGate] = useState<Gate | null>(null);
+  const [exitGate, setExitGate] = useState<Gate | null>(null);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [pax, setPax] = useState(1);
@@ -531,15 +535,22 @@ export default function TicketBookingClient({
                 <div 
                   className={styles.gateSelection} 
                   onClick={() => handleOpenGateModal("entrance")}
+                  style={{ border: !entranceGate ? '2px dashed #cbd5e1' : undefined, background: !entranceGate ? '#f8fafc' : undefined }}
                 >
-                  <img 
-                    src={entranceGate?.image || "/placeholder-gate.jpg"} 
-                    alt={entranceGate?.name} 
-                    className={styles.gateImage}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span className={styles.gateName}>{entranceGate?.name}</span>
+                  {entranceGate ? (
+                    <>
+                      <img 
+                        src={entranceGate.image} 
+                        alt={entranceGate.name} 
+                        className={styles.gateImage}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span className={styles.gateName}>{entranceGate.name}</span>
+                    </>
+                  ) : (
+                    <span style={{ padding: '20px', color: '#64748b', fontWeight: 600 }}>+ Select Entrance Gate</span>
+                  )}
                 </div>
               </div>
 
@@ -553,15 +564,22 @@ export default function TicketBookingClient({
                 <div 
                   className={styles.gateSelection} 
                   onClick={() => handleOpenGateModal("exit")}
+                  style={{ border: !exitGate ? '2px dashed #cbd5e1' : undefined, background: !exitGate ? '#f8fafc' : undefined }}
                 >
-                  <img 
-                    src={exitGate?.image || "/placeholder-gate.jpg"} 
-                    alt={exitGate?.name} 
-                    className={styles.gateImage}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span className={styles.gateName}>{exitGate?.name}</span>
+                  {exitGate ? (
+                    <>
+                      <img 
+                        src={exitGate.image} 
+                        alt={exitGate.name} 
+                        className={styles.gateImage}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span className={styles.gateName}>{exitGate.name}</span>
+                    </>
+                  ) : (
+                    <span style={{ padding: '20px', color: '#64748b', fontWeight: 600 }}>+ Select Exit Gate</span>
+                  )}
                 </div>
               </div>
 
@@ -672,7 +690,7 @@ export default function TicketBookingClient({
                   <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#64748b', background: '#f8fafc', padding: '10px', borderRadius: '6px', lineHeight: '1.4' }}>
                     {citizenType === "foreign" ? (
                       <div>
-                        <strong>Foreign National Fee:</strong> Class 1 gates (Sembalun, Senaru, Torean) are <strong>Rp 250,000 / day / person</strong>. Other gates are <strong>Rp 150,000 / day / person</strong>.
+                        <strong>Foreign National Fee:</strong> <strong>Rp 150,000 / day / person</strong> on normal weekdays and <strong>Rp 225,000 / day / person</strong> on weekend/holidays.
                       </div>
                     ) : (
                       <div>

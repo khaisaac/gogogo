@@ -9,6 +9,7 @@ type ImageUploadFieldProps = {
   currentImage?: string | null;
   currentImageFieldName?: string;
   folder?: "blog" | "packages";
+  onChange?: (url: string) => void;
 };
 
 const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
@@ -19,6 +20,7 @@ export default function ImageUploadField({
   currentImage,
   currentImageFieldName,
   folder = "packages",
+  onChange,
 }: ImageUploadFieldProps) {
   const [uploadedUrl, setUploadedUrl] = useState(currentImage || "");
   const [isUploading, setIsUploading] = useState(false);
@@ -75,6 +77,7 @@ export default function ImageUploadField({
             }
 
             setUploadedUrl(data.url);
+            if (onChange) onChange(data.url);
           } catch (uploadError) {
             const message =
               uploadError instanceof Error
@@ -98,7 +101,7 @@ export default function ImageUploadField({
           <button
             type="button"
             className={styles.cancelBtn}
-            onClick={() => { setUploadedUrl(""); setError(""); }}
+            onClick={() => { setUploadedUrl(""); setError(""); if (onChange) onChange(""); }}
           >
             Remove image
           </button>

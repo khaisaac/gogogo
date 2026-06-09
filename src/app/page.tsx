@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { getPublicPackages } from "@/lib/public-packages";
 import SenaruTransportSection from "@/components/SenaruTransportSection";
+import { prisma } from "@/lib/db";
 
 const WhyChooseUs = dynamic(() => import('@/components/WhyChooseUs'));
 const PriceTable = dynamic(() => import('@/components/PriceTable'));
@@ -19,6 +20,8 @@ export const revalidate = 60; // ISR: re-generate every 60 seconds
 
 export default async function Home() {
   const { sembalun, senaru, torean } = await getPublicPackages();
+  const ticketSetting = await prisma.ticketSetting.findUnique({ where: { id: "default" } });
+  const eRinjaniImage = ticketSetting?.image || "https://lh3.googleusercontent.com/d/1eEbPQwKIIIq6THCCFQ56XUGPqJljgD1u";
 
   return (
     <>
@@ -30,7 +33,7 @@ export default async function Home() {
         <SenaruPackages packages={senaru} />
         <SenaruTransportSection />
         <ToreanPackages packages={torean} />
-        <ERinjaniSection />
+        <ERinjaniSection image={eRinjaniImage} />
         <WhyChooseUs />
         <PriceTable packages={[...sembalun, ...senaru, ...torean]} />
         <HowToBook />

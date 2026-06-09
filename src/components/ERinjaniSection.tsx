@@ -4,7 +4,8 @@ import Link from "next/link";
 import { Ticket, ShieldCheck, MapPin, ArrowRight } from "lucide-react";
 import styles from "./ERinjaniSection.module.css";
 
-export default function ERinjaniSection() {
+export default function ERinjaniSection({ image }: { image?: string }) {
+  const defaultImage = "https://lh3.googleusercontent.com/d/1eEbPQwKIIIq6THCCFQ56XUGPqJljgD1u";
   return (
     <section className={styles.section}>
       <div className={styles.deco1} />
@@ -18,7 +19,7 @@ export default function ERinjaniSection() {
               Plan your Mount Rinjani trek the smart way! Secure your limited-availability national park ticket first, then match it with a flexible trekking package featuring free cancellation within 24 hours or pay-later options.
             </p>
             <img 
-              src="https://lh3.googleusercontent.com/d/1eEbPQwKIIIq6THCCFQ56XUGPqJljgD1u" 
+              src={image || defaultImage} 
               alt="e-Rinjani Hiking" 
               className={styles.promoImage}
               width={600}

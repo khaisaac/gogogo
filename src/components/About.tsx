@@ -6,7 +6,7 @@ import RotatingBadge from "./RotatingBadge";
 import styles from "./About.module.css";
 
 const aboutImages = [
-  "/1.jpeg",
+  "/1.jpg",
   "/n.jpg",
   "/senaru.jpg",
   "/sembalun.jpg"
@@ -23,7 +23,7 @@ export default function About() {
     const sectionWidth = e.currentTarget.offsetWidth;
     const scrollLeft = e.currentTarget.scrollLeft;
     const currentIndex = Math.round(scrollLeft / sectionWidth);
-    if(currentIndex !== activeIndex && currentIndex < aboutImages.length) {
+    if (currentIndex !== activeIndex && currentIndex < aboutImages.length) {
       setActiveIndex(currentIndex);
     }
   };
@@ -115,7 +115,7 @@ export default function About() {
           {/* Right Column — Photo Slider + Rotating Badge */}
           <div className={styles.imageCol}>
             <div className={styles.imageWrapper}>
-              <div 
+              <div
                 className={`${styles.imageSlider} ${isDragging ? styles.dragging : ""}`}
                 ref={sliderRef}
                 onScroll={handleScroll}

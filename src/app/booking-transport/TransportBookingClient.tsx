@@ -13,6 +13,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Info,
+  CheckCircle2,
 } from "lucide-react";
 
 type TransportOption = {
@@ -242,7 +243,12 @@ export default function TransportBookingClient({
                         </div>
                         <div className={styles.routeInfo}>
                           <span className={styles.routeName}>{opt.route}</span>
-                          <span className={styles.routePrice}>{formatPrice(opt.price)}</span>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span className={styles.routePrice}>{formatPrice(opt.price)}</span>
+                            {selectedRoute?.id === opt.id && (
+                              <CheckCircle2 size={24} color="#1a4d43" />
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}

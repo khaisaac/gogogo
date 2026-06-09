@@ -3,6 +3,7 @@
 import { useState } from "react";
 import styles from "../bookings/bookings.module.css";
 import { Trash2, Edit } from "lucide-react";
+import ImageUploadField from "@/components/admin/ImageUploadField";
 
 type Ticket = {
   id: string;
@@ -46,7 +47,11 @@ function calculateBasePrice(
 
     let pricePerDay = 0;
     if (citizenType === "foreign") {
-      pricePerDay = isClass1(entranceGateName) ? 250000 : 150000;
+      if (isClass1(entranceGateName)) {
+        pricePerDay = isWeekend ? 225000 : 150000;
+      } else {
+        pricePerDay = isWeekend ? 225000 : 150000;
+      }
     } else {
       // Local (WNI)
       if (isClass1(entranceGateName)) {
@@ -566,13 +571,13 @@ export default function TicketsTable({ tickets: initialTickets }: { tickets: any
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Cover Image Path / URL</label>
-                  <input 
-                    type="text" 
-                    value={settingsForm.image} 
-                    onChange={(e) => setSettingsForm({ ...settingsForm, image: e.target.value })} 
-                    style={{ padding: '10px 14px', border: '1px solid #cbd5e1', borderRadius: '8px', width: '100%' }}
-                    required
+                  <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>Cover Image</label>
+                  <ImageUploadField
+                    id="ticketSettingImage"
+                    name="ticketSettingImage"
+                    currentImage={settingsForm.image}
+                    onChange={(url) => setSettingsForm({ ...settingsForm, image: url })}
+                    folder="packages"
                   />
                 </div>
               </div>

@@ -27,7 +27,11 @@ function calculateBasePrice(
 
     let pricePerDay = 0;
     if (citizenType === "foreign") {
-      pricePerDay = isClass1(entranceGateName) ? 250000 : 150000;
+      if (isClass1(entranceGateName)) {
+        pricePerDay = isWeekend ? 225000 : 150000;
+      } else {
+        pricePerDay = isWeekend ? 225000 : 150000;
+      }
     } else {
       // Local (WNI)
       if (isClass1(entranceGateName)) {
