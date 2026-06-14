@@ -2,9 +2,21 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { requireAdmin, requireAdminContext } from "@/app/admin/_lib";
 import { prisma } from "@/lib/db";
 import { uploadImage } from "@/lib/storage";
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  return "Failed to save post";
+}
+
+function compactErrorMessage(raw: string) {
+  const cleaned = raw.replace(/\s+/g, " ").trim();
+  if (!cleaned) return "Failed to save post";
+  return cleaned.length > 180 ? `${cleaned.slice(0, 177)}...` : cleaned;
+}
 
 type BlogPayload = {
   title: string;
@@ -104,100 +116,118 @@ async function resolveTagIds(formData: FormData) {
 }
 
 export async function createPost(formData: FormData) {
-  const basePayload = getPayload(formData);
-  const { user } = await requireAdminContext();
-  const categoryId = await resolveCategoryId(formData, basePayload.category_id);
-  const payload: BlogPayload = {
-    ...basePayload,
-    category_id: categoryId,
-  };
-  const imageFile = formData.get("featured_image_file");
-  if (imageFile instanceof File && imageFile.size > 0) {
-    payload.featured_image = await uploadImage(imageFile, "blog");
-  }
+  try {
+    const basePayload = getPayload(formData);
+    const { user } = await requireAdminContext();
+    const categoryId = await resolveCategoryId(formData, basePayload.category_id);
+    const payload: BlogPayload = {
+      ...basePayload,
+      category_id: categoryId,
+    };
+    const imageFile = formData.get("featured_image_file");
+    if (imageFile instanceof File && imageFile.size > 0) {
+      payload.featured_image = await uploadImage(imageFile, "blog");
+    }
 
-  if (!payload.title || !payload.slug) {
-    throw new Error("Title and slug are required");
-  }
+    if (!payload.title || !payload.slug) {
+      throw new Error("Title and slug are required");
+    }
 
-  const post = await prisma.post.create({
-    data: {
-      title: payload.title,
-      slug: payload.slug,
-      category_id: payload.category_id,
-      excerpt: payload.excerpt,
-      content: payload.content,
-      featured_image: payload.featured_image,
-      cover_image_alignment: payload.cover_image_alignment,
-      is_published: payload.is_published,
-      published_at: payload.published_at ? new Date(payload.published_at) : null,
-      author_id: user.id,
-    },
-  });
-
-  const tagIds = await resolveTagIds(formData);
-  if (tagIds.length > 0) {
-    await prisma.postTag.createMany({
-      data: tagIds.map((tagId) => ({
-        post_id: post.id,
-        tag_id: tagId,
-      })),
+    const post = await prisma.post.create({
+      data: {
+        title: payload.title,
+        slug: payload.slug,
+        category_id: payload.category_id,
+        excerpt: payload.excerpt,
+        content: payload.content,
+        featured_image: payload.featured_image,
+        cover_image_alignment: payload.cover_image_alignment,
+        is_published: payload.is_published,
+        published_at: payload.published_at ? new Date(payload.published_at) : null,
+        author_id: user.id,
+      },
     });
-  }
 
-  revalidatePath("/");
-  revalidatePath("/admin/blog");
-  redirect("/admin/blog");
+    const tagIds = await resolveTagIds(formData);
+    if (tagIds.length > 0) {
+      await prisma.postTag.createMany({
+        data: tagIds.map((tagId) => ({
+          post_id: post.id,
+          tag_id: tagId,
+        })),
+      });
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/blog");
+    redirect("/admin/blog");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+    const message = compactErrorMessage(getErrorMessage(error));
+    console.error("❌ createPost failed:", error);
+    redirect(`/admin/blog/new?error=${encodeURIComponent(message)}`);
+  }
 }
 
 export async function updatePost(id: string, formData: FormData) {
-  const basePayload = getPayload(formData);
-  await requireAdmin();
-  const categoryId = await resolveCategoryId(formData, basePayload.category_id);
-  const payload: BlogPayload = {
-    ...basePayload,
-    category_id: categoryId,
-  };
-  const imageFile = formData.get("featured_image_file");
-  if (imageFile instanceof File && imageFile.size > 0) {
-    payload.featured_image = await uploadImage(imageFile, "blog");
-  }
+  try {
+    const basePayload = getPayload(formData);
+    await requireAdmin();
+    const categoryId = await resolveCategoryId(formData, basePayload.category_id);
+    const payload: BlogPayload = {
+      ...basePayload,
+      category_id: categoryId,
+    };
+    const imageFile = formData.get("featured_image_file");
+    if (imageFile instanceof File && imageFile.size > 0) {
+      payload.featured_image = await uploadImage(imageFile, "blog");
+    }
 
-  if (!payload.title || !payload.slug) {
-    throw new Error("Title and slug are required");
-  }
+    if (!payload.title || !payload.slug) {
+      throw new Error("Title and slug are required");
+    }
 
-  await prisma.post.update({
-    where: { id },
-    data: {
-      title: payload.title,
-      slug: payload.slug,
-      category_id: payload.category_id,
-      excerpt: payload.excerpt,
-      content: payload.content,
-      featured_image: payload.featured_image,
-      cover_image_alignment: payload.cover_image_alignment,
-      is_published: payload.is_published,
-      published_at: payload.published_at ? new Date(payload.published_at) : null,
-    },
-  });
-
-  // Clear existing tags
-  await prisma.postTag.deleteMany({ where: { post_id: id } });
-
-  const tagIds = await resolveTagIds(formData);
-  if (tagIds.length > 0) {
-    await prisma.postTag.createMany({
-      data: tagIds.map((tagId) => ({
-        post_id: id,
-        tag_id: tagId,
-      })),
+    await prisma.post.update({
+      where: { id },
+      data: {
+        title: payload.title,
+        slug: payload.slug,
+        category_id: payload.category_id,
+        excerpt: payload.excerpt,
+        content: payload.content,
+        featured_image: payload.featured_image,
+        cover_image_alignment: payload.cover_image_alignment,
+        is_published: payload.is_published,
+        published_at: payload.published_at ? new Date(payload.published_at) : null,
+      },
     });
-  }
 
-  revalidatePath("/");
-  revalidatePath("/admin/blog");
-  redirect("/admin/blog");
+    // Clear existing tags
+    await prisma.postTag.deleteMany({ where: { post_id: id } });
+
+    const tagIds = await resolveTagIds(formData);
+    if (tagIds.length > 0) {
+      await prisma.postTag.createMany({
+        data: tagIds.map((tagId) => ({
+          post_id: id,
+          tag_id: tagId,
+        })),
+      });
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin/blog");
+    redirect("/admin/blog");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+    const message = compactErrorMessage(getErrorMessage(error));
+    console.error("❌ updatePost failed:", error);
+    redirect(`/admin/blog/${id}/edit?error=${encodeURIComponent(message)}`);
+  }
 }
 
 export async function deletePost(id: string) {

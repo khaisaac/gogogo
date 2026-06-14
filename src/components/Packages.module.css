@@ -164,7 +164,7 @@
 .sembalunBackground {
   position: absolute;
   inset: 0;
-  background: url("https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/top.jpg") center/cover no-repeat;
+  background: url("/sembalun.jpg") center/cover no-repeat;
   z-index: 0;
 }
 

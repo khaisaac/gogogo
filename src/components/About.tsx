@@ -6,7 +6,7 @@ import RotatingBadge from "./RotatingBadge";
 import styles from "./About.module.css";
 
 const aboutImages = [
-  "/1.jpg",
+  "/1.jpeg",
   "/n.jpg",
   "/senaru.jpg",
   "/sembalun.jpg"
