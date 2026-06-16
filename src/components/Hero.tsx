@@ -1,4 +1,5 @@
 import Image from "next/image";
+import heroBanner from "../../public/hero-banner.png";
 import RotatingBadge from "./RotatingBadge";
 import styles from "./Hero.module.css";
 
@@ -6,10 +7,11 @@ export default function Hero() {
   return (
     <section id="hero" className={styles.hero}>
       <Image
-        src="/hero-banner.png"
+        src={heroBanner}
         alt="Mount Rinjani Trekking"
         fill
         priority
+        unoptimized
         className={styles.bgImage}
       />
       <div className={styles.overlay} />
