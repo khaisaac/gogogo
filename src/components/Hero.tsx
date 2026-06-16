@@ -1,5 +1,5 @@
 import Image from "next/image";
-import heroBanner from "../../public/hero-banner.png";
+import heroBanner from "../../public/hero-banner.svg";
 import RotatingBadge from "./RotatingBadge";
 import styles from "./Hero.module.css";
 
