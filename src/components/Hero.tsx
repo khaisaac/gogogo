@@ -6,7 +6,7 @@ export default function Hero() {
   return (
     <section id="hero" className={styles.hero}>
       <Image
-        src="https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/hero-banner.svg"
+        src="/hero-banner.png"
         alt="Mount Rinjani Trekking"
         fill
         priority
