@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import styles from "./blog-post.module.css";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,44 @@ const getValidImageUrl = (url: string | null | undefined) => {
   if (!url.startsWith("http") && !url.startsWith("/")) return "/" + url;
   return url;
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await prisma.post.findFirst({
+    where: { slug, is_published: true },
+    select: { title: true, excerpt: true, content: true, featured_image: true },
+  });
+
+  if (!post) {
+    return {
+      title: "Article Not Found",
+    };
+  }
+
+  let description = post.excerpt || "";
+  if (!description && post.content) {
+    // Strip HTML tags for description fallback
+    description = post.content.replace(/<[^>]*>?/gm, "").substring(0, 160).trim() + "...";
+  }
+
+  const imageUrl = getValidImageUrl(post.featured_image);
+
+  return {
+    title: `${post.title} | Rinjani Trekking`,
+    description,
+    openGraph: {
+      title: post.title,
+      description,
+      images: imageUrl !== "/hero-banner.png" ? [imageUrl] : [],
+    },
+  };
+}
+
+
 
 export default async function BlogPostPage({
   params, searchParams,

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { difficultyScoreToLabel } from "@/lib/difficulty";
 import { parsePackageContent } from "@/lib/package-content";
 import {
@@ -17,6 +18,44 @@ import BottomBookingScrollButton from "./BottomBookingScrollButton";
 import styles from "./PackageDetailPage.module.css";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const trekkingPackage = await getPublicPackageBySlug(slug);
+
+  if (!trekkingPackage) {
+    return {
+      title: "Package Not Found",
+    };
+  }
+
+  const content = parsePackageContent(trekkingPackage.description);
+  
+  let description = `Join our Mount Rinjani trekking package: ${trekkingPackage.title}. Book your adventure today!`;
+  if (content.detail) {
+    const stripped = content.detail.replace(/<[^>]*>?/gm, "").substring(0, 160).trim();
+    if (stripped) {
+      description = stripped + "...";
+    }
+  }
+
+  const galleryFromContent = content.gallery?.filter(Boolean) || [];
+  const coverImage = trekkingPackage.image || galleryFromContent[0] || "/hero-banner.png";
+
+  return {
+    title: `${trekkingPackage.title} | Rinjani Trekking`,
+    description,
+    openGraph: {
+      title: trekkingPackage.title,
+      description,
+      images: coverImage !== "/hero-banner.png" ? [coverImage] : [],
+    },
+  };
+}
 
 function toList(value: string) {
   return value
