@@ -1,5 +1,4 @@
 import Image from "next/image";
-import heroBanner from "../../public/hero-banner.svg";
 import RotatingBadge from "./RotatingBadge";
 import styles from "./Hero.module.css";
 
@@ -7,7 +6,7 @@ export default function Hero() {
   return (
     <section id="hero" className={styles.hero}>
       <Image
-        src={heroBanner}
+        src="/hero-banner.svg"
         alt="Mount Rinjani Trekking"
         fill
         priority
