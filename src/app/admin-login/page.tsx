@@ -159,19 +159,21 @@ function AdminLoginContent() {
           </button>
         </form>
 
-        <div className={styles.seedBox}>
-          <p className={styles.seedHelper}>
-            Belum punya akun Admin di database localhost kamu?
-          </p>
-          <button
-            type="button"
-            onClick={handleQuickSeed}
-            className={styles.seedBtn}
-            disabled={loading}
-          >
-            ⚡ Buat Akun Admin Default (admin@rinjani.com / admin123)
-          </button>
-        </div>
+        {process.env.NODE_ENV !== "production" && (
+          <div className={styles.seedBox}>
+            <p className={styles.seedHelper}>
+              Belum punya akun Admin di database localhost kamu?
+            </p>
+            <button
+              type="button"
+              onClick={handleQuickSeed}
+              className={styles.seedBtn}
+              disabled={loading}
+            >
+              ⚡ Buat Akun Admin Default (admin@rinjani.com / admin123)
+            </button>
+          </div>
+        )}
       </section>
     </main>
   );

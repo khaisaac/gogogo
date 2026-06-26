@@ -18,6 +18,9 @@ export async function verifyAdminRole(userId: string) {
 }
 
 export async function seedDefaultAdmin(customEmail?: string, customPassword?: string) {
+  if (process.env.NODE_ENV === "production") {
+    return { error: "Security: Admin seeding shortcut is disabled in production." };
+  }
   try {
     const email = customEmail?.trim() || "admin@rinjani.com";
     const plainPwd = customPassword?.trim() || "admin123";
