@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { adminLogin, verifyAdminRole, seedDefaultAdmin } from "./actions";
+import { adminLogin, verifyAdminRole } from "./actions";
 import styles from "./page.module.css";
 
 function AdminLoginContent() {
@@ -54,24 +54,7 @@ function AdminLoginContent() {
     setError("");
   };
 
-  const handleQuickSeed = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const res = await seedDefaultAdmin("admin@rinjani.com", "admin123");
-      if (res.error) {
-        setError("Gagal membuat akun: " + res.error);
-      } else {
-        setEmail("admin@rinjani.com");
-        setPassword("admin123");
-        alert("✅ Berhasil! Akun Admin default (admin@rinjani.com / admin123) sudah dibuat di DB lokal. Silakan klik 'Sign in'.");
-      }
-    } catch (err: any) {
-      setError("Gagal menghubungi server: " + (err.message || String(err)));
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,21 +142,7 @@ function AdminLoginContent() {
           </button>
         </form>
 
-        {process.env.NODE_ENV !== "production" && (
-          <div className={styles.seedBox}>
-            <p className={styles.seedHelper}>
-              Belum punya akun Admin di database localhost kamu?
-            </p>
-            <button
-              type="button"
-              onClick={handleQuickSeed}
-              className={styles.seedBtn}
-              disabled={loading}
-            >
-              ⚡ Buat Akun Admin Default (admin@rinjani.com / admin123)
-            </button>
-          </div>
-        )}
+
       </section>
     </main>
   );
