@@ -40,6 +40,8 @@ export default function PackagePricingSelector({
   );
   const [totalDays, setTotalDays] = useState<TotalDayOption>(2);
   const [selectedDate, setSelectedDate] = useState<string>("");
+  const [promoCode, setPromoCode] = useState<string>("");
+  const [voucherFeedback, setVoucherFeedback] = useState<string>("");
 
   // Get today's date in YYYY-MM-DD format based on local timezone
   const getTodayDateString = () => {
@@ -331,9 +333,44 @@ export default function PackagePricingSelector({
           />
         )}
       </div>
+
+      {/* Optional Voucher Code Box */}
+      <div className={styles.voucherBox}>
+        <div className={styles.voucherHeader}>
+          <span className={styles.voucherIcon}>🏷️</span> Have a Voucher Code?
+        </div>
+        <div className={styles.voucherRow}>
+          <input
+            type="text"
+            className={styles.voucherInput}
+            placeholder="ENTER PROMO CODE"
+            value={promoCode}
+            onChange={(e) => {
+              setPromoCode(e.target.value.toUpperCase());
+              setVoucherFeedback("");
+            }}
+          />
+          <button
+            type="button"
+            className={styles.voucherApplyBtn}
+            onClick={() => {
+              if (!promoCode.trim()) {
+                setVoucherFeedback("Please enter a code.");
+              } else {
+                setVoucherFeedback("✅ Code attached! Will apply at checkout.");
+              }
+            }}
+          >
+            Apply
+          </button>
+        </div>
+        {voucherFeedback && (
+          <p className={styles.voucherFeedbackText}>{voucherFeedback}</p>
+        )}
+      </div>
       
       <a 
-        href={`/checkout?package_id=${packageId}&price_type=${resolvedPriceType}&price_mode=${resolvedPricingMode}&pax=${resolvedPax}&total_days=${resolvedTotalDays}&date=${selectedDate}`} 
+        href={`/checkout?package_id=${packageId}&price_type=${resolvedPriceType}&price_mode=${resolvedPricingMode}&pax=${resolvedPax}&total_days=${resolvedTotalDays}&date=${selectedDate}&promo_code=${encodeURIComponent(promoCode.trim())}`} 
         className={styles.availabilityBtn}
         onClick={(e) => {
           if (!selectedDate) {

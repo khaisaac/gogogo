@@ -20,6 +20,7 @@ type CheckoutClientProps = {
   discountAmount: number | null;
   promoUsageLimit: number | null;
   promoUsageCount: number;
+  initialPromoCode?: string;
 };
 
 export default function CheckoutClient({
@@ -39,11 +40,12 @@ export default function CheckoutClient({
   discountAmount,
   promoUsageLimit,
   promoUsageCount,
+  initialPromoCode = "",
 }: CheckoutClientProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [email, setEmail] = useState(userEmail);
-  const [inputPromoCode, setInputPromoCode] = useState("");
+  const [inputPromoCode, setInputPromoCode] = useState(initialPromoCode);
   const [promoApplied, setPromoApplied] = useState(isDirectPromo);
   const isAdmin = userRole === "admin";
 
@@ -77,6 +79,12 @@ Special/Dietary Requirements: `,
   };
 
   const isPromoExhausted = promoUsageLimit !== null && promoUsageCount >= promoUsageLimit;
+
+  useEffect(() => {
+    if (initialPromoCode && packagePromoCode && initialPromoCode.trim().toUpperCase() === packagePromoCode.toUpperCase() && !isPromoExhausted) {
+      setPromoApplied(true);
+    }
+  }, [initialPromoCode, packagePromoCode, isPromoExhausted]);
 
   const handleApplyPromo = () => {
     if (!packagePromoCode) return;

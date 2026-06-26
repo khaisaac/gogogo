@@ -319,6 +319,85 @@
   -webkit-appearance: none;
 }
 
+/* Optional Voucher Box Styles (Ref: Komodo Lombok Cruise) */
+.voucherBox {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.voucherHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.voucherIcon {
+  font-size: 1.05rem;
+}
+
+.voucherRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voucherInput {
+  flex: 1;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: 0.5px;
+  background: #f8fafc;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.voucherInput:focus {
+  border-color: #3b82f6;
+  background: #ffffff;
+}
+
+.voucherApplyBtn {
+  height: 40px;
+  padding: 0 16px;
+  background: #60a5fa;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.84rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.voucherApplyBtn:hover {
+  background: #3b82f6;
+}
+
+.voucherApplyBtn:active {
+  transform: scale(0.97);
+}
+
+.voucherFeedbackText {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #059669;
+}
+
 .availabilityBtn {
   display: flex;
   align-items: center;

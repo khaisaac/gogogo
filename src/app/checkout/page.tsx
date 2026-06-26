@@ -27,6 +27,7 @@ export default async function CheckoutPage({
   const price_type = unresolvedSearchParams.price_type || "standard";
   const price_mode = unresolvedSearchParams.price_mode || "per_pax";
   const total_days = Number(unresolvedSearchParams.total_days) || 2;
+  const promo_code = unresolvedSearchParams.promo_code || "";
 
   const qs = new URLSearchParams(unresolvedSearchParams as Record<string, string>).toString();
   const currentUrl = `/checkout?${qs}`;
@@ -79,6 +80,7 @@ export default async function CheckoutPage({
         discountAmount={pkgData.discount_amount}
         promoUsageLimit={pkgData.promo_usage_limit}
         promoUsageCount={pkgData.promo_usage_count}
+        initialPromoCode={promo_code}
       />
     </div></main><Footer /></>
   );
