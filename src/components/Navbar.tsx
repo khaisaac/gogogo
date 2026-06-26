@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/client";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
@@ -30,27 +29,27 @@ export default function Navbar() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
-        try {
-          const res = await fetch("/api/user/profile");
-          if (res.ok) {
-            const data = await res.json();
-            if (data.profile?.role === "admin") {
-              setIsAdmin(true);
-            }
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) {
+            setUser(data.user);
+            setIsAdmin(data.user.role === "admin");
+          } else {
+            setUser(null);
+            setIsAdmin(false);
           }
-        } catch {}
-      }
+        }
+      } catch {}
     };
     fetchUser();
   }, [pathname]);
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    try {
+      await fetch("/api/auth/signout", { method: "POST" });
+    } catch {}
     setUser(null);
     setIsAdmin(false);
     router.refresh();

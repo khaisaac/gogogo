@@ -1,8 +1,9 @@
-import { type NextRequest } from 'next/server'
-import { updateSession } from '@/lib/supabase/proxy'
+import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  return await updateSession(request)
+  // Autentikasi admin ditangani langsung via sesi MySQL + JWT lokal (session_token).
+  // Tidak perlu melakukan panggilan proxy Supabase di sini.
+  return NextResponse.next()
 }
 
 export const config = {

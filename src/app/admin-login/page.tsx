@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { adminLogin, verifyAdminRole } from "./actions";
+import { adminLogin, verifyAdminRole, seedDefaultAdmin } from "./actions";
 import styles from "./page.module.css";
 
 function AdminLoginContent() {
@@ -54,6 +54,25 @@ function AdminLoginContent() {
     setError("");
   };
 
+  const handleQuickSeed = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await seedDefaultAdmin("admin@rinjani.com", "admin123");
+      if (res.error) {
+        setError("Gagal membuat akun: " + res.error);
+      } else {
+        setEmail("admin@rinjani.com");
+        setPassword("admin123");
+        alert("✅ Berhasil! Akun Admin default (admin@rinjani.com / admin123) sudah dibuat di DB lokal. Silakan klik 'Sign in'.");
+      }
+    } catch (err: any) {
+      setError("Gagal menghubungi server: " + (err.message || String(err)));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -84,7 +103,7 @@ function AdminLoginContent() {
         <p className={styles.kicker}>Admin Access</p>
         <h1 className={styles.title}>Admin Login</h1>
         <p className={styles.subtitle}>
-          Login menggunakan email dan password admin, tanpa verification code.
+          Login menggunakan email dan password admin portal.
         </p>
 
         {activeEmail && (
@@ -119,6 +138,7 @@ function AdminLoginContent() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@rinjani.com"
               required
             />
           </label>
@@ -129,14 +149,29 @@ function AdminLoginContent() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
               required
             />
           </label>
 
           <button type="submit" className={styles.submit} disabled={loading}>
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? "Memproses..." : "Sign in"}
           </button>
         </form>
+
+        <div className={styles.seedBox}>
+          <p className={styles.seedHelper}>
+            Belum punya akun Admin di database localhost kamu?
+          </p>
+          <button
+            type="button"
+            onClick={handleQuickSeed}
+            className={styles.seedBtn}
+            disabled={loading}
+          >
+            ⚡ Buat Akun Admin Default (admin@rinjani.com / admin123)
+          </button>
+        </div>
       </section>
     </main>
   );

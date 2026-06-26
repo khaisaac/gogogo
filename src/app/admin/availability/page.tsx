@@ -11,7 +11,6 @@ export default async function AvailabilityPage() {
   await requireAdmin();
 
   const packages = await prisma.package.findMany({
-    where: { is_active: true },
     orderBy: [{ route: "asc" }, { title: "asc" }],
     select: { id: true, title: true, route: true },
   });

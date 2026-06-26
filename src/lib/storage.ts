@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/db";
+import fs from "fs";
+import path from "path";
 
 const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 const ALLOWED_MIME_TYPES = [
@@ -8,10 +10,18 @@ const ALLOWED_MIME_TYPES = [
   "image/gif",
 ];
 
+function cleanFilename(name: string) {
+  return name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9.]/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
 
 /**
- * Upload a single image to local filesystem.
- * Returns the public URL path (e.g., /uploads/packages/1234-image.jpg)
+ * Upload a single image to local filesystem (/public/uploads) AND backup to MySQL StoredImage table.
+ * Returns the public URL path (e.g., /uploads/packages/171829-image.webp)
  */
 export async function uploadImage(
   file: File,
@@ -36,14 +46,37 @@ export async function uploadImage(
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
-  const storedImage = await prisma.storedImage.create({
-    data: {
-      data: buffer,
-      mimeType: file.type,
-    },
-  });
+  const ext = path.extname(file.name || "") || ".webp";
+  const baseName = path.basename(file.name || "image", ext);
+  const safeName = cleanFilename(baseName) || "photo";
+  const uniqueName = `${Date.now()}-${safeName}${ext}`;
+  const relativeFolder = `uploads/${folder}`;
+  const relativePath = `${relativeFolder}/${uniqueName}`;
+  const publicUrl = `/${relativePath}`;
 
-  return `/api/images/${storedImage.id}`;
+  // 1. Save to local filesystem /public/uploads/...
+  try {
+    const publicDir = path.join(process.cwd(), "public", relativeFolder);
+    fs.mkdirSync(publicDir, { recursive: true });
+    fs.writeFileSync(path.join(publicDir, uniqueName), buffer);
+  } catch (err) {
+    console.error("Warning: Failed to write uploaded image to disk:", err);
+  }
+
+  // 2. Backup to MySQL StoredImage (Self-healing guarantee against Hostinger redeploys)
+  try {
+    await prisma.storedImage.create({
+      data: {
+        id: relativePath, // e.g. "uploads/packages/123-image.webp"
+        data: buffer,
+        mimeType: file.type,
+      },
+    });
+  } catch (dbErr) {
+    console.error("Warning: Failed to backup image to MySQL:", dbErr);
+  }
+
+  return publicUrl;
 }
 
 /**
@@ -71,15 +104,25 @@ export async function uploadImages(
  */
 export async function deleteUploadedFile(publicUrl: string): Promise<boolean> {
   try {
-    if (!publicUrl.startsWith("/api/images/")) {
-      return false;
+    if (!publicUrl) return false;
+    const relativePath = publicUrl.replace(/^\//, "").split("?")[0];
+    
+    // 1. Delete from MySQL
+    await prisma.storedImage.deleteMany({
+      where: { id: relativePath },
+    });
+
+    // Also handle legacy /api/images/ID format
+    if (publicUrl.startsWith("/api/images/")) {
+      const id = publicUrl.replace("/api/images/", "").split("?")[0];
+      await prisma.storedImage.deleteMany({ where: { id } });
     }
 
-    const id = publicUrl.replace("/api/images/", "").split("?")[0];
-    
-    await prisma.storedImage.delete({
-      where: { id },
-    });
+    // 2. Delete from disk
+    const diskPath = path.join(process.cwd(), "public", relativePath);
+    if (fs.existsSync(diskPath)) {
+      fs.unlinkSync(diskPath);
+    }
     
     return true;
   } catch (error) {

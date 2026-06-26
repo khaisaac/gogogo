@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { compressImageToWebP } from "@/lib/image-compress";
 import styles from "./ImageUploadField.module.css";
 
 type ImageUploadFieldProps = {
@@ -61,8 +62,9 @@ export default function ImageUploadField({
           setIsUploading(true);
 
           try {
+            const compressedFile = await compressImageToWebP(file);
             const formData = new FormData();
-            formData.append("file", file);
+            formData.append("file", compressedFile);
             formData.append("folder", folder);
 
             const response = await fetch("/api/admin/uploads", {

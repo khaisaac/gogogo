@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { compressImageToWebP } from "@/lib/image-compress";
 import styles from "./MultiImageUploadField.module.css";
 
 type MultiImageUploadFieldProps = {
@@ -66,8 +67,9 @@ export default function MultiImageUploadField({
 
             for (const file of acceptedFiles) {
               try {
+                const compressed = await compressImageToWebP(file);
                 const formData = new FormData();
-                formData.append("file", file);
+                formData.append("file", compressed);
                 formData.append("folder", folder);
                 const response = await fetch("/api/admin/uploads", { method: "POST", body: formData });
                 const data = await response.json();

@@ -159,6 +159,7 @@ export async function createPost(formData: FormData) {
     }
 
     revalidatePath("/");
+    revalidatePath("/blog");
     revalidatePath("/admin/blog");
     redirect("/admin/blog");
   } catch (error) {
@@ -218,6 +219,7 @@ export async function updatePost(id: string, formData: FormData) {
     }
 
     revalidatePath("/");
+    revalidatePath("/blog");
     revalidatePath("/admin/blog");
     redirect("/admin/blog");
   } catch (error) {
@@ -234,5 +236,6 @@ export async function deletePost(id: string) {
   await requireAdmin();
   await prisma.post.delete({ where: { id } });
   revalidatePath("/");
+  revalidatePath("/blog");
   revalidatePath("/admin/blog");
 }

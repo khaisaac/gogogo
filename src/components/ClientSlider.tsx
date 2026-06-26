@@ -23,7 +23,6 @@ interface ClientSliderProps {
 
 const getValidImageUrl = (url: string | null | undefined) => {
   if (!url) return "/hero-banner.png";
-  if (url.toLowerCase().includes("supabase")) return "/n.jpg";
   if (url.startsWith("public/")) return url.replace("public/", "/");
   if (!url.startsWith("http") && !url.startsWith("/")) return "/" + url;
   return url;

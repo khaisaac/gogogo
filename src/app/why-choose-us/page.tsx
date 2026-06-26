@@ -44,7 +44,7 @@ export default function AboutPage() {
             <div className={styles.imageContent}>
               <div className={styles.imageWrapper}>
                 <Image 
-                  src="https://pvhtohzmttglkuauibhg.supabase.co/storage/v1/object/public/package/general/GOPR2283.JPG" 
+                  src="/hero-banner.png" 
                   alt="Local Experts guiding a group" 
                   fill
                   className={styles.image}

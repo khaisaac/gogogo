@@ -4,6 +4,7 @@ import { clearSessionCookie } from "@/lib/auth";
 import { requireAdmin } from "./_lib";
 import AdminSidebarNav from "./AdminSidebarNav";
 import styles from "./admin.module.css";
+import { Mountain, LogOut } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -23,21 +24,38 @@ export default async function AdminLayout({
 
   return (
     <div className={styles.adminPage}>
-      <header className={styles.header}>
+      <aside className={styles.header}>
         <div className={styles.headerInner}>
-          <div>
-            <p className={styles.kicker}>Site Admin</p>
-            <h1 className={styles.title}>Rinjani Dashboard</h1>
+          <div className={styles.brandArea}>
+            <div className={styles.brandLogo}>
+              <Mountain size={24} className={styles.logoIcon} />
+            </div>
+            <div>
+              <div className={styles.brandTitleRow}>
+                <h1 className={styles.title}>Rinjani Trek</h1>
+                <span className={styles.brandBadge}>PRO</span>
+              </div>
+              <p className={styles.kicker}>Admin Portal v2.0</p>
+            </div>
           </div>
+
           <AdminSidebarNav />
-          <form action={logout}>
-            <button type="submit" className={styles.logoutBtn}>
-              Log Out
-            </button>
-          </form>
+
+          <div className={styles.sidebarFooter}>
+            <form action={logout} className={styles.logoutForm}>
+              <button type="submit" className={styles.logoutBtn}>
+                <LogOut size={18} />
+                <span>Log Out</span>
+              </button>
+            </form>
+          </div>
         </div>
-      </header>
-      <main className={styles.main}>{children}</main>
+      </aside>
+      <main className={styles.main}>
+        <div className={styles.mainContainer}>
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

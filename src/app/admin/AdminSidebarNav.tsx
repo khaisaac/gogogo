@@ -2,6 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  ClipboardList,
+  Ticket,
+  QrCode,
+  Car,
+  Calendar,
+  FileText,
+  PlusCircle,
+  Package,
+  FolderPlus,
+  ExternalLink,
+} from "lucide-react";
 import styles from "./admin.module.css";
 
 function isActive(pathname: string, href: string) {
@@ -12,35 +25,79 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+type NavGroup = {
+  category: string;
+  items: {
+    href: string;
+    label: string;
+    icon: React.ComponentType<{ className?: string; size?: number }>;
+  }[];
+};
+
 export default function AdminSidebarNav() {
   const pathname = usePathname();
 
-  const links = [
-    { href: "/admin", label: "Dashboard" },
-    { href: "/admin/bookings", label: "Bookings" },
-    { href: "/admin/tickets", label: "🎟️ Ticket Bookings" },
-    { href: "/admin/tickets/gates", label: "⛩️ Ticket Gates" },
-    { href: "/admin/transport", label: "🚗 Transport Bookings" },
-    { href: "/admin/availability", label: "📅 Availability" },
-    { href: "/admin/blog", label: "Posts" },
-    { href: "/admin/blog/new", label: "Add New Post" },
-    { href: "/admin/packages", label: "All Packages" },
-    { href: "/admin/packages/new", label: "Add New Package" },
-    { href: "/", label: "View Site" },
+  const navGroups: NavGroup[] = [
+    {
+      category: "Overview",
+      items: [
+        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+      ],
+    },
+    {
+      category: "Operations",
+      items: [
+        { href: "/admin/bookings", label: "Trekking Bookings", icon: ClipboardList },
+        { href: "/admin/tickets", label: "Ticket Bookings", icon: Ticket },
+        { href: "/admin/tickets/gates", label: "Ticket Gates", icon: QrCode },
+        { href: "/admin/transport", label: "Transport Bookings", icon: Car },
+        { href: "/admin/availability", label: "Availability", icon: Calendar },
+      ],
+    },
+    {
+      category: "Content",
+      items: [
+        { href: "/admin/blog", label: "All Posts", icon: FileText },
+        { href: "/admin/blog/new", label: "Add New Post", icon: PlusCircle },
+      ],
+    },
+    {
+      category: "Products",
+      items: [
+        { href: "/admin/packages", label: "All Packages", icon: Package },
+        { href: "/admin/packages/new", label: "Add New Package", icon: FolderPlus },
+      ],
+    },
+    {
+      category: "System",
+      items: [
+        { href: "/", label: "View Live Site", icon: ExternalLink },
+      ],
+    },
   ];
 
   return (
     <nav className={styles.nav}>
-      {links.map((link) => (
-        <Link
-          key={link.href}
-          href={link.href}
-          className={`${styles.navLink} ${
-            isActive(pathname, link.href) ? styles.activeNavLink : ""
-          }`}
-        >
-          {link.label}
-        </Link>
+      {navGroups.map((group) => (
+        <div key={group.category} className={styles.navGroup}>
+          <p className={styles.navCategory}>{group.category}</p>
+          <div className={styles.navItems}>
+            {group.items.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(pathname, item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${styles.navLink} ${active ? styles.activeNavLink : ""}`}
+                >
+                  <Icon size={18} className={styles.navIcon} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       ))}
     </nav>
   );

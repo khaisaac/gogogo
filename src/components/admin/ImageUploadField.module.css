@@ -1,58 +1,76 @@
 .wrapper {
-  display: grid;
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .input {
   width: 100%;
-  border: 1px solid #8c8f94;
-  border-radius: 3px;
-  background: #ffffff;
-  padding: 8px 10px;
+  border: 1px dashed #94a3b8;
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 14px;
   font-size: 0.9rem;
-  color: #1d2327;
+  color: #334155;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.input:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .previewCard {
-  border: 2px solid #72aee6;
-  background: #f0f6fc;
-  border-radius: 4px;
-  padding: 8px;
-  display: grid;
-  gap: 8px;
-  max-width: 340px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 360px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
 }
 
 .previewLabel {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #0a4b78;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1d4ed8;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.6px;
 }
 
 .previewImage {
   width: 100%;
   max-height: 220px;
   object-fit: cover;
-  border-radius: 2px;
-  border: 1px solid #c3c4c7;
+  border-radius: 8px;
+  border: 1px solid #dbeafe;
   background: #ffffff;
 }
 
 .cancelBtn {
-  justify-self: start;
-  border: 1px solid #b32d2e;
+  align-self: flex-start;
+  border: 1px solid #fca5a5;
   background: #ffffff;
-  color: #b32d2e;
-  border-radius: 3px;
-  padding: 6px 10px;
-  font-size: 0.76rem;
-  font-weight: 600;
+  color: #dc2626;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
   cursor: pointer;
+  transition: all 0.15s;
 }
 
 .cancelBtn:hover {
-  background: #b32d2e;
+  background: #ef4444;
   color: #ffffff;
+  border-color: #ef4444;
 }
