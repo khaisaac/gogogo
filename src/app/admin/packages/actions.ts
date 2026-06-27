@@ -41,6 +41,7 @@ type PackagePayload = {
   discount_amount: number | null;
   promo_usage_limit: number | null;
   options: any;
+  faqs: any;
 } & Record<PriceFieldName, number | null>;
 
 function parseOptionalNumber(value: FormDataEntryValue | null) {
