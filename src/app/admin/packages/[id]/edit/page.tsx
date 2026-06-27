@@ -275,24 +275,6 @@ export default async function AdminEditPackagePage({
           </div>
 
           <div className={`${styles.field} ${styles.full}`}>
-            <label htmlFor="include">Include (satu baris per item)</label>
-            <textarea
-              id="include"
-              name="include"
-              defaultValue={content.include}
-            />
-          </div>
-
-          <div className={`${styles.field} ${styles.full}`}>
-            <label htmlFor="exclude">Exclude (satu baris per item)</label>
-            <textarea
-              id="exclude"
-              name="exclude"
-              defaultValue={content.exclude}
-            />
-          </div>
-
-          <div className={`${styles.field} ${styles.full}`}>
             <label htmlFor="what_to_bring">
               What to Bring (satu baris per item)
             </label>

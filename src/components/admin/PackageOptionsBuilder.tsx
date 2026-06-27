@@ -10,6 +10,8 @@ type OptionItem = {
   id: string;
   title: string;
   content: string;
+  include?: string;
+  exclude?: string;
 };
 
 type Props = {
@@ -34,7 +36,7 @@ export default function PackageOptionsBuilder({ defaultValue }: Props) {
     if (options.length >= 4) return;
     setOptions((prev) => [
       ...prev,
-      { id: Math.random().toString(36).substring(2, 9), title: "", content: "" },
+      { id: Math.random().toString(36).substring(2, 9), title: "", content: "", include: "", exclude: "" },
     ]);
   };
 
@@ -42,7 +44,7 @@ export default function PackageOptionsBuilder({ defaultValue }: Props) {
     setOptions((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleChange = (id: string, field: "title" | "content", value: string) => {
+  const handleChange = (id: string, field: "title" | "content" | "include" | "exclude", value: string) => {
     setOptions((prev) =>
       prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
     );
@@ -170,6 +172,52 @@ export default function PackageOptionsBuilder({ defaultValue }: Props) {
                     onChange={(val) => handleChange(item.id, "content", val)}
                     modules={modules}
                     placeholder="Ketik keterangan paket, fasilitas, dan klik ikon foto untuk upload gambar..."
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "12px", marginTop: "4px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 700, color: "#0e6d39", marginBottom: "4px" }}>
+                    ✓ Include (1 baris per item)
+                  </label>
+                  <textarea
+                    value={item.include || ""}
+                    onChange={(e) => handleChange(item.id, "include", e.target.value)}
+                    placeholder={"Guide berlisensi\nMakan selama trekking\nTenda & sleeping bag"}
+                    style={{
+                      width: "100%",
+                      minHeight: "80px",
+                      padding: "8px 12px",
+                      border: "1px solid #86efac",
+                      borderRadius: "6px",
+                      fontSize: "0.85rem",
+                      color: "#0f172a",
+                      background: "#f0fdf4",
+                      boxSizing: "border-box"
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 700, color: "#8a1f1f", marginBottom: "4px" }}>
+                    ✕ Exclude (1 baris per item)
+                  </label>
+                  <textarea
+                    value={item.exclude || ""}
+                    onChange={(e) => handleChange(item.id, "exclude", e.target.value)}
+                    placeholder={"Tiket pesawat\nAsuransi pribadi\nTip guide"}
+                    style={{
+                      width: "100%",
+                      minHeight: "80px",
+                      padding: "8px 12px",
+                      border: "1px solid #fca5a5",
+                      borderRadius: "6px",
+                      fontSize: "0.85rem",
+                      color: "#0f172a",
+                      background: "#fef2f2",
+                      boxSizing: "border-box"
+                    }}
                   />
                 </div>
               </div>

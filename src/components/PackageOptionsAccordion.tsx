@@ -7,6 +7,8 @@ type OptionItem = {
   id: string;
   title: string;
   content: string;
+  include?: string;
+  exclude?: string;
 };
 
 type Props = {
@@ -70,20 +72,114 @@ export default function PackageOptionsAccordion({ options }: Props) {
                 </span>
               </button>
 
-              {isExpanded && item.content && (
+              {isExpanded && (item.content || item.include || item.exclude) && (
                 <div className={styles.accordionBody}>
-                  <div
-                    className="quill-rendered-content"
-                    style={{
-                      color: "#4f6477",
-                      fontSize: "0.94rem",
-                      lineHeight: "1.7",
-                      borderTop: "1px dashed #cfd9e4",
-                      paddingTop: "16px",
-                      marginTop: "4px",
-                    }}
-                    dangerouslySetInnerHTML={{ __html: item.content }}
-                  />
+                  {item.content && (
+                    <div
+                      className="quill-rendered-content"
+                      style={{
+                        color: "#4f6477",
+                        fontSize: "0.94rem",
+                        lineHeight: "1.7",
+                        borderTop: "1px dashed #cfd9e4",
+                        paddingTop: "16px",
+                        marginTop: "4px",
+                      }}
+                      dangerouslySetInnerHTML={{ __html: item.content }}
+                    />
+                  )}
+
+                  {item.include && item.include.trim() && (
+                    <div
+                      style={{
+                        marginTop: "16px",
+                        paddingTop: "16px",
+                        borderTop: "1px dashed #cfd9e4",
+                      }}
+                    >
+                      <h4
+                        style={{
+                          color: "#0e6d39",
+                          fontSize: "0.95rem",
+                          fontWeight: 700,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          margin: "0 0 10px",
+                        }}
+                      >
+                        <img
+                          src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/check-circle-fill.svg"
+                          alt=""
+                          style={{ width: "16px", height: "16px" }}
+                        />
+                        Include
+                      </h4>
+                      <ul
+                        style={{
+                          paddingLeft: "24px",
+                          margin: 0,
+                          color: "#4f6477",
+                          display: "grid",
+                          gap: "6px",
+                          fontSize: "0.92rem",
+                        }}
+                      >
+                        {item.include
+                          .split("\n")
+                          .filter(Boolean)
+                          .map((inc, i) => (
+                            <li key={i}>{inc}</li>
+                          ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {item.exclude && item.exclude.trim() && (
+                    <div
+                      style={{
+                        marginTop: "16px",
+                        paddingTop: "16px",
+                        borderTop: "1px dashed #cfd9e4",
+                      }}
+                    >
+                      <h4
+                        style={{
+                          color: "#8a1f1f",
+                          fontSize: "0.95rem",
+                          fontWeight: 700,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          margin: "0 0 10px",
+                        }}
+                      >
+                        <img
+                          src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/x-circle-fill.svg"
+                          alt=""
+                          style={{ width: "16px", height: "16px" }}
+                        />
+                        Exclude
+                      </h4>
+                      <ul
+                        style={{
+                          paddingLeft: "24px",
+                          margin: 0,
+                          color: "#4f6477",
+                          display: "grid",
+                          gap: "6px",
+                          fontSize: "0.92rem",
+                        }}
+                      >
+                        {item.exclude
+                          .split("\n")
+                          .filter(Boolean)
+                          .map((exc, i) => (
+                            <li key={i}>{exc}</li>
+                          ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               )}
             </section>

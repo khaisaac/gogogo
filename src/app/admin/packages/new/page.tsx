@@ -260,24 +260,6 @@ export default async function AdminNewPackagePage({
           </div>
 
           <div className={`${styles.field} ${styles.full}`}>
-            <label htmlFor="include">Include (satu baris per item)</label>
-            <textarea
-              id="include"
-              name="include"
-              placeholder={"Guide berlisensi\nMakan selama trekking\nTenda"}
-            />
-          </div>
-
-          <div className={`${styles.field} ${styles.full}`}>
-            <label htmlFor="exclude">Exclude (satu baris per item)</label>
-            <textarea
-              id="exclude"
-              name="exclude"
-              placeholder={"Tiket pesawat\nAsuransi pribadi\nTip guide"}
-            />
-          </div>
-
-          <div className={`${styles.field} ${styles.full}`}>
             <label htmlFor="what_to_bring">
               What to Bring (satu baris per item)
             </label>

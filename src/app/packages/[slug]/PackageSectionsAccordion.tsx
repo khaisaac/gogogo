@@ -16,8 +16,6 @@ type PackageSectionsAccordionProps = {
 type SectionKey =
   | "itinerary"
   | "highlights"
-  | "include"
-  | "exclude"
   | "bring"
   | "notes";
 
@@ -45,22 +43,6 @@ const SECTION_CONFIG: SectionConfig[] = [
       "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/star-fill.svg",
     iconAlt: "Highlights icon",
     iconClassName: styles.iconHighlight,
-  },
-  {
-    key: "include",
-    title: "Include",
-    iconUrl:
-      "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/check-circle-fill.svg",
-    iconAlt: "Include icon",
-    iconClassName: styles.iconInclude,
-  },
-  {
-    key: "exclude",
-    title: "Exclude",
-    iconUrl:
-      "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/x-circle-fill.svg",
-    iconAlt: "Exclude icon",
-    iconClassName: styles.iconExclude,
   },
   {
     key: "bring",
