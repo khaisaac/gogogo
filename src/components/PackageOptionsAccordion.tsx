@@ -39,66 +39,54 @@ export default function PackageOptionsAccordion({ options }: Props) {
   return (
     <article className={styles.detailCard}>
       <h2 className={styles.sectionTitle}>Package Options</h2>
-      <div style={{ display: "grid", gap: "12px", marginTop: "16px" }}>
+      <div className={styles.accordionList}>
         {validOptions.map((item) => {
           const isExpanded = expandedId === item.id;
           return (
-            <div
-              key={item.id}
-              style={{
-                background: isExpanded ? "#111827" : "#18181b",
-                border: isExpanded ? "1px solid #10b981" : "1px solid #27272a",
-                borderRadius: "14px",
-                overflow: "hidden",
-                transition: "all 0.25s ease",
-              }}
-            >
+            <section key={item.id} className={styles.accordionItem}>
               <button
                 type="button"
+                className={styles.accordionSummary}
                 onClick={() => toggle(item.id)}
-                style={{
-                  width: "100%",
-                  padding: "16px 20px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  background: "transparent",
-                  border: "none",
-                  color: "#ffffff",
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  textAlign: "left",
-                  cursor: "pointer",
-                }}
+                aria-expanded={isExpanded}
               >
-                <span>{item.title}</span>
-                <span
-                  style={{
-                    transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)",
-                    transition: "transform 0.25s ease",
-                    fontSize: "1.2rem",
-                    color: isExpanded ? "#10b981" : "#a1a1aa",
-                  }}
-                >
-                  ⌄
+                <span className={styles.summaryLeft}>
+                  <span
+                    className={`${styles.summaryIcon} ${styles.iconItinerary}`}
+                    aria-hidden
+                  >
+                    <img
+                      src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/box-seam-fill.svg"
+                      alt="Package option icon"
+                    />
+                  </span>
+                  <span className={styles.sectionSubtitle}>{item.title}</span>
+                </span>
+                <span className={styles.toggleBadge}>
+                  {isExpanded ? "Hide" : "Show"}
+                  <span className={styles.summaryArrow} aria-hidden>
+                    {isExpanded ? "^" : "v"}
+                  </span>
                 </span>
               </button>
 
               {isExpanded && item.content && (
-                <div
-                  className="quill-rendered-content"
-                  style={{
-                    padding: "0 20px 20px",
-                    color: "#d1d5db",
-                    fontSize: "0.92rem",
-                    lineHeight: "1.6",
-                    borderTop: "1px solid rgba(255,255,255,0.06)",
-                    paddingTop: "16px",
-                  }}
-                  dangerouslySetInnerHTML={{ __html: item.content }}
-                />
+                <div className={styles.accordionBody}>
+                  <div
+                    className="quill-rendered-content"
+                    style={{
+                      color: "#4f6477",
+                      fontSize: "0.94rem",
+                      lineHeight: "1.7",
+                      borderTop: "1px dashed #cfd9e4",
+                      paddingTop: "16px",
+                      marginTop: "4px",
+                    }}
+                    dangerouslySetInnerHTML={{ __html: item.content }}
+                  />
+                </div>
               )}
-            </div>
+            </section>
           );
         })}
       </div>
@@ -108,14 +96,19 @@ export default function PackageOptionsAccordion({ options }: Props) {
           height: auto;
           border-radius: 10px;
           margin: 12px 0;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
         :global(.quill-rendered-content ul),
         :global(.quill-rendered-content ol) {
           padding-left: 20px;
-          margin: 8px 0;
+          margin: 10px 0;
         }
         :global(.quill-rendered-content p) {
           margin: 8px 0;
+        }
+        :global(.quill-rendered-content a) {
+          color: #0f6ddf;
+          text-decoration: underline;
         }
       `}</style>
     </article>
