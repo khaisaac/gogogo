@@ -40,6 +40,7 @@ type PackagePayload = {
   discount_percentage: number | null;
   discount_amount: number | null;
   promo_usage_limit: number | null;
+  options: any;
 } & Record<PriceFieldName, number | null>;
 
 function parseOptionalNumber(value: FormDataEntryValue | null) {
@@ -141,6 +142,16 @@ function getPayload(formData: FormData): PackagePayload {
   const discount_amount = parseOptionalNumber(formData.get("discount_amount"));
   const promo_usage_limit = parseOptionalNumber(formData.get("promo_usage_limit"));
 
+  let options = null;
+  try {
+    const rawOptions = formData.get("package_options");
+    if (typeof rawOptions === "string" && rawOptions.trim()) {
+      options = JSON.parse(rawOptions);
+    }
+  } catch (err) {
+    console.error("Failed to parse package_options:", err);
+  }
+
   return {
     title,
     route,
@@ -165,6 +176,7 @@ function getPayload(formData: FormData): PackagePayload {
     discount_percentage,
     discount_amount,
     promo_usage_limit,
+    options,
   };
 }
 

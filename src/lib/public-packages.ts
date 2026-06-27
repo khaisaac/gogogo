@@ -19,6 +19,7 @@ export type PublicPackage = {
   discount_amount?: number | null;
   promo_usage_limit?: number | null;
   promo_usage_count?: number;
+  options?: any;
 } & PackagePricingFields;
 
 export function slugifyPackageTitle(input: string) {
@@ -80,6 +81,7 @@ export async function getPublicPackages() {
       discount_amount: true,
       promo_usage_limit: true,
       promo_usage_count: true,
+      options: true,
       price_1pax: true,
       price_2_3pax: true,
       price_4_5pax: true,

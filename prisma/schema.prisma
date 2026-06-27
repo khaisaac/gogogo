@@ -97,6 +97,7 @@ model Package {
   discount_amount      Int?
   promo_usage_limit    Int?
   promo_usage_count    Int      @default(0)
+  options              Json?
 
   is_active   Boolean  @default(true)
   created_at  DateTime @default(now())

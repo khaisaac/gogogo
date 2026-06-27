@@ -4,6 +4,7 @@ import { requireAdmin } from "@/app/admin/_lib";
 import { prisma } from "@/lib/db";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import ItineraryEditor from "@/components/admin/ItineraryEditor";
+import PackageOptionsBuilder from "@/components/admin/PackageOptionsBuilder";
 import MultiImageUploadField from "@/components/admin/MultiImageUploadField";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { DIFFICULTY_OPTIONS, difficultyScoreToValue } from "@/lib/difficulty";
@@ -305,6 +306,10 @@ export default async function AdminEditPackagePage({
           <div className={`${styles.field} ${styles.full}`}>
             <label htmlFor="notes">Notes</label>
             <textarea id="notes" name="notes" defaultValue={content.notes} />
+          </div>
+
+          <div className={`${styles.field} ${styles.full}`}>
+            <PackageOptionsBuilder defaultValue={(pkg as any).options} />
           </div>
 
           <div className={`${styles.field} ${styles.full}`}>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import ItineraryEditor from "@/components/admin/ItineraryEditor";
+import PackageOptionsBuilder from "@/components/admin/PackageOptionsBuilder";
 import MultiImageUploadField from "@/components/admin/MultiImageUploadField";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { DIFFICULTY_OPTIONS } from "@/lib/difficulty";
@@ -294,6 +295,10 @@ export default async function AdminNewPackagePage({
               name="notes"
               placeholder={"Catatan tambahan untuk peserta trekking."}
             />
+          </div>
+
+          <div className={`${styles.field} ${styles.full}`}>
+            <PackageOptionsBuilder />
           </div>
 
           <div className={`${styles.field} ${styles.full}`}>
