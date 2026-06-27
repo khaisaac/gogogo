@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Resend } from "resend";
-import { getPerPaxPrice, getTotalPackagePrice, type PriceType, type TotalDayOption } from "@/lib/pricing";
+import { getPerPaxPrice, getTotalPackagePrice, getPackageOptions, type PriceType, type TotalDayOption } from "@/lib/pricing";
 import { parsePackageContent } from "@/lib/package-content";
 
 function getResendClient() {
@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const { package_id, full_name, email, whatsapp, trekking_date, number_of_trekkers, price_type, price_mode, total_days, hotel_pickup_location, special_requirements, order_note, payment_type, passport_number, nationality, gender, birthday, height, weight, arrival_day, promo_code_applied } = body;
 
     const trekkersCount = Number(number_of_trekkers);
-    const selectedPriceType: PriceType = price_type === "private" ? "private" : "standard";
+    const selectedPriceType = price_type || "private";
     const selectedPriceMode: "per_pax" | "total_package" = price_mode === "total_package" ? "total_package" : "per_pax";
     const selectedTotalDays: TotalDayOption = total_days === 3 ? 3 : 2;
 
@@ -36,6 +36,7 @@ export async function POST(request: Request) {
 
     let package_title = null;
     let total_price = null;
+    let descriptionHtml = "";
     let includeHtml = "";
     let excludeHtml = "";
 
@@ -73,28 +74,45 @@ export async function POST(request: Request) {
           }
         }
 
-        if (pkg.description) {
+        const options = getPackageOptions(pkg as any);
+        const selectedOption = options.find((o) => o.id === selectedPriceType);
+
+        if (pkg.description || selectedOption) {
           const content = parsePackageContent(pkg.description);
           
-          const includeItems = content.include.split("\n").map((i) => i.trim()).filter(Boolean);
+          const descContent = selectedOption?.content?.trim() || content.detail?.trim();
+          if (descContent) {
+            descriptionHtml = `
+              <div style="margin-top: 16px;">
+                <h3 style="color: #1a5c2e; font-size: 16px; margin-bottom: 8px;">📝 Package Description</h3>
+                <div style="color: #444; font-size: 14px; line-height: 1.6; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                  ${descContent}
+                </div>
+              </div>
+            `;
+          }
+
+          const incSource = selectedOption?.include?.trim() || content.include;
+          const includeItems = incSource ? incSource.split("\n").map((i: string) => i.trim()).filter(Boolean) : [];
           if (includeItems.length > 0) {
             includeHtml = `
               <div style="margin-top: 16px;">
                 <h3 style="color: #1a5c2e; font-size: 16px; margin-bottom: 8px;">✅ Include</h3>
                 <ul style="margin: 0; padding-left: 20px; color: #444; font-size: 14px;">
-                  ${includeItems.map((item) => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
+                  ${includeItems.map((item: string) => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
                 </ul>
               </div>
             `;
           }
           
-          const excludeItems = content.exclude.split("\n").map((i) => i.trim()).filter(Boolean);
+          const excSource = selectedOption?.exclude?.trim() || content.exclude;
+          const excludeItems = excSource ? excSource.split("\n").map((i: string) => i.trim()).filter(Boolean) : [];
           if (excludeItems.length > 0) {
             excludeHtml = `
               <div style="margin-top: 16px;">
                 <h3 style="color: #721c24; font-size: 16px; margin-bottom: 8px;">❌ Exclude</h3>
                 <ul style="margin: 0; padding-left: 20px; color: #444; font-size: 14px;">
-                  ${excludeItems.map((item) => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
+                  ${excludeItems.map((item: string) => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
                 </ul>
               </div>
             `;
@@ -172,7 +190,7 @@ export async function POST(request: Request) {
           from: "Trekking Mount Rinjani <noreply@trekkingmountrinjani.com>",
           to: email,
           subject: `Booking Confirmation — ${package_title || "Rinjani Trek"}`,
-          html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #1a5c2e;">🏔️ Booking Received!</h2><p>Hi <strong>${full_name}</strong>,</p><p>Thank you for booking with Trekking Mount Rinjani.</p><table style="width: 100%; border-collapse: collapse; margin: 16px 0;"><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Package</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${package_title || "Custom"}</strong></td></tr><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Date</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${trekking_date}</strong></td></tr><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Adults</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${trekkersCount}</strong></td></tr>${total_price ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Total</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>$${total_price} USD</strong></td></tr>` : ""}</table>${includeHtml}${excludeHtml}<div style="margin-top: 24px;"><p style="color: #666;">Booking ID: <code>${booking.id}</code></p></div></div>`,
+          html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;"><h2 style="color: #1a5c2e;">🏔️ Booking Received!</h2><p>Hi <strong>${full_name}</strong>,</p><p>Thank you for booking with Trekking Mount Rinjani.</p><table style="width: 100%; border-collapse: collapse; margin: 16px 0;"><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Package</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${package_title || "Custom"}</strong></td></tr><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Date</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${trekking_date}</strong></td></tr><tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Adults</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>${trekkersCount}</strong></td></tr>${total_price ? `<tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #666;">Total</td><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>$${total_price} USD</strong></td></tr>` : ""}</table>${descriptionHtml}${includeHtml}${excludeHtml}<div style="margin-top: 24px;"><p style="color: #666;">Booking ID: <code>${booking.id}</code></p></div></div>`,
         });
       } catch (emailErr) { console.error("Email send error:", emailErr); }
 
@@ -263,6 +281,8 @@ export async function POST(request: Request) {
     <div class="section-title">📝 Order Note</div>
     <div class="pre-text">${order_note.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div>
     ` : ""}
+
+    ${descriptionHtml}${includeHtml}${excludeHtml}
 
     <div class="section-title">🔖 Booking ID</div>
     <div class="booking-id">${booking.id}</div>
