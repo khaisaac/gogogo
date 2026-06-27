@@ -25,12 +25,20 @@ type PackagePricingSelectorProps = {
   packageId: string;
   prices: PackagePricingFields;
   fallbackDisplayPrice: number;
+  packagePromoCode?: string | null;
+  isDirectPromo?: boolean;
+  promoUsageLimit?: number | null;
+  promoUsageCount?: number;
 };
 
 export default function PackagePricingSelector({
   packageId,
   prices,
   fallbackDisplayPrice,
+  packagePromoCode,
+  isDirectPromo,
+  promoUsageLimit,
+  promoUsageCount = 0,
 }: PackagePricingSelectorProps) {
   const [priceType, setPriceType] = useState<PriceType>("private");
   const [selectedTierKey, setSelectedTierKey] = useState<GroupTierKey>("1");
@@ -340,32 +348,60 @@ export default function PackagePricingSelector({
           <span className={styles.voucherIcon}>🏷️</span> Have a Voucher Code?
         </div>
         <div className={styles.voucherRow}>
-          <input
-            type="text"
-            className={styles.voucherInput}
-            placeholder="ENTER PROMO CODE"
-            value={promoCode}
-            onChange={(e) => {
-              setPromoCode(e.target.value.toUpperCase());
-              setVoucherFeedback("");
-            }}
-          />
+          <div className={styles.voucherInputWrap}>
+            <input
+              type="text"
+              className={styles.voucherInput}
+              placeholder="ENTER PROMO CODE"
+              value={promoCode}
+              onChange={(e) => {
+                setPromoCode(e.target.value.toUpperCase());
+                setVoucherFeedback("");
+              }}
+            />
+            {promoCode && (
+              <button
+                type="button"
+                className={styles.voucherClearBtn}
+                onClick={() => {
+                  setPromoCode("");
+                  setVoucherFeedback("");
+                }}
+                aria-label="Clear code"
+              >
+                ✕
+              </button>
+            )}
+          </div>
           <button
             type="button"
             className={styles.voucherApplyBtn}
             onClick={() => {
-              if (!promoCode.trim()) {
+              const typed = promoCode.trim().toUpperCase();
+              if (!typed) {
                 setVoucherFeedback("Please enter a code.");
-              } else {
-                setVoucherFeedback("✅ Code attached! Will apply at checkout.");
+                return;
               }
+              if (!packagePromoCode || typed !== packagePromoCode.trim().toUpperCase()) {
+                setVoucherFeedback("❌ Invalid voucher code.");
+                return;
+              }
+              if (promoUsageLimit !== null && promoUsageLimit !== undefined && promoUsageCount >= promoUsageLimit) {
+                setVoucherFeedback("❌ Voucher quota has been exhausted.");
+                return;
+              }
+              setVoucherFeedback("✅ Code valid & attached! Will apply at checkout.");
             }}
           >
             Apply
           </button>
         </div>
         {voucherFeedback && (
-          <p className={styles.voucherFeedbackText}>{voucherFeedback}</p>
+          <p className={
+            voucherFeedback.startsWith("❌")
+              ? styles.voucherFeedbackError
+              : styles.voucherFeedbackText
+          }>{voucherFeedback}</p>
         )}
       </div>
       

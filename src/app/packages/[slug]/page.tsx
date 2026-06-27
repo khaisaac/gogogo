@@ -235,6 +235,10 @@ export default async function PackageDetailPage({
                   packageId={trekkingPackage.id}
                   prices={trekkingPackage}
                   fallbackDisplayPrice={trekkingPackage.displayPrice}
+                  packagePromoCode={trekkingPackage.promo_code}
+                  isDirectPromo={trekkingPackage.is_direct_promo}
+                  promoUsageLimit={trekkingPackage.promo_usage_limit}
+                  promoUsageCount={trekkingPackage.promo_usage_count}
                 />
 
                 <ul className={styles.policyList}>
