@@ -7,8 +7,8 @@ import styles from "./PackageDetailPage.module.css";
 type PackageSectionsAccordionProps = {
   itinerary: ItineraryDay[];
   highlights: string[];
-  includeItems: string[];
-  excludeItems: string[];
+  includeItems?: string[];
+  excludeItems?: string[];
   whatToBringItems: string[];
   notes: string;
 };
@@ -92,8 +92,6 @@ function renderDay(item: ItineraryDay) {
 export default function PackageSectionsAccordion({
   itinerary,
   highlights,
-  includeItems,
-  excludeItems,
   whatToBringItems,
   notes,
 }: PackageSectionsAccordionProps) {
@@ -175,28 +173,6 @@ export default function PackageSectionsAccordion({
                       : ["Tour highlights belum tersedia."]
                     ).map((item, index) => (
                       <li key={`highlights-${index}`}>{item}</li>
-                    ))}
-                  </ul>
-                ) : null}
-
-                {section.key === "include" ? (
-                  <ul className={styles.highlightList}>
-                    {(includeItems.length
-                      ? includeItems
-                      : ["Belum ada data include."]
-                    ).map((item, index) => (
-                      <li key={`include-${index}`}>{item}</li>
-                    ))}
-                  </ul>
-                ) : null}
-
-                {section.key === "exclude" ? (
-                  <ul className={styles.highlightList}>
-                    {(excludeItems.length
-                      ? excludeItems
-                      : ["Belum ada data exclude."]
-                    ).map((item, index) => (
-                      <li key={`exclude-${index}`}>{item}</li>
                     ))}
                   </ul>
                 ) : null}
