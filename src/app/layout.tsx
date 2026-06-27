@@ -80,6 +80,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_URL,
   },
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 // JSON-LD Structured Data for Local Business + TourOperator
@@ -105,6 +110,7 @@ const jsonLd = {
     longitude: 116.4194,
   },
   image: `${SITE_URL}/hero-banner.png`,
+  logo: `${SITE_URL}/logo.png`,
   priceRange: "$$",
   openingHoursSpecification: {
     "@type": "OpeningHoursSpecification",
