@@ -190,28 +190,41 @@ export default function PackageOptionsBuilder({ defaultValue, packageData }: Pro
           Belum ada Package Option. Klik tombol &quot;+ Tambah Option&quot; di atas.
         </div>
       ) : (
-        <div style={{ display: "grid", gap: "20px" }}>
-          {options.map((item, idx) => (
+        <div style={{ display: "grid", gap: "22px" }}>
+          {options.map((item, idx) => {
+            const themes = [
+              { border: "#10b981", headerBg: "#ecfdf5", titleColor: "#065f46", badge: "#059669" },
+              { border: "#3b82f6", headerBg: "#eff6ff", titleColor: "#1e40af", badge: "#2563eb" },
+              { border: "#f59e0b", headerBg: "#fffbeb", titleColor: "#92400e", badge: "#d97706" },
+              { border: "#8b5cf6", headerBg: "#f5f3ff", titleColor: "#5b21b6", badge: "#7c3aed" },
+            ];
+            const theme = themes[idx % themes.length];
+            return (
             <div key={item.id} style={{
-              border: "1px solid #cbd5e1",
-              borderRadius: "10px",
-              padding: "18px",
+              border: `2px solid ${theme.border}`,
+              borderRadius: "12px",
+              overflow: "hidden",
               background: "#ffffff",
               display: "grid",
               gap: "14px",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.03)"
+              boxShadow: `0 4px 12px ${theme.border}20`
             }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", paddingBottom: "10px" }}>
-                <span style={{ fontWeight: 700, color: "#1e293b", fontSize: "0.95rem" }}>Option #{idx + 1}: {item.title || "Untitled Option"}</span>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: theme.headerBg, padding: "12px 18px", borderBottom: `1px solid ${theme.border}40` }}>
+                <span style={{ fontWeight: 700, color: theme.titleColor, fontSize: "1rem", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ background: theme.badge, color: "#fff", padding: "2px 8px", borderRadius: "12px", fontSize: "0.78rem" }}>#{idx + 1}</span>
+                  {item.title || "Untitled Option"}
+                </span>
                 <button
                   type="button"
                   onClick={() => handleRemove(item.id)}
                   style={{
-                    background: "transparent",
-                    border: "none",
+                    background: "#fee2e2",
+                    border: "1px solid #fca5a5",
+                    padding: "4px 10px",
+                    borderRadius: "6px",
                     color: "#ef4444",
                     fontWeight: 700,
-                    fontSize: "0.85rem",
+                    fontSize: "0.8rem",
                     cursor: "pointer"
                   }}
                   title="Hapus option"
@@ -219,9 +232,9 @@ export default function PackageOptionsBuilder({ defaultValue, packageData }: Pro
                   ✕ Hapus
                 </button>
               </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>
+              <div style={{ padding: "0 18px 18px", display: "grid", gap: "14px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 700, color: "#475569", marginBottom: "4px" }}>
                   Judul Dropdown (cth: Private Deluxe Package / Sharing Group)
                 </label>
                 <input
@@ -368,8 +381,10 @@ export default function PackageOptionsBuilder({ defaultValue, packageData }: Pro
                   />
                 </div>
               </div>
+              </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

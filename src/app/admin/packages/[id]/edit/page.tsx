@@ -227,15 +227,15 @@ export default async function AdminEditPackagePage({
           </div>
 
           <div className={`${styles.field} ${styles.full}`}>
-            <PackageFaqsBuilder defaultValue={(pkg as any).faqs} />
-          </div>
-
-          <div className={`${styles.field} ${styles.full}`}>
             <label>Itinerary</label>
             <ItineraryEditor
               name="itinerary"
               defaultValue={content.itinerary}
             />
+          </div>
+
+          <div className={`${styles.field} ${styles.full}`}>
+            <PackageFaqsBuilder defaultValue={(pkg as any).faqs} />
           </div>
         </div>
 

@@ -231,15 +231,15 @@ export default async function AdminNewPackagePage({
           </div>
 
           <div className={`${styles.field} ${styles.full}`}>
-            <PackageFaqsBuilder />
-          </div>
-
-          <div className={`${styles.field} ${styles.full}`}>
             <label>Itinerary</label>
             <ItineraryEditor
               name="itinerary"
               defaultValue={DEFAULT_ITINERARY}
             />
+          </div>
+
+          <div className={`${styles.field} ${styles.full}`}>
+            <PackageFaqsBuilder />
           </div>
         </div>
 
