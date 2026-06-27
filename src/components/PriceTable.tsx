@@ -7,7 +7,7 @@ import {
   GROUP_TIER_OPTIONS,
   PRICE_TYPES,
   getGroupTierPrice,
-  type PriceType,
+  getPackageOptions,
 } from "@/lib/pricing";
 
 type PriceTableProps = {
@@ -16,7 +16,7 @@ type PriceTableProps = {
 
 export default function PriceTable({ packages }: PriceTableProps) {
   const tableRef = useRef<HTMLDivElement>(null);
-  const [priceType, setPriceType] = useState<PriceType>("private");
+  const [priceType, setPriceType] = useState<string>("private");
 
   const scrollLeft = () => {
     if (tableRef.current) {
@@ -30,15 +30,35 @@ export default function PriceTable({ packages }: PriceTableProps) {
     }
   };
 
+  const availablePriceTypes = useMemo(() => {
+    const map = new Map<string, string>();
+    packages.forEach((pkg) => {
+      const opts = getPackageOptions(pkg);
+      opts.forEach((opt) => {
+        if (!map.has(opt.id)) {
+          map.set(opt.id, opt.title);
+        }
+      });
+    });
+    if (map.size === 0) {
+      return [{ value: "private", label: "Private" }, { value: "standard", label: "Standard" }];
+    }
+    return Array.from(map.entries()).map(([value, label]) => ({ value, label }));
+  }, [packages]);
+
+  const activePriceType = availablePriceTypes.some((t) => t.value === priceType)
+    ? priceType
+    : availablePriceTypes[0]?.value || "private";
+
   const priceData = useMemo(
     () =>
       packages.map((pkg) => ({
         package: pkg.title,
         prices: GROUP_TIER_OPTIONS.map((tier) =>
-          getGroupTierPrice(pkg, priceType, tier.key),
+          getGroupTierPrice(pkg, activePriceType, tier.key),
         ),
       })),
-    [packages, priceType],
+    [packages, activePriceType],
   );
 
   return (
@@ -52,12 +72,12 @@ export default function PriceTable({ packages }: PriceTableProps) {
         </p>
 
         <div className={styles.priceTypeSwitch}>
-          {PRICE_TYPES.map((typeDef) => (
+          {availablePriceTypes.map((typeDef) => (
             <button
               key={typeDef.value}
               type="button"
               className={`${styles.typeBtn} ${
-                priceType === typeDef.value ? styles.typeBtnActive : ""
+                activePriceType === typeDef.value ? styles.typeBtnActive : ""
               }`}
               onClick={() => setPriceType(typeDef.value)}
             >

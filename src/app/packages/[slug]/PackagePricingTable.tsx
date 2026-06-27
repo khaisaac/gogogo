@@ -1,9 +1,9 @@
 import {
-  PRICE_TYPES,
   GROUP_TIER_OPTIONS,
   TOTAL_DAY_OPTIONS,
   getGroupTierPrice,
   getTotalPackagePrice,
+  getPackageOptions,
   type PackagePricingFields,
 } from "@/lib/pricing";
 import styles from "./PackagePricingTable.module.css";
@@ -13,22 +13,23 @@ type PackagePricingTableProps = {
 };
 
 export default function PackagePricingTable({ prices }: PackagePricingTableProps) {
-  // Determine which price types (Private, Standard) actually have any pricing data
-  const availablePriceTypes = PRICE_TYPES.filter((type) => {
-    const hasTierPrice = GROUP_TIER_OPTIONS.some(
-      (tier) => getGroupTierPrice(prices, type.value, tier.key) !== null
-    );
-    const hasTotalPackagePrice = TOTAL_DAY_OPTIONS.some(
-      (days) => getTotalPackagePrice(prices, type.value, days) !== null
-    );
-    return hasTierPrice || hasTotalPackagePrice;
-  });
+  const options = getPackageOptions(prices);
+  const availablePriceTypes = options
+    .filter((opt) => {
+      const hasTierPrice = GROUP_TIER_OPTIONS.some(
+        (tier) => getGroupTierPrice(prices, opt.id, tier.key) !== null
+      );
+      const hasTotalPackagePrice = TOTAL_DAY_OPTIONS.some(
+        (days) => getTotalPackagePrice(prices, opt.id, days) !== null
+      );
+      return hasTierPrice || hasTotalPackagePrice;
+    })
+    .map((opt) => ({ value: opt.id, label: opt.title }));
 
   if (availablePriceTypes.length === 0) {
     return null;
   }
 
-  // Filter out options that don't have prices across ANY available price type
   const availableTiers = GROUP_TIER_OPTIONS.filter((tier) =>
     availablePriceTypes.some(
       (type) => getGroupTierPrice(prices, type.value, tier.key) !== null

@@ -8,14 +8,13 @@ import {
   GROUP_TIER_OPTIONS,
   PAX_OPTIONS,
   getGroupTierForPaxCount,
-  PRICE_TYPES,
   TOTAL_DAY_OPTIONS,
   getPerPaxPrice,
   getGroupTierPrice,
   getTotalPackagePrice,
+  getPackageOptions,
   type GroupTierKey,
   type PaxNumber,
-  type PriceType,
   type TotalDayOption,
   type PackagePricingFields,
 } from "@/lib/pricing";
@@ -40,7 +39,7 @@ export default function PackagePricingSelector({
   promoUsageLimit,
   promoUsageCount = 0,
 }: PackagePricingSelectorProps) {
-  const [priceType, setPriceType] = useState<PriceType>("private");
+  const [priceType, setPriceType] = useState<string>("private");
   const [selectedTierKey, setSelectedTierKey] = useState<GroupTierKey>("1");
   const [pax, setPax] = useState<PaxNumber>(1);
   const [pricingMode, setPricingMode] = useState<"per_pax" | "total_package">(
@@ -84,16 +83,19 @@ export default function PackagePricingSelector({
   }, [packageId]);
 
   const availableServiceTypes = useMemo(() => {
-    return PRICE_TYPES.filter((typeDef) => {
-      const hasPerPax = PAX_OPTIONS.some(
-        (option) => getPerPaxPrice(prices, typeDef.value, option) !== null,
-      );
-      const hasTotalPackage = TOTAL_DAY_OPTIONS.some(
-        (days) => getTotalPackagePrice(prices, typeDef.value, days) !== null,
-      );
+    const options = getPackageOptions(prices);
+    return options
+      .filter((opt) => {
+        const hasPerPax = PAX_OPTIONS.some(
+          (option) => getPerPaxPrice(prices, opt.id, option) !== null,
+        );
+        const hasTotalPackage = TOTAL_DAY_OPTIONS.some(
+          (days) => getTotalPackagePrice(prices, opt.id, days) !== null,
+        );
 
-      return hasPerPax || hasTotalPackage;
-    });
+        return hasPerPax || hasTotalPackage;
+      })
+      .map((opt) => ({ value: opt.id, label: opt.title }));
   }, [prices]);
 
   const resolvedPriceType =
@@ -169,7 +171,7 @@ export default function PackagePricingSelector({
       : (perPaxPrice ?? fallbackDisplayPrice);
   const safeDisplayedPrice = displayedPrice > 0 ? displayedPrice : null;
   const serviceLabel =
-    PRICE_TYPES.find((item) => item.value === resolvedPriceType)?.label ||
+    availableServiceTypes.find((item) => item.value === resolvedPriceType)?.label ||
     "Private";
   const hasModeChoice = hasPerPaxPrices && hasTotalPackagePrices;
   const decrementAdult = () =>
@@ -212,7 +214,7 @@ export default function PackagePricingSelector({
         <select
           className={styles.bookingSelect}
           value={resolvedPriceType}
-          onChange={(event) => setPriceType(event.target.value as PriceType)}
+          onChange={(event) => setPriceType(event.target.value)}
           aria-label="Select service type"
         >
           {availableServiceTypes.map((typeDef) => (

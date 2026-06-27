@@ -6,13 +6,7 @@ import PackageFaqsBuilder from "@/components/admin/PackageFaqsBuilder";
 import MultiImageUploadField from "@/components/admin/MultiImageUploadField";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { DIFFICULTY_OPTIONS } from "@/lib/difficulty";
-import {
-  GROUP_TIER_OPTIONS,
-  PRICE_TYPES,
-  TOTAL_DAY_OPTIONS,
-  groupPriceFieldName,
-  totalPriceFieldName,
-} from "@/lib/pricing";
+
 import { createPackage } from "../actions";
 import styles from "../../admin.module.css";
 
@@ -112,55 +106,7 @@ export default async function AdminNewPackagePage({
             </select>
           </div>
 
-          <div className={`${styles.field} ${styles.full}`}>
-            <label>Pricing Matrix (USD per group tier)</label>
-            <p className={styles.helper}>
-              Isi harga per person untuk bucket 1, 2-3, 4-5, 6-8, dan 9-10+
-              trekkers. Saat checkout, total tetap dihitung per person dikali
-              jumlah adult.
-            </p>
-            <div className={styles.pricingMatrix}>
-              {PRICE_TYPES.map((typeDef) => (
-                <section key={typeDef.value} className={styles.pricingSection}>
-                  <h3 className={styles.pricingTitle}>{typeDef.label}</h3>
-                  <div className={styles.pricingGrid}>
-                    {GROUP_TIER_OPTIONS.map((tier) => {
-                      const field = groupPriceFieldName(typeDef.value, tier.key);
 
-                      return (
-                        <div key={field} className={styles.field}>
-                          <label htmlFor={field}>{tier.label}</label>
-                          <input
-                            id={field}
-                            name={field}
-                            type="number"
-                            min={0}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className={styles.pricingTotalGrid}>
-                    {TOTAL_DAY_OPTIONS.map((days) => {
-                      const field = totalPriceFieldName(typeDef.value, days);
-
-                      return (
-                        <div key={field} className={styles.field}>
-                          <label htmlFor={field}>Total {days} Days</label>
-                          <input
-                            id={field}
-                            name={field}
-                            type="number"
-                            min={0}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              ))}
-            </div>
-          </div>
 
           <div className={`${styles.field} ${styles.full}`}>
             <label>Promo / Discount Settings</label>

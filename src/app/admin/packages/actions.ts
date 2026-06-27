@@ -42,7 +42,8 @@ type PackagePayload = {
   promo_usage_limit: number | null;
   options: any;
   faqs: any;
-} & Record<PriceFieldName, number | null>;
+  [key: string]: any;
+};
 
 function parseOptionalNumber(value: FormDataEntryValue | null) {
   if (!value) return null;
@@ -71,39 +72,102 @@ function compactErrorMessage(raw: string) {
 
 function parsePricingFields(
   formData: FormData,
-): Record<PriceFieldName | TotalPriceFieldName | LegacyPriceFieldName, number | null> {
-  const pricing = {} as Record<
-    PriceFieldName | TotalPriceFieldName | LegacyPriceFieldName,
-    number | null
-  >;
+  options?: any[] | null,
+): Record<string, number | null> {
+  const pricing: Record<string, number | null> = {};
 
-  const privateGroupTierPrices: Partial<Record<GroupTierKey, number | null>> = {};
-
-  for (const typeDef of PRICE_TYPES) {
-    for (const tier of GROUP_TIER_OPTIONS) {
-      const field = groupPriceFieldName(typeDef.value, tier.key as GroupTierKey);
-      const groupPrice = parseOptionalNumber(formData.get(field));
-
-      if (typeDef.value === "private") {
-        privateGroupTierPrices[tier.key] = groupPrice;
-      }
-
-      for (const pax of tier.paxValues) {
-        pricing[priceFieldName(typeDef.value, pax)] = groupPrice;
-      }
+  for (const typeDef of ["private", "standard"] as const) {
+    for (const pax of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const) {
+      pricing[`${typeDef}_price_${pax}pax`] = null;
     }
-
-    for (const days of TOTAL_DAY_OPTIONS) {
-      const field = totalPriceFieldName(typeDef.value, days);
-      pricing[field] = parseOptionalNumber(formData.get(field));
+    for (const days of [2, 3] as const) {
+      pricing[`${typeDef}_total_${days}_days`] = null;
     }
   }
+  pricing.price_1pax = null;
+  pricing.price_2_3pax = null;
+  pricing.price_4_5pax = null;
+  pricing.price_6plus = null;
 
-  pricing.price_1pax = privateGroupTierPrices["1"] ?? null;
-  pricing.price_2_3pax = privateGroupTierPrices["2_3"] ?? null;
-  pricing.price_4_5pax = privateGroupTierPrices["4_5"] ?? null;
-  pricing.price_6plus =
-    privateGroupTierPrices["6_8"] ?? privateGroupTierPrices["9_10"] ?? null;
+  if (Array.isArray(options) && options.length > 0) {
+    const parseNum = (v: any) =>
+      v === null || v === undefined || v === "" || isNaN(Number(v)) || Number(v) <= 0
+        ? null
+        : Number(v);
+
+    const privateOpt =
+      options.find(
+        (o: any) =>
+          o.id === "private" || o.title?.toLowerCase().includes("private"),
+      ) || options[0];
+    if (privateOpt?.pricing) {
+      const p = privateOpt.pricing;
+      const p1 = parseNum(p.price_1pax);
+      const p23 = parseNum(p.price_2_3pax);
+      const p45 = parseNum(p.price_4_5pax);
+      const p68 = parseNum(p.price_6_8pax);
+      const p910 = parseNum(p.price_9_10pax) ?? p68;
+
+      pricing.private_price_1pax = p1;
+      pricing.private_price_2pax = p23;
+      pricing.private_price_3pax = p23;
+      pricing.private_price_4pax = p45;
+      pricing.private_price_5pax = p45;
+      pricing.private_price_6pax = p68;
+      pricing.private_price_7pax = p68;
+      pricing.private_price_8pax = p68;
+      pricing.private_price_9pax = p910;
+      pricing.private_price_10pax = p910;
+      pricing.private_total_2_days = parseNum(p.total_2_days);
+      pricing.private_total_3_days = parseNum(p.total_3_days);
+
+      pricing.price_1pax = p1;
+      pricing.price_2_3pax = p23;
+      pricing.price_4_5pax = p45;
+      pricing.price_6plus = p68 ?? p910;
+    }
+
+    const standardOpt =
+      options.find(
+        (o: any) =>
+          o.id === "standard" || o.title?.toLowerCase().includes("standard"),
+      ) || (options.length > 1 ? options[1] : null);
+    if (standardOpt?.pricing) {
+      const p = standardOpt.pricing;
+      const p1 = parseNum(p.price_1pax);
+      const p23 = parseNum(p.price_2_3pax);
+      const p45 = parseNum(p.price_4_5pax);
+      const p68 = parseNum(p.price_6_8pax);
+      const p910 = parseNum(p.price_9_10pax) ?? p68;
+
+      pricing.standard_price_1pax = p1;
+      pricing.standard_price_2pax = p23;
+      pricing.standard_price_3pax = p23;
+      pricing.standard_price_4pax = p45;
+      pricing.standard_price_5pax = p45;
+      pricing.standard_price_6pax = p68;
+      pricing.standard_price_7pax = p68;
+      pricing.standard_price_8pax = p68;
+      pricing.standard_price_9pax = p910;
+      pricing.standard_price_10pax = p910;
+      pricing.standard_total_2_days = parseNum(p.total_2_days);
+      pricing.standard_total_3_days = parseNum(p.total_3_days);
+    }
+  } else {
+    for (const typeDef of PRICE_TYPES) {
+      for (const tier of GROUP_TIER_OPTIONS) {
+        const field = groupPriceFieldName(typeDef.value, tier.key as GroupTierKey);
+        const groupPrice = parseOptionalNumber(formData.get(field));
+        for (const pax of tier.paxValues) {
+          pricing[priceFieldName(typeDef.value, pax)] = groupPrice;
+        }
+      }
+      for (const days of TOTAL_DAY_OPTIONS) {
+        const field = totalPriceFieldName(typeDef.value, days);
+        pricing[field] = parseOptionalNumber(formData.get(field));
+      }
+    }
+  }
 
   return pricing;
 }
@@ -128,7 +192,18 @@ function getPayload(formData: FormData): PackagePayload {
     .map((value) => value.trim())
     .filter(Boolean);
   const difficultyRaw = String(formData.get("difficulty") || "moderate");
-  const pricing = parsePricingFields(formData);
+
+  let options = null;
+  try {
+    const rawOptions = formData.get("package_options");
+    if (typeof rawOptions === "string" && rawOptions.trim()) {
+      options = JSON.parse(rawOptions);
+    }
+  } catch (err) {
+    console.error("Failed to parse package_options:", err);
+  }
+
+  const pricing = parsePricingFields(formData, options);
 
   let route: "sembalun" | "senaru" | "torean" = "sembalun";
   if (routeValue === "senaru") {
@@ -142,16 +217,6 @@ function getPayload(formData: FormData): PackagePayload {
   const discount_percentage = parseOptionalNumber(formData.get("discount_percentage"));
   const discount_amount = parseOptionalNumber(formData.get("discount_amount"));
   const promo_usage_limit = parseOptionalNumber(formData.get("promo_usage_limit"));
-
-  let options = null;
-  try {
-    const rawOptions = formData.get("package_options");
-    if (typeof rawOptions === "string" && rawOptions.trim()) {
-      options = JSON.parse(rawOptions);
-    }
-  } catch (err) {
-    console.error("Failed to parse package_options:", err);
-  }
 
   let faqs = null;
   try {
