@@ -15,6 +15,7 @@ import PackagePricingSelector from "./PackagePricingSelector";
 import PackagePricingTable from "./PackagePricingTable";
 import PackageSectionsAccordion from "./PackageSectionsAccordion";
 import PackageOptionsAccordion from "@/components/PackageOptionsAccordion";
+import PackageFaqsAccordion from "@/components/PackageFaqsAccordion";
 import BottomBookingScrollButton from "./BottomBookingScrollButton";
 import styles from "./PackageDetailPage.module.css";
 
@@ -307,11 +308,11 @@ export default async function PackageDetailPage({
               <PackageSectionsAccordion
                 itinerary={itinerary}
                 highlights={highlights}
-                includeItems={includeItems}
-                excludeItems={excludeItems}
                 whatToBringItems={whatToBringItems}
                 notes={content.notes}
               />
+
+              <PackageFaqsAccordion faqs={(trekkingPackage as any).faqs} />
 
               <section className={styles.relatedTourSection}>
                 <h2 className={styles.relatedTourTitle}>Related Tour</h2>

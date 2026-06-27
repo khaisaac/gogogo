@@ -152,6 +152,16 @@ function getPayload(formData: FormData): PackagePayload {
     console.error("Failed to parse package_options:", err);
   }
 
+  let faqs = null;
+  try {
+    const rawFaqs = formData.get("package_faqs");
+    if (typeof rawFaqs === "string" && rawFaqs.trim()) {
+      faqs = JSON.parse(rawFaqs);
+    }
+  } catch (err) {
+    console.error("Failed to parse package_faqs:", err);
+  }
+
   return {
     title,
     route,
@@ -177,6 +187,7 @@ function getPayload(formData: FormData): PackagePayload {
     discount_amount,
     promo_usage_limit,
     options,
+    faqs,
   };
 }
 

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import ItineraryEditor from "@/components/admin/ItineraryEditor";
 import PackageOptionsBuilder from "@/components/admin/PackageOptionsBuilder";
+import PackageFaqsBuilder from "@/components/admin/PackageFaqsBuilder";
 import MultiImageUploadField from "@/components/admin/MultiImageUploadField";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { DIFFICULTY_OPTIONS, difficultyScoreToValue } from "@/lib/difficulty";
@@ -292,6 +293,10 @@ export default async function AdminEditPackagePage({
 
           <div className={`${styles.field} ${styles.full}`}>
             <PackageOptionsBuilder defaultValue={(pkg as any).options} />
+          </div>
+
+          <div className={`${styles.field} ${styles.full}`}>
+            <PackageFaqsBuilder defaultValue={(pkg as any).faqs} />
           </div>
 
           <div className={`${styles.field} ${styles.full}`}>

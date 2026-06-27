@@ -2,6 +2,7 @@ import Link from "next/link";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import ItineraryEditor from "@/components/admin/ItineraryEditor";
 import PackageOptionsBuilder from "@/components/admin/PackageOptionsBuilder";
+import PackageFaqsBuilder from "@/components/admin/PackageFaqsBuilder";
 import MultiImageUploadField from "@/components/admin/MultiImageUploadField";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { DIFFICULTY_OPTIONS } from "@/lib/difficulty";
@@ -281,6 +282,10 @@ export default async function AdminNewPackagePage({
 
           <div className={`${styles.field} ${styles.full}`}>
             <PackageOptionsBuilder />
+          </div>
+
+          <div className={`${styles.field} ${styles.full}`}>
+            <PackageFaqsBuilder />
           </div>
 
           <div className={`${styles.field} ${styles.full}`}>
