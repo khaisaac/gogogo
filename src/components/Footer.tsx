@@ -7,7 +7,7 @@ export default function Footer() {
     <footer id="contact" className={styles.footer}>
       <div className={`container ${styles.grid}`}>
         <div className={styles.col}>
-          <Image src="/logo.png" alt="Trekking Mount Rinjani" width={180} height={60} className={styles.logo} loading="lazy" />
+          <Image src="/logoFooter.png" alt="Trekking Mount Rinjani" width={180} height={60} className={styles.logo} loading="lazy" />
           <p className={styles.desc}>
             Local &amp; licensed Rinjani trekking agency. Direct booking without
             intermediaries — better price, better experience.
