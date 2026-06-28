@@ -304,6 +304,103 @@ export default async function PackageDetailPage({
 
             <PackageOptionsAccordion options={(trekkingPackage as any).options} />
 
+            {(includeItems.length > 0 || excludeItems.length > 0) && (
+              <div style={{ display: "grid", gap: "16px", marginBottom: "32px" }}>
+                {includeItems.length > 0 && (
+                  <div
+                    style={{
+                      background: "#ffffff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "16px",
+                      padding: "24px",
+                      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
+                    }}
+                  >
+                    <h3
+                      style={{
+                        color: "#0f172a",
+                        fontSize: "1.25rem",
+                        fontWeight: 800,
+                        margin: "0 0 16px 0",
+                      }}
+                    >
+                      Include
+                    </h3>
+                    <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "14px" }}>
+                      {includeItems.map((inc, i) => (
+                        <li
+                          key={i}
+                          style={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: "12px",
+                            color: "#334155",
+                            fontSize: "0.95rem",
+                            lineHeight: "1.6",
+                          }}
+                        >
+                          <span style={{ display: "inline-flex", flexShrink: 0, marginTop: "2px" }}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                              <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                          </span>
+                          <span>{inc}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {excludeItems.length > 0 && (
+                  <div
+                    style={{
+                      background: "#ffffff",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "16px",
+                      padding: "24px",
+                      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
+                    }}
+                  >
+                    <h3
+                      style={{
+                        color: "#0f172a",
+                        fontSize: "1.25rem",
+                        fontWeight: 800,
+                        margin: "0 0 16px 0",
+                      }}
+                    >
+                      Exclude
+                    </h3>
+                    <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: "14px" }}>
+                      {excludeItems.map((exc, i) => (
+                        <li
+                          key={i}
+                          style={{
+                            display: "flex",
+                            alignItems: "flex-start",
+                            gap: "12px",
+                            color: "#334155",
+                            fontSize: "0.95rem",
+                            lineHeight: "1.6",
+                          }}
+                        >
+                          <span style={{ display: "inline-flex", flexShrink: 0, marginTop: "2px" }}>
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="10" />
+                              <line x1="15" y1="9" x2="9" y2="15" />
+                              <line x1="9" y1="9" x2="15" y2="15" />
+                            </svg>
+                          </span>
+                          <span>{exc}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
             <article className={styles.detailCard}>
               <PackageSectionsAccordion
                 itinerary={itinerary}

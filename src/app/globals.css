@@ -269,10 +269,23 @@ button {
   }
 }
 
-/* ===== WYSIWYG CONTENT RESTORE ===== */
-.wysiwyg-content {
+/* ===== WYSIWYG & RICH TEXT CONTENT RESTORE ===== */
+.wysiwyg-content,
+.quill-rendered-content {
   word-wrap: break-word;
   overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.wysiwyg-content *,
+.quill-rendered-content * {
+  max-width: 100% !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  box-sizing: border-box !important;
 }
 
 .wysiwyg-content ul {

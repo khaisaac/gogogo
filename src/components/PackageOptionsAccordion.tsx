@@ -113,7 +113,7 @@ export default function PackageOptionsAccordion({ options }: Props) {
                   width: "100%",
                 }}
               >
-                <span className={styles.summaryLeft} style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                <span className={styles.summaryLeft} style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1, minWidth: 0, paddingRight: "8px" }}>
                   <span
                     className={styles.summaryIcon}
                     style={{
@@ -138,7 +138,7 @@ export default function PackageOptionsAccordion({ options }: Props) {
                   </span>
                   <span
                     className={styles.sectionSubtitle}
-                    style={{ color: theme.titleColor, fontWeight: 700, fontSize: "1.1rem" }}
+                    style={{ color: theme.titleColor, fontWeight: 700, fontSize: "1.05rem", wordBreak: "break-word", overflowWrap: "break-word", lineHeight: 1.3 }}
                   >
                     {item.title}
                   </span>
@@ -156,6 +156,7 @@ export default function PackageOptionsAccordion({ options }: Props) {
                     display: "flex",
                     alignItems: "center",
                     gap: "6px",
+                    flexShrink: 0,
                   }}
                 >
                   {isExpanded ? "Hide" : "Show"}
@@ -166,7 +167,7 @@ export default function PackageOptionsAccordion({ options }: Props) {
               </button>
 
               {isExpanded && (item.content || item.include || item.exclude) && (
-                <div className={styles.accordionBody} style={{ padding: "20px", background: "#ffffff" }}>
+                <div className={styles.accordionBody} style={{ padding: "16px", background: "#ffffff", overflowX: "hidden", wordBreak: "break-word", overflowWrap: "break-word" }}>
                   {item.content && (
                     <div
                       className="quill-rendered-content"
@@ -174,6 +175,9 @@ export default function PackageOptionsAccordion({ options }: Props) {
                         color: "#334155",
                         fontSize: "0.95rem",
                         lineHeight: "1.7",
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                        whiteSpace: "normal"
                       }}
                       dangerouslySetInnerHTML={{ __html: item.content }}
                     />
@@ -182,44 +186,56 @@ export default function PackageOptionsAccordion({ options }: Props) {
                   {item.include && item.include.trim() && (
                     <div
                       style={{
-                        marginTop: item.content ? "18px" : "0",
-                        paddingTop: item.content ? "18px" : "0",
-                        borderTop: item.content ? "1px dashed #cbd5e1" : "none",
+                        background: "#ffffff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "16px",
+                        padding: "20px",
+                        marginTop: "20px",
+                        boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
                       }}
                     >
-                      <h4
+                      <h3
                         style={{
-                          color: "#059669",
-                          fontSize: "0.96rem",
-                          fontWeight: 700,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                          margin: "0 0 12px",
+                          color: "#0f172a",
+                          fontSize: "1.2rem",
+                          fontWeight: 800,
+                          margin: "0 0 16px 0",
                         }}
                       >
-                        <img
-                          src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/check-circle-fill.svg"
-                          alt=""
-                          style={{ width: "18px", height: "18px", filter: "sepia(1) hue-rotate(90deg) saturate(5)" }}
-                        />
                         Include
-                      </h4>
+                      </h3>
                       <ul
                         style={{
-                          paddingLeft: "24px",
+                          listStyle: "none",
+                          padding: 0,
                           margin: 0,
-                          color: "#334155",
                           display: "grid",
-                          gap: "8px",
-                          fontSize: "0.93rem",
+                          gap: "14px",
                         }}
                       >
                         {item.include
                           .split("\n")
                           .filter(Boolean)
                           .map((inc, i) => (
-                            <li key={i}>{inc}</li>
+                            <li
+                              key={i}
+                              style={{
+                                display: "flex",
+                                alignItems: "flex-start",
+                                gap: "12px",
+                                color: "#334155",
+                                fontSize: "0.95rem",
+                                lineHeight: "1.6",
+                              }}
+                            >
+                              <span style={{ display: "inline-flex", flexShrink: 0, marginTop: "2px" }}>
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                                  <polyline points="22 4 12 14.01 9 11.01" />
+                                </svg>
+                              </span>
+                              <span>{inc}</span>
+                            </li>
                           ))}
                       </ul>
                     </div>
@@ -228,44 +244,57 @@ export default function PackageOptionsAccordion({ options }: Props) {
                   {item.exclude && item.exclude.trim() && (
                     <div
                       style={{
-                        marginTop: "18px",
-                        paddingTop: "18px",
-                        borderTop: "1px dashed #cbd5e1",
+                        background: "#ffffff",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "16px",
+                        padding: "20px",
+                        marginTop: "16px",
+                        boxShadow: "0 4px 16px rgba(0, 0, 0, 0.04)",
                       }}
                     >
-                      <h4
+                      <h3
                         style={{
-                          color: "#e11d48",
-                          fontSize: "0.96rem",
-                          fontWeight: 700,
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                          margin: "0 0 12px",
+                          color: "#0f172a",
+                          fontSize: "1.2rem",
+                          fontWeight: 800,
+                          margin: "0 0 16px 0",
                         }}
                       >
-                        <img
-                          src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/x-circle-fill.svg"
-                          alt=""
-                          style={{ width: "18px", height: "18px", filter: "sepia(1) hue-rotate(300deg) saturate(5)" }}
-                        />
                         Exclude
-                      </h4>
+                      </h3>
                       <ul
                         style={{
-                          paddingLeft: "24px",
+                          listStyle: "none",
+                          padding: 0,
                           margin: 0,
-                          color: "#334155",
                           display: "grid",
-                          gap: "8px",
-                          fontSize: "0.93rem",
+                          gap: "14px",
                         }}
                       >
                         {item.exclude
                           .split("\n")
                           .filter(Boolean)
                           .map((exc, i) => (
-                            <li key={i}>{exc}</li>
+                            <li
+                              key={i}
+                              style={{
+                                display: "flex",
+                                alignItems: "flex-start",
+                                gap: "12px",
+                                color: "#334155",
+                                fontSize: "0.95rem",
+                                lineHeight: "1.6",
+                              }}
+                            >
+                              <span style={{ display: "inline-flex", flexShrink: 0, marginTop: "2px" }}>
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                                  <circle cx="12" cy="12" r="10" />
+                                  <line x1="15" y1="9" x2="9" y2="15" />
+                                  <line x1="9" y1="9" x2="15" y2="15" />
+                                </svg>
+                              </span>
+                              <span>{exc}</span>
+                            </li>
                           ))}
                       </ul>
                     </div>
@@ -277,9 +306,27 @@ export default function PackageOptionsAccordion({ options }: Props) {
         })}
       </div>
       <style jsx>{`
-        :global(.quill-rendered-content img) {
+        :global(.quill-rendered-content) {
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          word-break: break-word;
           max-width: 100%;
-          height: auto;
+          overflow-x: auto;
+        }
+        :global(.quill-rendered-content *),
+        :global(.quill-rendered-content p),
+        :global(.quill-rendered-content span),
+        :global(.quill-rendered-content div) {
+          max-width: 100% !important;
+          white-space: normal !important;
+          word-wrap: break-word !important;
+          overflow-wrap: break-word !important;
+          word-break: break-word !important;
+          box-sizing: border-box !important;
+        }
+        :global(.quill-rendered-content img) {
+          max-width: 100% !important;
+          height: auto !important;
           border-radius: 10px;
           margin: 12px 0;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
