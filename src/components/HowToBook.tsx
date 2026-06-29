@@ -2,7 +2,7 @@ import styles from "./HowToBook.module.css";
 
 export default function HowToBook() {
   return (
-    <section className={`section-alt ${styles.section}`}>
+    <section id="how-to-book" className={`section-alt ${styles.section}`}>
       <div className="container">
         <div className={styles.grid}>
           <div className={styles.card}>

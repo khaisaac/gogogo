@@ -1,24 +1,88 @@
 .pricingTableWrapper {
   margin: 2rem 0 3rem;
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 6px -2px rgb(0 0 0 / 0.04);
   border: 1px solid #e2e8f0;
+  max-width: 100%;
+  width: 100%;
+}
+
+.header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .pricingTitle {
   font-size: 1.25rem;
   font-weight: 700;
   color: #0f172a;
-  padding: 1.25rem 1.5rem;
   margin: 0;
-  border-bottom: 1px solid #e2e8f0;
-  background-color: #f8fafc;
+}
+
+.activeLabel {
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.activeLabel strong {
+  color: #0284c7;
+  font-weight: 700;
+}
+
+.tabsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: #e2e8f0;
+  padding: 0.35rem;
+  border-radius: 12px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.tabBtn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tabBtn:hover {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.activeTab {
+  background: #ffffff !important;
+  color: #0284c7 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .tableContainer {
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .pricingTable {
@@ -36,15 +100,15 @@
 .pricingTable th {
   background-color: #f8fafc;
   color: #475569;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  white-space: nowrap;
 }
 
 .pricingTable td {
   color: #334155;
+  font-size: 0.95rem;
 }
 
 .pricingTable tbody tr:last-child td {
@@ -56,7 +120,7 @@
 }
 
 .sectionRow {
-  background-color: #f1f5f9;
+  background-color: #f1f5f9 !important;
 }
 
 .sectionRow td {
@@ -65,15 +129,48 @@
 }
 
 .sectionRow strong {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  color: #0284c7;
+}
+
+.priceCell {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.priceBadge {
+  display: inline-block;
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.naBadge {
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 @media (max-width: 640px) {
+  .header {
+    padding: 1rem;
+  }
   .pricingTable th,
   .pricingTable td {
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
+  }
+  .tabsContainer {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+  .tabBtn {
+    text-align: center;
+    padding: 0.5rem 0.5rem;
   }
 }

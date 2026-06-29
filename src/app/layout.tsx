@@ -193,7 +193,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body suppressHydrationWarning>
+      <body id="top" suppressHydrationWarning>
         <Script
           strategy="lazyOnload"
           src="https://www.googletagmanager.com/gtag/js?id=AW-11203920100"

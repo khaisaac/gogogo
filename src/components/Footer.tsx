@@ -7,7 +7,9 @@ export default function Footer() {
     <footer id="contact" className={styles.footer}>
       <div className={`container ${styles.grid}`}>
         <div className={styles.col}>
-          <Image src="/logoFooter.png" alt="Trekking Mount Rinjani" width={180} height={60} className={styles.logo} loading="lazy" />
+          <Link href="/#top" aria-label="Home">
+            <Image src="/logoFooter.png" alt="Trekking Mount Rinjani" width={180} height={60} className={styles.logo} loading="lazy" />
+          </Link>
           <p className={styles.desc}>
             Local &amp; licensed Rinjani trekking agency. Direct booking without
             intermediaries — better price, better experience.
@@ -28,9 +30,9 @@ export default function Footer() {
         <div className={styles.col}>
           <h4 className={styles.colTitle}>Packages</h4>
           <ul className={styles.list}>
-            <li><a href="#sembalun">Sembalun Trekking Route</a></li>
-            <li><a href="#senaru">Senaru Trekking Route</a></li>
-            <li><a href="#torean">Torean Trekking Route</a></li>
+            <li><Link href="/#sembalun">Sembalun Trekking Route</Link></li>
+            <li><Link href="/#senaru">Senaru Trekking Route</Link></li>
+            <li><Link href="/#torean">Torean Trekking Route</Link></li>
             <li><Link href="/booking-transport">Senaru Transport</Link></li>
           </ul>
         </div>
@@ -38,10 +40,10 @@ export default function Footer() {
         <div className={styles.col}>
           <h4 className={styles.colTitle}>Quick Links</h4>
           <ul className={styles.list}>
-            <li><a href="#about">About Us</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Booking Procedure</a></li>
+            <li><Link href="/#about">About Us</Link></li>
+            <li><Link href="/#pricing">Pricing</Link></li>
+            <li><Link href="/blog">Blog</Link></li>
+            <li><Link href="/#how-to-book">Booking Procedure</Link></li>
           </ul>
         </div>
 
@@ -60,7 +62,7 @@ export default function Footer() {
             </li>
             <li>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span>Jalan Senaru Bayan, Lombok Utara</span>
+              <a href="https://maps.google.com/?q=Jalan+Senaru+Bayan,+Lombok+Utara" target="_blank" rel="noopener noreferrer">Jalan Senaru Bayan, Lombok Utara</a>
             </li>
           </ul>
         </div>
@@ -69,7 +71,7 @@ export default function Footer() {
       <div className={styles.bottom}>
         <div className={`container ${styles.bottomCont}`}>
           <p>© 2026 Trekking Mount Rinjani. All rights reserved.</p>
-          <a href="#" className={styles.scrollToTop} aria-label="Scroll to top">
+          <a href="#top" className={styles.scrollToTop} aria-label="Scroll to top">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square">
               <path d="M12 19V5M5 12l7-7 7 7"/>
             </svg>
