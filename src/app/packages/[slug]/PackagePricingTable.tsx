@@ -60,9 +60,9 @@ export default function PackagePricingTable({ prices }: PackagePricingTableProps
         {availablePriceTypes.length > 1 && (
           <div className={styles.sliderHintBox}>
             <div className={styles.hintText}>
-              <span className={styles.swipeIcon}>↔️</span>
+              {/* <span className={styles.swipeIcon}>↔️</span> */}
               <span>
-                <strong>Geser / Slide tabel ke samping</strong> untuk melihat seluruh opsi layanan
+                <strong>Slide the table to the side</strong> to view all service options
               </span>
             </div>
             <div className={styles.sliderControls}>

@@ -44,7 +44,7 @@
 }
 
 .sliderHintBox {
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -174,7 +174,7 @@
   font-weight: 500;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .header {
     padding: 1rem;
   }
@@ -184,6 +184,7 @@
     font-size: 0.875rem;
   }
   .sliderHintBox {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
     text-align: center;
