@@ -32,7 +32,7 @@ export default async function AdminLayout({
             </div>
             <div>
               <div className={styles.brandTitleRow}>
-                <h1 className={styles.title}>Rinjani Trek</h1>
+                <h1 className={styles.brandTitle}>Rinjani Trek</h1>
                 <span className={styles.brandBadge}>PRO</span>
               </div>
               <p className={styles.kicker}>Admin Portal v2.0</p>

@@ -74,11 +74,20 @@
   gap: 8px;
 }
 
-.title {
+.brandTitle {
   font-size: 1.1rem;
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.title,
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.5px;
   margin: 0;
 }
 
