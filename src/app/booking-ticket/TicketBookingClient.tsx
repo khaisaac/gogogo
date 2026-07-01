@@ -80,11 +80,7 @@ function calculateBasePrice(
 
     let pricePerDay = 0;
     if (citizenType === "foreign") {
-      if (isClass1(entranceGateName)) {
-        pricePerDay = isWeekend ? 225000 : 150000;
-      } else {
-        pricePerDay = isWeekend ? 225000 : 150000;
-      }
+      pricePerDay = 250000;
     } else {
       // Local (WNI)
       if (isClass1(entranceGateName)) {
@@ -690,7 +686,7 @@ export default function TicketBookingClient({
                   <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#64748b', background: '#f8fafc', padding: '10px', borderRadius: '6px', lineHeight: '1.4' }}>
                     {citizenType === "foreign" ? (
                       <div>
-                        <strong>Foreign National Fee:</strong> <strong>Rp 150,000 / day / person</strong> on normal weekdays and <strong>Rp 225,000 / day / person</strong> on weekend/holidays.
+                        <strong>Foreign National Fee:</strong> <strong>Rp 250,000 / day / person</strong>.
                       </div>
                     ) : (
                       <div>
