@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { difficultyScoreToLabel } from "@/lib/difficulty";
 import { parsePackageContent } from "@/lib/package-content";
+import { getPageSEO } from "@/lib/seo";
 import {
   getPublicPackageBySlug,
   getPublicPackages,
@@ -48,15 +49,11 @@ export async function generateMetadata({
   const galleryFromContent = content.gallery?.filter(Boolean) || [];
   const coverImage = trekkingPackage.image || galleryFromContent[0] || "/hero-banner.png";
 
-  return {
+  return await getPageSEO(`packages/${slug}`, {
     title: `${trekkingPackage.title} | Rinjani Trekking`,
     description,
-    openGraph: {
-      title: trekkingPackage.title,
-      description,
-      images: coverImage !== "/hero-banner.png" ? [coverImage] : [],
-    },
-  };
+    image: coverImage,
+  });
 }
 
 function toList(value: string) {

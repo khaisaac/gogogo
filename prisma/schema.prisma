@@ -278,6 +278,22 @@ model Post {
   created_at            DateTime  @default(now())
   updated_at            DateTime  @updatedAt
 
+  // SEO Fields
+  seo_title           String?   @db.Text
+  meta_description    String?   @db.Text
+  meta_keywords       String?   @db.Text
+  canonical_url       String?   @db.Text
+  robots              String?   @default("index, follow")
+  og_title            String?   @db.Text
+  og_description      String?   @db.Text
+  og_image            String?   @db.Text
+  twitter_title       String?   @db.Text
+  twitter_description String?   @db.Text
+  twitter_image       String?   @db.Text
+  focus_keyword       String?   @db.Text
+  schema_type         String?   @default("Article")
+  seo_status          String?   @default("published") // 'draft' | 'published'
+
   // Relations
   author                User?     @relation("PostAuthor", fields: [author_id], references: [id], onDelete: SetNull)
   category              Category? @relation(fields: [category_id], references: [id], onDelete: SetNull)
@@ -434,3 +450,79 @@ model StoredImage {
 
   @@map("stored_images")
 }
+
+// 14. SEO Management for Static & Dynamic Pages
+model SeoPage {
+  id                  String   @id @default(uuid())
+  page_slug           String   @unique
+  seo_title           String?  @db.Text
+  meta_description    String?  @db.Text
+  meta_keywords       String?  @db.Text
+  canonical_url       String?  @db.Text
+  robots              String   @default("index, follow")
+  og_title            String?  @db.Text
+  og_description      String?  @db.Text
+  og_image            String?  @db.Text
+  twitter_title       String?  @db.Text
+  twitter_description String?  @db.Text
+  twitter_image       String?  @db.Text
+  focus_keyword       String?  @db.Text
+  schema_type         String?  @default("Website")
+  seo_status          String?  @default("published") // 'draft' | 'published'
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  @@map("seo_pages")
+}
+
+// 15. SEO Redirects (301 Redirect Manager)
+model SeoRedirect {
+  id          String   @id @default(uuid())
+  source_url  String   @unique
+  target_url  String
+  status_code Int      @default(301)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("seo_redirects")
+}
+
+// 16. SEO Revision History & Audit Trail
+model SeoRevision {
+  id              String   @id @default(uuid())
+  target_type     String   // 'page' | 'post'
+  target_id       String   // page_slug or post_id
+  changed_by      String?
+  old_title       String?  @db.Text
+  new_title       String?  @db.Text
+  old_description String?  @db.Text
+  new_description String?  @db.Text
+  created_at      DateTime @default(now())
+
+  @@index([target_type, target_id])
+  @@map("seo_revisions")
+}
+
+// 17. Global SEO Settings (Robots.txt, Sitemap Ping, etc)
+model SeoSetting {
+  key        String   @id // e.g. 'robots_txt', 'sitemap_config'
+  value      String   @db.LongText
+  updated_at DateTime @updatedAt
+
+  @@map("seo_settings")
+}
+
+// 18. Image SEO Metadata
+model ImageSeoMetadata {
+  id         String   @id @default(uuid())
+  url        String   @unique @db.VarChar(255)
+  alt_text   String?  @db.Text
+  title      String?  @db.Text
+  caption    String?  @db.Text
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("image_seo_metadata")
+}
+
+

@@ -28,6 +28,20 @@ type BlogPayload = {
   cover_image_alignment: string;
   is_published: boolean;
   published_at: string | null;
+  seo_title?: string | null;
+  meta_description?: string | null;
+  meta_keywords?: string | null;
+  canonical_url?: string | null;
+  robots?: string | null;
+  og_title?: string | null;
+  og_description?: string | null;
+  og_image?: string | null;
+  twitter_title?: string | null;
+  twitter_description?: string | null;
+  twitter_image?: string | null;
+  focus_keyword?: string | null;
+  schema_type?: string | null;
+  seo_status?: string | null;
 };
 
 function slugify(input: string) {
@@ -57,6 +71,20 @@ function getPayload(formData: FormData): BlogPayload {
       String(formData.get("cover_image_alignment") || "center").trim(),
     is_published: isPublished,
     published_at: isPublished ? new Date().toISOString() : null,
+    seo_title: String(formData.get("seo_title") || "").trim() || null,
+    meta_description: String(formData.get("meta_description") || "").trim() || null,
+    meta_keywords: String(formData.get("meta_keywords") || "").trim() || null,
+    canonical_url: String(formData.get("canonical_url") || "").trim() || null,
+    robots: String(formData.get("robots") || "index, follow").trim() || "index, follow",
+    og_title: String(formData.get("og_title") || "").trim() || null,
+    og_description: String(formData.get("og_description") || "").trim() || null,
+    og_image: String(formData.get("og_image") || "").trim() || null,
+    twitter_title: String(formData.get("twitter_title") || "").trim() || null,
+    twitter_description: String(formData.get("twitter_description") || "").trim() || null,
+    twitter_image: String(formData.get("twitter_image") || "").trim() || null,
+    focus_keyword: String(formData.get("focus_keyword") || "").trim() || null,
+    schema_type: String(formData.get("schema_type") || "Article").trim() || "Article",
+    seo_status: String(formData.get("seo_status") || "published").trim() || "published",
   };
 }
 
@@ -145,6 +173,20 @@ export async function createPost(formData: FormData) {
         is_published: payload.is_published,
         published_at: payload.published_at ? new Date(payload.published_at) : null,
         author_id: user.id,
+        seo_title: payload.seo_title,
+        meta_description: payload.meta_description,
+        meta_keywords: payload.meta_keywords,
+        canonical_url: payload.canonical_url,
+        robots: payload.robots,
+        og_title: payload.og_title,
+        og_description: payload.og_description,
+        og_image: payload.og_image,
+        twitter_title: payload.twitter_title,
+        twitter_description: payload.twitter_description,
+        twitter_image: payload.twitter_image,
+        focus_keyword: payload.focus_keyword,
+        schema_type: payload.schema_type,
+        seo_status: payload.seo_status,
       },
     });
 
@@ -190,6 +232,17 @@ export async function updatePost(id: string, formData: FormData) {
       throw new Error("Title and slug are required");
     }
 
+    const existingPost = await prisma.post.findUnique({ where: { id }, select: { slug: true } });
+    if (existingPost && existingPost.slug !== payload.slug) {
+      try {
+        await prisma.seoRedirect.upsert({
+          where: { source_url: `/blog/${existingPost.slug}` },
+          update: { target_url: `/blog/${payload.slug}`, status_code: 301 },
+          create: { source_url: `/blog/${existingPost.slug}`, target_url: `/blog/${payload.slug}`, status_code: 301 },
+        });
+      } catch (_) {}
+    }
+
     await prisma.post.update({
       where: { id },
       data: {
@@ -202,8 +255,34 @@ export async function updatePost(id: string, formData: FormData) {
         cover_image_alignment: payload.cover_image_alignment,
         is_published: payload.is_published,
         published_at: payload.published_at ? new Date(payload.published_at) : null,
+        seo_title: payload.seo_title,
+        meta_description: payload.meta_description,
+        meta_keywords: payload.meta_keywords,
+        canonical_url: payload.canonical_url,
+        robots: payload.robots,
+        og_title: payload.og_title,
+        og_description: payload.og_description,
+        og_image: payload.og_image,
+        twitter_title: payload.twitter_title,
+        twitter_description: payload.twitter_description,
+        twitter_image: payload.twitter_image,
+        focus_keyword: payload.focus_keyword,
+        schema_type: payload.schema_type,
+        seo_status: payload.seo_status,
       },
     });
+
+    try {
+      await prisma.seoRevision.create({
+        data: {
+          target_type: "post",
+          target_id: id,
+          changed_by: "Admin",
+          new_title: payload.seo_title || payload.title,
+          new_description: payload.meta_description || payload.excerpt,
+        },
+      });
+    } catch (_) {}
 
     // Clear existing tags
     await prisma.postTag.deleteMany({ where: { post_id: id } });

@@ -14,6 +14,12 @@ import {
   Package,
   FolderPlus,
   ExternalLink,
+  Globe,
+  TrendingUp,
+  Layers,
+  Repeat,
+  AlertOctagon,
+  History,
 } from "lucide-react";
 import styles from "./admin.module.css";
 
@@ -22,6 +28,7 @@ function isActive(pathname: string, href: string) {
   if (href === "/admin/blog") return pathname === "/admin/blog";
   if (href === "/admin/packages") return pathname === "/admin/packages";
   if (href === "/admin/availability") return pathname === "/admin/availability";
+  if (href === "/admin/seo") return pathname === "/admin/seo";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -66,6 +73,19 @@ export default function AdminSidebarNav() {
       items: [
         { href: "/admin/packages", label: "All Packages", icon: Package },
         { href: "/admin/packages/new", label: "Add New Package", icon: FolderPlus },
+      ],
+    },
+    {
+      category: "Professional SEO Pro ⭐",
+      items: [
+        { href: "/admin/seo", label: "SEO Dashboard", icon: TrendingUp },
+        { href: "/admin/seo/static", label: "Static Pages SEO", icon: Globe },
+        { href: "/admin/seo/articles", label: "Article SEO Overview", icon: FileText },
+        { href: "/admin/seo/bulk", label: "Bulk SEO Editor", icon: Layers },
+        { href: "/admin/seo/redirects", label: "301 Redirects", icon: Repeat },
+        { href: "/admin/seo/robots", label: "Robots & Sitemap", icon: Globe },
+        { href: "/admin/seo/broken-links", label: "Broken Links 404", icon: AlertOctagon },
+        { href: "/admin/seo/tools", label: "Export / Import & Rev", icon: History },
       ],
     },
     {

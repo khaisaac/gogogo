@@ -13,10 +13,15 @@ const getValidImageUrl = (url: string | null | undefined) => {
   return url;
 };
 
-export const metadata = {
-  title: "Blog & Guides — Trekking Mount Rinjani",
-  description: "Read our latest guides, tips, and stories to prepare for your Rinjani adventure.",
-};
+import type { Metadata } from "next";
+import { getPageSEO } from "@/lib/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return await getPageSEO("blog", {
+    title: "Blog & Guides — Trekking Mount Rinjani",
+    description: "Read our latest guides, tips, and stories to prepare for your Rinjani adventure.",
+  });
+}
 
 export default async function BlogPage({
   searchParams,

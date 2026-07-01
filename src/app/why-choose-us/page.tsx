@@ -4,10 +4,15 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import styles from "./page.module.css";
 import Image from "next/image";
 
-export const metadata = {
-  title: "About Us | Why Choose Us - Rinjani Trekking",
-  description: "Learn more about our Rinjani trekking services, our experienced team, and our commitment to safety and quality.",
-};
+import type { Metadata } from "next";
+import { getPageSEO } from "@/lib/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return await getPageSEO("why-choose-us", {
+    title: "About Us | Why Choose Us - Rinjani Trekking",
+    description: "Learn more about our Rinjani trekking services, our experienced team, and our commitment to safety and quality.",
+  });
+}
 
 export default function AboutPage() {
   return (

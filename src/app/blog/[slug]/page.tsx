@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { getArticleSEO } from "@/lib/seo";
 import styles from "./blog-post.module.css";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +24,26 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await prisma.post.findFirst({
     where: { slug, is_published: true },
-    select: { title: true, excerpt: true, content: true, featured_image: true },
+    select: {
+      title: true,
+      slug: true,
+      excerpt: true,
+      content: true,
+      featured_image: true,
+      published_at: true,
+      created_at: true,
+      seo_title: true,
+      meta_description: true,
+      meta_keywords: true,
+      canonical_url: true,
+      robots: true,
+      og_title: true,
+      og_description: true,
+      og_image: true,
+      twitter_title: true,
+      twitter_description: true,
+      twitter_image: true,
+    },
   });
 
   if (!post) {
@@ -32,23 +52,7 @@ export async function generateMetadata({
     };
   }
 
-  let description = post.excerpt || "";
-  if (!description && post.content) {
-    // Strip HTML tags for description fallback
-    description = post.content.replace(/<[^>]*>?/gm, "").substring(0, 160).trim() + "...";
-  }
-
-  const imageUrl = getValidImageUrl(post.featured_image);
-
-  return {
-    title: `${post.title} | Rinjani Trekking`,
-    description,
-    openGraph: {
-      title: post.title,
-      description,
-      images: imageUrl !== "/hero-banner.png" ? [imageUrl] : [],
-    },
-  };
+  return await getArticleSEO(post);
 }
 
 

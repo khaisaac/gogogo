@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { updatePost } from "../../actions";
+import ArticleSeoFormSection from "@/components/admin/seo/ArticleSeoFormSection";
 import styles from "../../../admin.module.css";
 
 export default async function AdminEditPostPage({
@@ -165,6 +166,23 @@ export default async function AdminEditPostPage({
               <option value="right">Right Edge</option>
             </select>
           </div>
+
+          <ArticleSeoFormSection
+            postSlug={post.slug}
+            initialData={{
+              seo_title: post.seo_title || undefined,
+              meta_description: post.meta_description || undefined,
+              meta_keywords: post.meta_keywords || undefined,
+              canonical_url: post.canonical_url || undefined,
+              robots: post.robots || undefined,
+              og_title: post.og_title || undefined,
+              og_description: post.og_description || undefined,
+              og_image: post.og_image || undefined,
+              twitter_title: post.twitter_title || undefined,
+              twitter_description: post.twitter_description || undefined,
+              twitter_image: post.twitter_image || undefined,
+            }}
+          />
         </div>
 
         <label className={styles.inlineCheck}>

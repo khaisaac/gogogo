@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import ImageUploadField from "@/components/admin/ImageUploadField";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { createPost } from "../actions";
+import ArticleSeoFormSection from "@/components/admin/seo/ArticleSeoFormSection";
 import styles from "../../admin.module.css";
 
 export default async function AdminNewPostPage() {
@@ -113,6 +114,8 @@ export default async function AdminNewPostPage() {
               <option value="right">Right Edge</option>
             </select>
           </div>
+
+          <ArticleSeoFormSection />
         </div>
 
         <label className={styles.inlineCheck}>
