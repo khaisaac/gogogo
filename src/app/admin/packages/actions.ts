@@ -212,8 +212,8 @@ function getPayload(formData: FormData): PackagePayload {
     route = "torean";
   }
 
-  const is_direct_promo = formData.get("is_direct_promo") === "on";
   const promo_code = String(formData.get("promo_code") || "").trim() || null;
+  const is_direct_promo = promo_code ? false : (formData.get("is_direct_promo") === "on");
   const discount_percentage = parseOptionalNumber(formData.get("discount_percentage"));
   const discount_amount = parseOptionalNumber(formData.get("discount_amount"));
   const promo_usage_limit = parseOptionalNumber(formData.get("promo_usage_limit"));

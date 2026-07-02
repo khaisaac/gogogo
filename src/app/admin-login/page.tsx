@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { adminLogin, verifyAdminRole } from "./actions";
 import styles from "./page.module.css";
 
 function AdminLoginContent() {
@@ -62,19 +61,23 @@ function AdminLoginContent() {
     setError("");
 
     try {
-      const result = await adminLogin(email, password);
+      const res = await fetch("/api/auth/admin-login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-      if (result?.error) {
-        setError(result.error);
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setError(data.error || "Login gagal. Periksa email dan password Anda.");
         return;
       }
 
-      // Success
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      router.push("/admin/packages");
-      router.refresh();
+      // Gunakan window.location.href agar browser melakukan full-load ke panel admin tanpa masalah cache client router
+      window.location.href = "/admin/packages";
     } catch (err: any) {
-      setError(`Network/Action error: ${err.message || "Failed to contact server"}`);
+      setError(`Koneksi error: ${err.message || "Gagal menghubungi server"}`);
     } finally {
       setLoading(false);
     }

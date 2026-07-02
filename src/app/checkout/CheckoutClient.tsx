@@ -46,7 +46,17 @@ export default function CheckoutClient({
   const [error, setError] = useState("");
   const [email, setEmail] = useState(userEmail);
   const [inputPromoCode, setInputPromoCode] = useState(initialPromoCode);
-  const [promoApplied, setPromoApplied] = useState(isDirectPromo);
+
+  const hasPromoCode = Boolean(packagePromoCode && packagePromoCode.trim() !== "");
+  const effectiveDirectPromo = Boolean(isDirectPromo && !hasPromoCode);
+
+  const [promoApplied, setPromoApplied] = useState(() => {
+    if (effectiveDirectPromo) return true;
+    if (hasPromoCode && initialPromoCode && packagePromoCode && initialPromoCode.trim().toUpperCase() === packagePromoCode.trim().toUpperCase()) {
+      return !(promoUsageLimit !== null && promoUsageCount >= promoUsageLimit);
+    }
+    return false;
+  });
   const isAdmin = userRole === "admin";
 
   const [formData, setFormData] = useState({
@@ -81,14 +91,17 @@ Special/Dietary Requirements: `,
   const isPromoExhausted = promoUsageLimit !== null && promoUsageCount >= promoUsageLimit;
 
   useEffect(() => {
-    if (initialPromoCode && packagePromoCode && initialPromoCode.trim().toUpperCase() === packagePromoCode.toUpperCase() && !isPromoExhausted) {
+    if (hasPromoCode && initialPromoCode && packagePromoCode && initialPromoCode.trim().toUpperCase() === packagePromoCode.trim().toUpperCase() && !isPromoExhausted) {
       setPromoApplied(true);
+      setInputPromoCode(initialPromoCode);
+    } else if (hasPromoCode && !effectiveDirectPromo) {
+      setPromoApplied(false);
     }
-  }, [initialPromoCode, packagePromoCode, isPromoExhausted]);
+  }, [initialPromoCode, packagePromoCode, isPromoExhausted, hasPromoCode, effectiveDirectPromo]);
 
   const handleApplyPromo = () => {
     if (!packagePromoCode) return;
-    if (inputPromoCode.trim().toUpperCase() === packagePromoCode.toUpperCase()) {
+    if (inputPromoCode.trim().toUpperCase() === packagePromoCode.trim().toUpperCase()) {
       if (isPromoExhausted) {
         setError("Voucher quota has been exhausted.");
         setPromoApplied(false);
@@ -135,7 +148,7 @@ Special/Dietary Requirements: `,
         order_note: formData.orderNote,
         payment_type: formData.paymentType,
         arrival_day: formData.arrivalDay,
-        promo_code_applied: promoApplied ? (isDirectPromo ? "DIRECT_PROMO" : packagePromoCode) : null,
+        promo_code_applied: promoApplied ? (effectiveDirectPromo ? "DIRECT_PROMO" : packagePromoCode) : null,
         discount_amount_applied: appliedDiscountAmount,
       };
 
@@ -413,7 +426,7 @@ Special/Dietary Requirements: `,
             <strong>{pax} Adults</strong>
           </div>
 
-          {!isDirectPromo && packagePromoCode && !isPromoExhausted && (
+          {hasPromoCode && !isPromoExhausted && (
             <div className={styles.summaryItem} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px', marginTop: '16px', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px' }}>
               <span style={{ fontWeight: 600, fontSize: '0.9em' }}>Have a voucher code?</span>
               <div style={{ display: 'flex', width: '100%', gap: '8px' }}>

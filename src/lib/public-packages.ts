@@ -48,7 +48,9 @@ function mapPackage(pkg: any): PublicPackage {
   let originalDisplayPrice = getDisplayPrice(pkg);
   let displayPrice = originalDisplayPrice;
 
-  if (pkg.is_direct_promo) {
+  const effectiveDirectPromo = Boolean(pkg.is_direct_promo && (!pkg.promo_code || pkg.promo_code.trim() === ""));
+
+  if (effectiveDirectPromo) {
     if (pkg.discount_percentage) {
       displayPrice = Math.round(originalDisplayPrice * (1 - pkg.discount_percentage / 100));
     } else if (pkg.discount_amount) {
@@ -60,7 +62,8 @@ function mapPackage(pkg: any): PublicPackage {
     ...pkg,
     slug,
     displayPrice,
-    originalDisplayPrice: pkg.is_direct_promo ? originalDisplayPrice : undefined,
+    originalDisplayPrice: effectiveDirectPromo ? originalDisplayPrice : undefined,
+    is_direct_promo: effectiveDirectPromo,
   };
 }
 

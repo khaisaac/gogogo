@@ -58,7 +58,11 @@ export async function POST(request: Request) {
           total_price = perPaxPrice * trekkersCount;
         }
 
-        if (pkg.is_direct_promo || (promo_code_applied && pkg.promo_code && promo_code_applied.toUpperCase() === pkg.promo_code.toUpperCase())) {
+        const hasPromoCode = Boolean(pkg.promo_code && pkg.promo_code.trim() !== "");
+        const effectiveDirectPromo = Boolean(pkg.is_direct_promo && !hasPromoCode);
+        const validVoucherApplied = Boolean(hasPromoCode && promo_code_applied && promo_code_applied.trim().toUpperCase() === pkg.promo_code!.trim().toUpperCase());
+
+        if (effectiveDirectPromo || validVoucherApplied) {
           const isPromoExhausted = pkg.promo_usage_limit !== null && pkg.promo_usage_count >= pkg.promo_usage_limit;
           
           if (!isPromoExhausted) {

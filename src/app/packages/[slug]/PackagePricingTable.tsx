@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import {
   GROUP_TIER_OPTIONS,
   TOTAL_DAY_OPTIONS,
@@ -16,7 +15,6 @@ type PackagePricingTableProps = {
 };
 
 export default function PackagePricingTable({ prices }: PackagePricingTableProps) {
-  const tableRef = useRef<HTMLDivElement>(null);
   const options = getPackageOptions(prices);
   const availablePriceTypes = options
     .filter((opt) => {
@@ -34,12 +32,6 @@ export default function PackagePricingTable({ prices }: PackagePricingTableProps
     return null;
   }
 
-  const scroll = (offset: number) => {
-    if (tableRef.current) {
-      tableRef.current.scrollBy({ left: offset, behavior: "smooth" });
-    }
-  };
-
   const availableTiers = GROUP_TIER_OPTIONS.filter((tier) =>
     availablePriceTypes.some((type) => getGroupTierPrice(prices, type.value, tier.key) !== null)
   );
@@ -54,34 +46,16 @@ export default function PackagePricingTable({ prices }: PackagePricingTableProps
         <div className={styles.titleRow}>
           <h3 className={styles.pricingTitle}>Pricing Information</h3>
           <span className={styles.activeLabel}>
-            Showing: <strong>All Service Options</strong>
+            All prices in <strong>USD</strong>
           </span>
         </div>
-        {availablePriceTypes.length > 1 && (
-          <div className={styles.sliderHintBox}>
-            <div className={styles.hintText}>
-              {/* <span className={styles.swipeIcon}>↔️</span> */}
-              <span>
-                <strong>Slide the table to the side</strong> to view all service options
-              </span>
-            </div>
-            <div className={styles.sliderControls}>
-              <button type="button" onClick={() => scroll(-250)} className={styles.slideBtn}>
-                ◀ Slide
-              </button>
-              <button type="button" onClick={() => scroll(250)} className={styles.slideBtn}>
-                Slide ▶
-              </button>
-            </div>
-          </div>
-        )}
       </div>
 
-      <div className={styles.tableContainer} ref={tableRef}>
+      <div className={styles.tableContainer}>
         <table className={styles.pricingTable}>
           <thead>
             <tr>
-              <th>Group Size / Duration</th>
+              <th>Group Size</th>
               {availablePriceTypes.map((type) => (
                 <th key={type.value}>{type.label}</th>
               ))}
@@ -90,11 +64,13 @@ export default function PackagePricingTable({ prices }: PackagePricingTableProps
           <tbody>
             {availableTiers.length > 0 && (
               <>
-                <tr className={styles.sectionRow}>
-                  <td colSpan={availablePriceTypes.length + 1}>
-                    <strong>Price Per Person (USD)</strong>
-                  </td>
-                </tr>
+                {availableTotalDays.length > 0 && (
+                  <tr className={styles.sectionRow}>
+                    <td colSpan={availablePriceTypes.length + 1}>
+                      <strong>Price Per Person (USD)</strong>
+                    </td>
+                  </tr>
+                )}
                 {availableTiers.map((tier) => (
                   <tr key={tier.key}>
                     <td>{tier.label}</td>
@@ -147,3 +123,4 @@ export default function PackagePricingTable({ prices }: PackagePricingTableProps
     </div>
   );
 }
+
