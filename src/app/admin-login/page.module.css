@@ -106,12 +106,42 @@
   height: 42px;
   padding: 0 11px;
   font-size: 0.9rem;
+  width: 100%;
 }
 
 .field input:focus {
   outline: none;
   border-color: #2a8742;
   box-shadow: 0 0 0 3px rgba(42, 135, 66, 0.2);
+}
+
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.passwordWrapper input {
+  padding-right: 40px;
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #557060;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.eyeBtn:hover {
+  color: #1d3a27;
 }
 
 .submit {

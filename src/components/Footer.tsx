@@ -68,6 +68,42 @@ export default function Footer() {
         </div>
       </div>
 
+      <div className={`container ${styles.partnersSection}`}>
+        <h5 className={styles.partnersTitle}>Official Partners &amp; Accreditations</h5>
+        <div className={styles.partnersGrid}>
+          <div className={styles.partnerItem}>
+            <Image
+              src="/pijar.png"
+              alt="Pijar"
+              width={320}
+              height={160}
+              className={`${styles.partnerLogo} ${styles.pijarLogo}`}
+              loading="lazy"
+            />
+          </div>
+          <div className={styles.partnerItem}>
+            <Image
+              src="/wonder.png"
+              alt="Wonderful Indonesia"
+              width={320}
+              height={160}
+              className={styles.partnerLogo}
+              loading="lazy"
+            />
+          </div>
+          <div className={styles.partnerItem}>
+            <Image
+              src="/taman.png"
+              alt="Taman Nasional Gunung Rinjani"
+              width={320}
+              height={160}
+              className={styles.partnerLogo}
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </div>
+
       <div className={styles.bottom}>
         <div className={`container ${styles.bottomCont}`}>
           <p>© 2026 Trekking Mount Rinjani. All rights reserved.</p>

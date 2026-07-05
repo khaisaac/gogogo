@@ -99,8 +99,59 @@
   color: var(--color-primary);
 }
 
-.bottom {
+/* Official Partners & Accreditations */
+.partnersSection {
   margin-top: 56px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.partnersTitle {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 28px;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  text-align: center;
+}
+
+.partnersGrid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 64px;
+  flex-wrap: wrap;
+}
+
+.partnerItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+  transition: transform var(--transition-fast);
+}
+
+.partnerItem:hover {
+  transform: translateY(-4px);
+}
+
+.partnerLogo {
+  max-height: 95px;
+  max-width: 280px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.pijarLogo {
+  max-height: 145px;
+  max-width: 220px;
+}
+
+.bottom {
+  margin-top: 40px;
   padding: 24px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   font-family: var(--font-body);
@@ -143,5 +194,28 @@
   .grid {
     grid-template-columns: 1fr;
     gap: 36px;
+  }
+  .partnersSection {
+    margin-top: 40px;
+    padding-top: 32px;
+  }
+  .partnersTitle {
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+  }
+  .partnersGrid {
+    gap: 36px;
+  }
+  .partnerItem {
+    min-height: 75px;
+  }
+  .partnerLogo {
+    max-height: 65px;
+    max-width: 200px;
+  }
+  .pijarLogo {
+    max-height: 95px;
+    max-width: 160px;
   }
 }
