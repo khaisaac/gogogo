@@ -345,70 +345,76 @@ export default function PackagePricingSelector({
       </div>
 
       {/* Optional Voucher Code Box */}
-      <div className={styles.voucherBox}>
-        <div className={styles.voucherHeader}>
-          <span className={styles.voucherIcon}>🏷️</span> Have a Voucher Code?
-        </div>
-        <div className={styles.voucherRow}>
-          <div className={styles.voucherInputWrap}>
-            <input
-              type="text"
-              className={styles.voucherInput}
-              placeholder="ENTER PROMO CODE"
-              value={promoCode}
-              onChange={(e) => {
-                setPromoCode(e.target.value.toUpperCase());
-                setVoucherFeedback("");
-              }}
-            />
-            {promoCode && (
-              <button
-                type="button"
-                className={styles.voucherClearBtn}
-                onClick={() => {
-                  setPromoCode("");
+      {Boolean(packagePromoCode && packagePromoCode.trim() !== "" && !isDirectPromo && (promoUsageLimit === null || promoUsageLimit === undefined || promoUsageCount < promoUsageLimit)) && (
+        <div className={styles.voucherBox}>
+          <div className={styles.voucherHeader}>
+            <span className={styles.voucherIcon}>🏷️</span> Have a Voucher Code?
+          </div>
+          <div className={styles.voucherRow}>
+            <div className={styles.voucherInputWrap}>
+              <input
+                type="text"
+                className={styles.voucherInput}
+                placeholder="ENTER PROMO CODE"
+                value={promoCode}
+                onChange={(e) => {
+                  setPromoCode(e.target.value.toUpperCase());
                   setVoucherFeedback("");
                 }}
-                aria-label="Clear code"
-              >
-                ✕
-              </button>
-            )}
+              />
+              {promoCode && (
+                <button
+                  type="button"
+                  className={styles.voucherClearBtn}
+                  onClick={() => {
+                    setPromoCode("");
+                    setVoucherFeedback("");
+                  }}
+                  aria-label="Clear code"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            <button
+              type="button"
+              className={styles.voucherApplyBtn}
+              onClick={() => {
+                const typed = promoCode.trim().toUpperCase();
+                if (!typed) {
+                  setVoucherFeedback("Please enter a code.");
+                  return;
+                }
+                if (!packagePromoCode || typed !== packagePromoCode.trim().toUpperCase()) {
+                  setVoucherFeedback("❌ Invalid voucher code.");
+                  return;
+                }
+                if (promoUsageLimit !== null && promoUsageLimit !== undefined && promoUsageCount >= promoUsageLimit) {
+                  setVoucherFeedback("❌ Voucher quota has been exhausted.");
+                  return;
+                }
+                setVoucherFeedback("✅ Code valid & attached! Will apply at checkout.");
+              }}
+            >
+              Apply
+            </button>
           </div>
-          <button
-            type="button"
-            className={styles.voucherApplyBtn}
-            onClick={() => {
-              const typed = promoCode.trim().toUpperCase();
-              if (!typed) {
-                setVoucherFeedback("Please enter a code.");
-                return;
-              }
-              if (!packagePromoCode || typed !== packagePromoCode.trim().toUpperCase()) {
-                setVoucherFeedback("❌ Invalid voucher code.");
-                return;
-              }
-              if (promoUsageLimit !== null && promoUsageLimit !== undefined && promoUsageCount >= promoUsageLimit) {
-                setVoucherFeedback("❌ Voucher quota has been exhausted.");
-                return;
-              }
-              setVoucherFeedback("✅ Code valid & attached! Will apply at checkout.");
-            }}
-          >
-            Apply
-          </button>
+          {voucherFeedback && (
+            <p className={
+              voucherFeedback.startsWith("❌")
+                ? styles.voucherFeedbackError
+                : styles.voucherFeedbackText
+            }>{voucherFeedback}</p>
+          )}
         </div>
-        {voucherFeedback && (
-          <p className={
-            voucherFeedback.startsWith("❌")
-              ? styles.voucherFeedbackError
-              : styles.voucherFeedbackText
-          }>{voucherFeedback}</p>
-        )}
-      </div>
+      )}
       
       <a 
-        href={`/checkout?package_id=${packageId}&price_type=${resolvedPriceType}&price_mode=${resolvedPricingMode}&pax=${resolvedPax}&total_days=${resolvedTotalDays}&date=${selectedDate}&promo_code=${encodeURIComponent(promoCode.trim())}`} 
+        href={`/checkout?package_id=${packageId}&price_type=${resolvedPriceType}&price_mode=${resolvedPricingMode}&pax=${resolvedPax}&total_days=${resolvedTotalDays}&date=${selectedDate}&promo_code=${encodeURIComponent(
+          (packagePromoCode && promoCode.trim().toUpperCase() === packagePromoCode.trim().toUpperCase() && !isDirectPromo)
+            ? promoCode.trim()
+            : ""
+        )}`} 
         className={styles.availabilityBtn}
         onClick={(e) => {
           if (!selectedDate) {

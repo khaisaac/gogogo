@@ -147,8 +147,10 @@ export async function POST(request: Request) {
       if (package_id && (body.promo_code_applied || body.discount_amount_applied)) {
         const pkgForUpdate = await tx.package.findUnique({ where: { id: package_id } });
         if (pkgForUpdate) {
+          const hasPromoCode = Boolean(pkgForUpdate.promo_code && pkgForUpdate.promo_code.trim() !== "");
+          const effectiveDirectPromo = Boolean(pkgForUpdate.is_direct_promo && !hasPromoCode);
           const isPromoExhausted = pkgForUpdate.promo_usage_limit !== null && pkgForUpdate.promo_usage_count >= pkgForUpdate.promo_usage_limit;
-          const isMatchingCode = body.promo_code_applied === "DIRECT_PROMO" || (body.promo_code_applied && pkgForUpdate.promo_code && body.promo_code_applied.toUpperCase() === pkgForUpdate.promo_code.toUpperCase());
+          const isMatchingCode = (effectiveDirectPromo && body.promo_code_applied === "DIRECT_PROMO") || (hasPromoCode && body.promo_code_applied && body.promo_code_applied.trim().toUpperCase() === pkgForUpdate.promo_code!.trim().toUpperCase());
           
           if (!isPromoExhausted && isMatchingCode) {
             isPromoSuccessfullyApplied = true;

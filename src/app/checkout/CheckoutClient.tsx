@@ -94,13 +94,17 @@ Special/Dietary Requirements: `,
     if (hasPromoCode && initialPromoCode && packagePromoCode && initialPromoCode.trim().toUpperCase() === packagePromoCode.trim().toUpperCase() && !isPromoExhausted) {
       setPromoApplied(true);
       setInputPromoCode(initialPromoCode);
-    } else if (hasPromoCode && !effectiveDirectPromo) {
+    } else if (!effectiveDirectPromo) {
       setPromoApplied(false);
     }
   }, [initialPromoCode, packagePromoCode, isPromoExhausted, hasPromoCode, effectiveDirectPromo]);
 
   const handleApplyPromo = () => {
-    if (!packagePromoCode) return;
+    if (!packagePromoCode || !hasPromoCode) {
+      setError("No voucher code available for this package.");
+      setPromoApplied(false);
+      return;
+    }
     if (inputPromoCode.trim().toUpperCase() === packagePromoCode.trim().toUpperCase()) {
       if (isPromoExhausted) {
         setError("Voucher quota has been exhausted.");
@@ -426,7 +430,7 @@ Special/Dietary Requirements: `,
             <strong>{pax} Adults</strong>
           </div>
 
-          {hasPromoCode && !isPromoExhausted && (
+          {hasPromoCode && !effectiveDirectPromo && !isPromoExhausted && (
             <div className={styles.summaryItem} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '8px', marginTop: '16px', padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px' }}>
               <span style={{ fontWeight: 600, fontSize: '0.9em' }}>Have a voucher code?</span>
               <div style={{ display: 'flex', width: '100%', gap: '8px' }}>
